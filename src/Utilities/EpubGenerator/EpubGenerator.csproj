@@ -15,14 +15,4 @@
     <InternalsVisibleTo Include="EpubGenerator.Test" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="temp\**" />
-    <EmbeddedResource Remove="temp\**" />
-    <None Remove="temp\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
-
 </Project>

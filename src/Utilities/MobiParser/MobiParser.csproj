@@ -1,16 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <AssemblyName>Richasy.RodelReader.Utilities.EpubParser</AssemblyName>
+    <AssemblyName>Richasy.RodelReader.Utilities.MobiParser</AssemblyName>
     <RootNamespace>$(AssemblyName)</RootNamespace>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="EpubParser.Test" />
+    <InternalsVisibleTo Include="MobiParser.Test" />
   </ItemGroup>
 
 </Project>
