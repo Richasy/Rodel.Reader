@@ -2,5 +2,7 @@
   <Folder Name="/Utilities/">
     <Project Path="Utilities/EpubGenerator.Test/EpubGenerator.Test.csproj" Id="8901cd61-8a67-4757-8a6a-48fb9af6d8d2" />
     <Project Path="Utilities/EpubGenerator/EpubGenerator.csproj" Id="fc724acf-dc31-4037-9c88-01eb14ce8a7f" />
+    <Project Path="Utilities/EpubParser.Test/EpubParser.Test.csproj" Id="ef642972-69a8-43f4-bb4a-b275ff6f662d" />
+    <Project Path="Utilities/EpubParser/EpubParser.csproj" Id="21d0369c-7870-4e63-8dba-bee9bd73c5d9" />
   </Folder>
 </Solution>
