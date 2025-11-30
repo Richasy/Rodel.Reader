@@ -10,6 +10,12 @@ namespace Richasy.RodelPlayer.Utilities.EpubGenerator;
 /// </summary>
 internal static class EncodingHelper
 {
+    private static readonly Lazy<Encoding> Gb2312Encoding = new(() =>
+    {
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        return Encoding.GetEncoding("gb2312");
+    });
+
     /// <summary>
     /// 检测流的编码.
     /// </summary>
@@ -28,8 +34,10 @@ internal static class EncodingHelper
         var originalPosition = stream.Position;
         stream.Position = 0;
 
-        Span<byte> bom = stackalloc byte[4];
-        var bytesRead = stream.Read(bom);
+        // 读取更多字节用于编码检测
+        var bufferSize = (int)Math.Min(4096, stream.Length);
+        var buffer = new byte[bufferSize];
+        var bytesRead = stream.Read(buffer, 0, bufferSize);
         stream.Position = originalPosition;
 
         if (bytesRead < 2)
@@ -37,17 +45,31 @@ internal static class EncodingHelper
             return defaultEncoding;
         }
 
-        return DetectEncodingFromBom(bom[..bytesRead], defaultEncoding);
+        var data = buffer.AsSpan(0, bytesRead);
+
+        // 首先检测 BOM
+        var bomEncoding = DetectEncodingFromBom(data, null);
+        if (bomEncoding is not null)
+        {
+            return bomEncoding;
+        }
+
+        // 尝试 UTF-8 无 BOM 验证
+        if (IsValidUtf8(data))
+        {
+            return Encoding.UTF8;
+        }
+
+        // 不是有效的 UTF-8，尝试 GB2312/GBK
+        return Gb2312Encoding.Value;
     }
 
     /// <summary>
     /// 从 BOM 检测编码.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Encoding DetectEncodingFromBom(ReadOnlySpan<byte> bom, Encoding? defaultEncoding = null)
+    public static Encoding? DetectEncodingFromBom(ReadOnlySpan<byte> bom, Encoding? defaultEncoding)
     {
-        defaultEncoding ??= Encoding.UTF8;
-
         if (bom.Length >= 3 && bom[0] == 0xEF && bom[1] == 0xBB && bom[2] == 0xBF)
         {
             return Encoding.UTF8;
@@ -88,6 +110,97 @@ internal static class EncodingHelper
         }
 
         var bomLength = Math.Min(4, data.Length);
-        return DetectEncodingFromBom(data[..bomLength], defaultEncoding);
+        var bomEncoding = DetectEncodingFromBom(data[..bomLength], null);
+        if (bomEncoding is not null)
+        {
+            return bomEncoding;
+        }
+
+        // 尝试 UTF-8 验证
+        if (IsValidUtf8(data))
+        {
+            return Encoding.UTF8;
+        }
+
+        // 回退到 GB2312
+        return Gb2312Encoding.Value;
+    }
+
+    /// <summary>
+    /// 验证字节序列是否是有效的 UTF-8.
+    /// </summary>
+    private static bool IsValidUtf8(ReadOnlySpan<byte> data)
+    {
+        var i = 0;
+        while (i < data.Length)
+        {
+            var b = data[i];
+
+            if (b <= 0x7F)
+            {
+                // ASCII
+                i++;
+            }
+            else if ((b & 0xE0) == 0xC0)
+            {
+                // 2-byte sequence
+                if (i + 1 >= data.Length || (data[i + 1] & 0xC0) != 0x80)
+                {
+                    return false;
+                }
+
+                // 检查过长编码
+                if ((b & 0x1E) == 0)
+                {
+                    return false;
+                }
+
+                i += 2;
+            }
+            else if ((b & 0xF0) == 0xE0)
+            {
+                // 3-byte sequence
+                if (i + 2 >= data.Length || (data[i + 1] & 0xC0) != 0x80 || (data[i + 2] & 0xC0) != 0x80)
+                {
+                    return false;
+                }
+
+                // 检查过长编码
+                if (b == 0xE0 && (data[i + 1] & 0x20) == 0)
+                {
+                    return false;
+                }
+
+                i += 3;
+            }
+            else if ((b & 0xF8) == 0xF0)
+            {
+                // 4-byte sequence
+                if (i + 3 >= data.Length || (data[i + 1] & 0xC0) != 0x80 || (data[i + 2] & 0xC0) != 0x80 || (data[i + 3] & 0xC0) != 0x80)
+                {
+                    return false;
+                }
+
+                // 检查过长编码和范围
+                if (b == 0xF0 && (data[i + 1] & 0x30) == 0)
+                {
+                    return false;
+                }
+
+                if (b > 0xF4)
+                {
+                    return false;
+                }
+
+                i += 4;
+            }
+            else
+            {
+                // 无效的 UTF-8 起始字节
+                return false;
+            }
+        }
+
+        return true;
     }
 }

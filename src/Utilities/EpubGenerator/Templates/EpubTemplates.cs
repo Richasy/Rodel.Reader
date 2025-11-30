@@ -282,23 +282,17 @@ internal static class EpubTemplates
     /// <summary>
     /// 默认样式表.
     /// </summary>
+    /// <remarks>
+    /// 注意：不设置 font-family、color、background-color，让阅读器可以覆写这些属性.
+    /// </remarks>
     public const string DefaultStyleSheet = """
         /* EPUB Default Stylesheet */
-        
-        /* Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        /* 不设置字体、颜色、背景色，让阅读器可以自由覆写 */
         
         /* Body */
         body {
-            font-family: Georgia, "Times New Roman", serif;
             font-size: 1em;
             line-height: 1.6;
-            color: #333;
-            background-color: #fff;
             padding: 1em;
         }
         
@@ -321,7 +315,7 @@ internal static class EpubTemplates
         
         .book-author {
             font-size: 1.2em;
-            color: #666;
+            opacity: 0.7;
         }
         
         /* TOC Page */
@@ -333,8 +327,9 @@ internal static class EpubTemplates
             font-size: 1.5em;
             text-align: center;
             margin-bottom: 1.5em;
-            border-bottom: 1px solid #ccc;
+            border-bottom: 1px solid currentColor;
             padding-bottom: 0.5em;
+            opacity: 0.3;
         }
         
         .toc-list {
@@ -346,7 +341,6 @@ internal static class EpubTemplates
         }
         
         .toc-list a {
-            color: #333;
             text-decoration: none;
         }
         
@@ -397,7 +391,6 @@ internal static class EpubTemplates
         
         /* Links */
         a {
-            color: #0066cc;
             text-decoration: none;
         }
         
@@ -433,7 +426,7 @@ internal static class EpubTemplates
         
         .image-figure figcaption {
             font-size: 0.9em;
-            color: #666;
+            opacity: 0.7;
             margin-top: 0.5em;
             font-style: italic;
         }

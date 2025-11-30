@@ -44,7 +44,7 @@ internal static class StringExtensions
         var needsEncoding = false;
         foreach (var c in value)
         {
-            if (c is '&' or '<' or '>' or '"' or '\'')
+            if (c is '&' or '<' or '>' or '"' or '\'' || IsInvalidXmlChar(c))
             {
                 needsEncoding = true;
                 break;
@@ -60,6 +60,12 @@ internal static class StringExtensions
         var sb = StringBuilderPool.Rent();
         foreach (var c in value)
         {
+            // 跳过无效的 XML 控制字符
+            if (IsInvalidXmlChar(c))
+            {
+                continue;
+            }
+
             _ = c switch
             {
                 '&' => sb.Append("&amp;"),
@@ -72,6 +78,19 @@ internal static class StringExtensions
         }
 
         return StringBuilderPool.ToStringAndReturn(sb);
+    }
+
+    /// <summary>
+    /// 检查字符是否为无效的 XML 字符.
+    /// XML 1.0 规范中有效字符: #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF].
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool IsInvalidXmlChar(char c)
+    {
+        // 无效字符：0x00-0x08, 0x0B, 0x0C, 0x0E-0x1F (除了 TAB=0x09, LF=0x0A, CR=0x0D)
+        // 以及 0xFFFE, 0xFFFF
+        return c < 0x20 && c != '\t' && c != '\n' && c != '\r'
+            || c >= 0xFFFE;
     }
 
     /// <summary>

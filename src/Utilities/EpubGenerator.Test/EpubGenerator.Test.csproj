@@ -6,6 +6,38 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <UseVSTest>true</UseVSTest>
+    <!-- 测试项目禁用文档注释警告和断言样式建议 -->
+    <NoWarn>$(NoWarn);CS1591;CA1707;CA1861;MSTEST0004;MSTEST0032;MSTEST0037</NoWarn>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Moq" />
+    <PackageReference Include="System.Text.Encoding.CodePages" />
+    <PackageReference Include="VersOne.Epub" />
+    <PackageReference Include="coverlet.collector">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EpubGenerator\EpubGenerator.csproj" />
+  </ItemGroup>
+
+  <!-- 测试数据文件 -->
+  <ItemGroup>
+    <None Include="TestData\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!-- 构建前自动生成测试元数据 -->
+  <Target Name="GenerateTestMetadata" BeforeTargets="Build" Condition="Exists('$(ProjectDir)TestData\Input') AND Exists('$(ProjectDir)TestData\Generate-ExpectedMetadata.ps1')">
+    <Message Importance="High" Text="正在生成测试元数据..." />
+    <Exec Command="pwsh -NoProfile -ExecutionPolicy Bypass -File &quot;$(ProjectDir)TestData\Generate-ExpectedMetadata.ps1&quot;" 
+          WorkingDirectory="$(ProjectDir)TestData"
+          IgnoreExitCode="true"
+          ConsoleToMSBuild="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="MetadataOutput" />
+    </Exec>
+  </Target>
 
 </Project>

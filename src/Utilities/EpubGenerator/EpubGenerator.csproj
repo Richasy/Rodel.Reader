@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Text.Encoding.CodePages" />
+  </ItemGroup>
+
+  <ItemGroup>
     <InternalsVisibleTo Include="EpubGenerator.Test" />
   </ItemGroup>
 

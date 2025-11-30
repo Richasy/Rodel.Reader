@@ -133,10 +133,10 @@ public sealed partial class RegexTextSplitter : ITextSplitter
                 }
                 else
                 {
-                    // 添加内容
+                    // 添加内容（使用 \n 统一换行符，避免跨平台差异）
                     if (!string.IsNullOrWhiteSpace(trimmedLine) || !options.RemoveEmptyLines)
                     {
-                        contentBuilder.AppendLine(trimmedLine);
+                        contentBuilder.Append(trimmedLine).Append('\n');
                     }
                 }
             }

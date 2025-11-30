@@ -47,11 +47,11 @@ public sealed class ChapterInfo
     /// <summary>
     /// 生成的文件名（不含扩展名）.
     /// </summary>
-    public string FileName => _fileName ??= string.Create(10, Index, static (span, index) =>
-    {
-        "chapter".CopyTo(span);
-        index.TryFormat(span[7..], out _, "D3");
-    });
+    /// <remarks>
+    /// 格式为 chapter + 索引数字，数字至少 3 位，不足补零.
+    /// 例如: chapter000, chapter001, ..., chapter999, chapter1000, ...
+    /// </remarks>
+    public string FileName => _fileName ??= $"chapter{Index:D3}";
 
     /// <summary>
     /// 获取内容的只读跨度.

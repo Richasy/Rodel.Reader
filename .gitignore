@@ -371,3 +371,7 @@ tools/Prompt.txt
 docs/.vitepress/dist
 docs/.vitepress/cache
 yt-dlp.exe
+
+# EpubGenerator 测试数据（自动生成）
+src/Utilities/EpubGenerator.Test/TestData/Expected/
+src/Utilities/EpubGenerator.Test/TestData/Output/

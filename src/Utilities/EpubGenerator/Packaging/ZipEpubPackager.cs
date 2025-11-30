@@ -24,7 +24,7 @@ internal sealed class ZipEpubPackager : IEpubPackager
     private const string ImagesFolder = "Images";
     private const string FontsFolder = "Fonts";
     private const string TextFolder = "Text";
-    private const string DefaultStyleFileName = "style.css";
+    private const string DefaultStyleFileName = "main.css";
     private const string MimeTypeFileName = "mimetype";
 
     /// <inheritdoc/>
