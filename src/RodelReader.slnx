@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/Utilities/">
+    <Project Path="Utilities/EpubGenerator.Test/EpubGenerator.Test.csproj" Id="8901cd61-8a67-4757-8a6a-48fb9af6d8d2" />
+    <Project Path="Utilities/EpubGenerator/EpubGenerator.csproj" Id="fc724acf-dc31-4037-9c88-01eb14ce8a7f" />
+  </Folder>
+</Solution>
