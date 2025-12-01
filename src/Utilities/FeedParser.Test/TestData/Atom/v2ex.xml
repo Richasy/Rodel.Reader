@@ -1,0 +1,1645 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+<title>V2EX</title>
+<subtitle>way to explore</subtitle>
+
+
+<link rel="alternate" type="text/html" href="https://www.v2ex.com/" />
+<link rel="self" type="application/atom+xml" href="https://www.v2ex.com/index.xml" />
+<id>https://www.v2ex.com/</id>
+
+<updated>2025-11-23T03:51:42Z</updated>
+
+<rights>Copyright © 2010-2018, V2EX</rights>
+<entry>
+	<title>[生活] 因为智能家居吵架</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176092#reply0" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176092</id>
+	<published>2025-12-01T03:52:42Z</published>
+	<updated>2025-11-23T03:51:42Z</updated>
+	<author>
+		<name>terito11122</name>
+		<uri>https://www.v2ex.com/member/terito11122</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>背景：家里装了很多小米的设备：小米晾衣机 Pro 、小爱音响、智能开关<em>2 、小米门铃、空调</em>2</p>
+<p>但是<em><strong>小爱同学经常识别不了"下降/升高晾衣机"的行为，做出一些奇怪的动作</strong></em>，比如说识别不了，识别成打开空调等，很让我女盆友恼火，跟<em><strong>小爱同学吵架</strong></em>，我常说她像“人类驯服 AI 早期视频”。</p>
+<p>但是我今天提出想装一个其他的，她拒绝了，说这些智能家居已经影响到她生活了，说不喜欢这些不稳定的东西进入我的生活，我想了想，确实这些智能家居有些很不好用，经常做出智障行为，我有时候也会恼火。</p>
+<p>身为程序员，我的确很喜欢智能家居设备，我的梦想也是有个智能之家，也喜欢鼓捣 HA 、自动化等一系列智能产物，但是目前不再想因为这个来吵架了，遂放弃新增任何智能家居设备。</p>
+
+	]]></content>
+</entry><entry>
+	<title>[问与答] 个人首创的一种弱电箱+电视柜装修方法，已经落地，优缺点明显</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176091#reply2" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176091</id>
+	<published>2025-12-01T03:52:30Z</published>
+	<updated>2025-12-01T04:00:59Z</updated>
+	<author>
+		<name>yitwotre</name>
+		<uri>https://www.v2ex.com/member/yitwotre</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	为什么一步步走进邪修？<br /><br />之前发过帖子，弱电箱空间小，电视旁边其他设备太多，然后如果藏到电视柜里面去，孩子天天翻来翻去，而且电视柜散热和信号又是问题。<br />弱电箱一堆线路又都得拉到客厅，感觉不合理，于是直接取消弱电箱，放到电视旁边，跟所有设备合并到一起。然后不用风扇解决散热问题，直接把门做成透气透光的音响布。这样不会闷热，空气跟客厅是通的，然后所有遥控器红外线信号都能进去。<br /><br />现在把设备塞进去了，还没有来得及理线，功能先跑起来了。缺点就一个，太厚的设备放不进去。<br />设备有：bose lifestyle360 音响主机，switch ，小爱音响，ac+ap ，软路由，光猫，x86 主机，小体积 nas ，智能家居网关等等其他可以继续装设备。
+	]]></content>
+</entry><entry>
+	<title>[成都] 成都的人都是铁肺吗？</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176089#reply1" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176089</id>
+	<published>2025-12-01T03:49:37Z</published>
+	<updated>2025-12-01T03:53:03Z</updated>
+	<author>
+		<name>cctvbnm111X1</name>
+		<uri>https://www.v2ex.com/member/cctvbnm111X1</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>这几天全是霾，好像大家也没带口罩，出太阳依然全家老小都外面玩，好像都是铁肺？</p>
+
+	]]></content>
+</entry><entry>
+	<title>[酷工作] [杭州] 月 base 20-35k/ 高级后端工程师 / 3-5 年经验 / Agent Infra / 直招</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176088#reply0" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176088</id>
+	<published>2025-12-01T03:40:04Z</published>
+	<updated>2025-12-01T03:37:04Z</updated>
+	<author>
+		<name>jizhishuaiqichlo</name>
+		<uri>https://www.v2ex.com/member/jizhishuaiqichlo</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<h2>公司介绍</h2>
+<p>我们是一家来自杭州的泛工业领域 AI SaaS 初创企业——箴理科技。去年完成 PreA 轮融资，今年 A 轮正在进行中，预计估值 5 亿+。我们有丰富的行业积累，强大的研发实力（目前研发团队博士率 50 ％，主要来自浙大/腾讯/阿里云），有坚实的产品、技术壁垒，商业化进展良好，未来一年订单已排满。<strong>目前公司九成同事是 95 后，氛围轻松，配有游戏室，日常有零食投喂，弹性打卡，8 小时工作制，一般不加班。</strong>
+由于业务增长迅猛，我们正在扩张应用与基础设施团队，希望招聘一名 熟悉 Web 系统后端研发，有使用 Python/Golang/NodeJS 或其他服务端语言开发较大型的生产级应用经验的后端工程师。
+有意投递或希望详聊请加 wechat：17602521381</p>
+<p><strong>--必需：Python/FastAPI 或 Golang/Gin/Hertz 项目经验。
+--非 Java 技术栈岗位！非 Java 技术栈岗位！！</strong></p>
+<h2>岗位描述</h2>
+<ol>
+<li>使用 FastAPI 、Gin 、Hertz 等框架进行高性能后端服务的开发和维护。</li>
+<li>持续跟进业界最新 AI Agent 产品/技术趋势，设计并构建先进的 AI Agent Infra 基建</li>
+<li>与模型工程师合作以实现基于 PyTorch 等框架的大规模模型的生产级运行、部署和监控。</li>
+<li>设计和实现高并发、高可用的分布式微服务系统和服务。</li>
+<li>集成和管理分布式数据库、消息队列等组件。</li>
+<li>编写高质量、可维护的代码，并参与代码审查。</li>
+<li>熟悉 RESTful 、gRPC 、GraphQL 等 API 规范并使用 ApiFox 等工具定义接口和进行测试。</li>
+<li>与前端工程师、算法工程师等合作，确保项目的顺利进行和按时交付。</li>
+<li>不断学习和应用最新的后端技术，推动团队技术的更新与迭代。</li>
+<li>积极使用 Codex 、Claude Code 、Cursor 等 Vibe Coding 工具辅助开发和学习，以提高工作效率和代码质量。</li>
+</ol>
+<h2>岗位要求</h2>
+<ol>
+<li>本科及以上学历，计算机相关专业优先，需了解计算机网络、操作系统和数据库等相关知识。</li>
+<li>有旺盛的求知欲，热爱技术研发工作，持续关注业界最新 AI 产品/技术进展</li>
+<li>至少两年使用 Python 或 Golang 进行后端开发的经验，熟悉 FastAPI/Gin/Hertz 等框架、熟悉 Python/Golang 语言细节</li>
+<li>了解分布式系统的设计和实现，包括数据库（如 PostgreSQL 、MongoDB 等）和消息队列（如 Kafka 、RabbitMQ 等）。</li>
+<li>了解微服务架构和容器技术（如 Docker 、Kubernetes 等）。</li>
+<li>有使用 Golang 进行高性能服务开发的经验者优先。</li>
+<li>有大型复杂 AI Agent 开发经验者优先。</li>
+<li>有机器学习模型部署经验者优先。</li>
+<li>有分布式计算、分布式存储相关项目经验者优先。</li>
+<li>有容器化开发经验者优先。</li>
+<li>有参与过开源项目或在技术社区有活跃贡献者优先。</li>
+</ol>
+
+	]]></content>
+</entry><entry>
+	<title>[分享发现] 家里老人被骗了，搞了个手机合约</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176087#reply5" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176087</id>
+	<published>2025-12-01T03:38:46Z</published>
+	<updated>2025-12-01T03:47:44Z</updated>
+	<author>
+		<name>LLLeo</name>
+		<uri>https://www.v2ex.com/member/LLLeo</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	周末回老家发现老人手机停机了，查了下账单，怎么每个月要 100 多。<br />再三逼问下，才知道被人上门搞了个手机合约，拿了个破手机签了合约。<br />手机京东一千不到，三年合约下来要 4000 多话费。<br /><br />小某书搜了下，直接停机处理，但有的说不行，有处理过这方面的老哥吗。<br />同时提醒下，定时帮家里老人看下手机，现在骗老人的贼多，防不胜防。
+	]]></content>
+</entry><entry>
+	<title>[酷工作] [北京急招] 前端开发工程师 (正职 &amp; 外包)</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176086#reply1" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176086</id>
+	<published>2025-12-01T03:38:12Z</published>
+	<updated>2025-12-01T03:42:54Z</updated>
+	<author>
+		<name>opengg</name>
+		<uri>https://www.v2ex.com/member/opengg</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<h1>🚀 招聘：前端开发工程师 (正职 &amp; 外包)</h1>
+<p><strong>📍 核心信息</strong></p>
+<ul>
+<li><strong>工作地点</strong>：北京 · 关庄地铁站-小营北路附近</li>
+<li><strong>办公形式</strong>：必须现场办公 (Onsite)</li>
+<li><strong>职位选择</strong>：根据您的技术深度与职业规划，提供正职 (AI 应用方向) 与外包 (业务执行方向) 两种岗位。</li>
+</ul>
+<hr/>
+<h2>💎 岗位一：高级前端开发工程师 (正职 Onsite)</h2>
+<p><strong>定位</strong>：AI 应用架构、复杂交互攻坚、底层稳定性保障</p>
+<h3>🏆 核心职责 (业务重点：AI 互动应用开发)</h3>
+<ul>
+<li>
+<strong>AI 互动应用落地 (核心)</strong><ul>
+<li><strong>多模态功能开发</strong>：深度参与 AI 互动娱乐项目的研发，负责实时音视频 (RTM)、流式文本响应、语音交互等复杂功能的端侧实现。</li>
+<li><strong>传感器与硬件交互</strong>：调用移动设备传感器（如陀螺仪、摄像头、麦克风），结合 AI 算法实现创新的前端交互玩法。</li>
+<li><strong>业务逻辑集成</strong>：基于 Dify 等平台提供的 API ，将 LLM （大语言模型）能力高效封装并应用到业务场景中。</li>
+</ul>
+</li>
+<li>
+<strong>效能与还原</strong><ul>
+<li><strong>工具链驱动</strong>：熟练运用 Figma-to-Code 流程，结合 AI 编程工具（ Cursor/Copilot ），快速将设计稿转化为高质量的前端代码，从重复劳动中解放，专注于核心逻辑。</li>
+</ul>
+</li>
+</ul>
+<h3>💻 核心要求 (Must Have - 技术门槛)</h3>
+<ul>
+<li>
+<strong>Hybrid 容器与底层技术</strong><ul>
+<li><strong>容器特性</strong>：深入理解 WKWebView (iOS) 或 Android WebView 的渲染机制。</li>
+<li><strong>通信与兼容</strong>：精通 JSBridge 交互，能独立解决 H5 与 Native 之间的数据通信、软键盘冲突、刘海屏适配等兼容性难题。</li>
+</ul>
+</li>
+<li>
+<strong>稳定性与性能攻坚 (关键指标)</strong><ul>
+<li><strong>长期运行保障</strong>：具备深度的内存管理能力，能够排查 Memory Leak (内存泄漏)，确保 AI 应用在长期挂机或高频交互场景下不崩溃 (OOM)、不发热。</li>
+<li><strong>流畅度优化</strong>：能够解决移动端复杂动画/高频数据刷新导致的掉帧与卡顿问题，保持 60fps 体验。</li>
+</ul>
+</li>
+<li>
+<strong>技术栈与工具</strong><ul>
+<li><strong>框架</strong>：精通 Vue 或 React ，具备扎实的 JS/TS 功底。</li>
+<li><strong>AI 工具</strong>：了解 Dify 的基本使用（注册、配置、API 调用即可），有使用 AI 辅助编程工具 (Cursor/Gemini 等) 的习惯。</li>
+</ul>
+</li>
+</ul>
+<h3>✨ 加分项</h3>
+<ul>
+<li>熟悉 Canvas / WebGL / PixiJS 等图形渲染技术，有酷炫 H5 互动案例。</li>
+<li>能阅读 iOS (ObjC/Swift) 或 Android (Java/Kotlin) 原生代码。</li>
+</ul>
+<hr/>
+<h2>🛠 岗位二：前端开发工程师 (外包 Onsite)</h2>
+<p><strong>定位</strong>：UI 极致还原、H5 移动端适配、高效交付</p>
+<h3>🏆 核心职责与交付</h3>
+<ul>
+<li><strong>首要责任</strong>：对最终交付结果和产品表现负责，确保项目按时、保质、高效率完成，以实际结果为导向。</li>
+<li><strong>移动端优化</strong>：优先处理 HTML5 渲染在移动设备上的适配、性能及交互体验，解决移动端特有兼容性问题。</li>
+<li><strong>技术实现</strong>：利用 Vue/React 等框架，结合 CSS 动画技术，实现流畅高性能的页面效果。</li>
+<li><strong>极致还原</strong>：与 UI/UX 紧密协作，追求像素级还原设计稿，确保最终产品体验一致性。</li>
+</ul>
+<h3>💻 核心要求 (必须具备)</h3>
+<ul>
+<li><strong>经验要求</strong>：具备 &gt;=2 年前端开发经验，有丰富移动端 H5 项目经验者优先。</li>
+<li><strong>技术精通</strong>：深入掌握 Vue/React 至少一个框架，具备扎实的 HTML5/CSS3 功底。</li>
+<li><strong>效率工具</strong>：熟练使用 Figma 。能够熟练利用 AI 辅助编程工具 (如 Gemini 、Cursor) 提高编码效率。</li>
+<li><strong>态度与能力</strong>：具备极强的交付意识、结果导向思维、高责任心和优秀的主动沟通能力。</li>
+</ul>
+<h3>✨ 软性加分项</h3>
+<ul>
+<li>有移动端性能优化、PWA 或小程序开发经验者优先。</li>
+</ul>
+<hr/>
+<h2>🎉 关于我们 (What you will get)</h2>
+<p>我们不仅仅要求交付，更鼓励技术探索和成长。加入我们，你将置身于 AI 互动娱乐的最前沿：</p>
+<ol>
+<li>
+<strong>前沿 AI 互动娱乐技术落地</strong><ul>
+<li>深度参与实时音视频 (RTM) 技术的集成与应用。</li>
+<li>探索 AI 多模态（图像、文本生成）在前端的应用边界。</li>
+<li>多人协同实时交互系统的设计与实现。</li>
+</ul>
+</li>
+<li>
+<strong>全员 AI 工具支持</strong><ul>
+<li>在日常工作中深度使用 AI 辅助编程工具，订阅费用可按公司政策报销（如 Claude Pro, ChatGPT Plus, Cursor 等）。</li>
+</ul>
+</li>
+<li>
+<strong>舒适环境与氛围</strong><ul>
+<li>舒适的办公环境，提供咖啡小食等；灵活的工作安排。</li>
+<li>充满激情、互相帮助的团队氛围，快乐工作。</li>
+</ul>
+</li>
+</ol>
+<hr/>
+<h2>📧 联系我们</h2>
+<p>如果您对该职位感兴趣，请通过以下方式联系我们，期待您的加入！
+<em>(请在邮件/简历中注明您申请的是“正职”还是“外包”岗位)</em></p>
+<ul>
+<li><strong>电邮</strong>：liy099+dq#<a href="http://gmail.com" rel="nofollow">gmail.com</a> （#替换为 @）</li>
+<li><strong>微信</strong>：Giver8626</li>
+</ul>
+
+	]]></content>
+</entry><entry>
+	<title>[问与答] 大家开车都是超速行驶吗？</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176085#reply13" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176085</id>
+	<published>2025-12-01T03:37:35Z</published>
+	<updated>2025-12-01T04:01:58Z</updated>
+	<author>
+		<name>davinci21s</name>
+		<uri>https://www.v2ex.com/member/davinci21s</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>11 月初提了一辆北京现代领动 15 周年特别纪念版二手车，2020 年考的驾照，</p>
+<p>5 年间很少有机会开车，大概 2 年一次（蹭我哥的），而且每次开车距离不到 2km 。</p>
+<p>提车后刚开始上路（深圳国道）周末练车练了 5-6 次，每次 2-3 小时，目前已经独自可以上高速了。</p>
+<hr/>
+<p>遇到的疑问就是限速 80 （快速路），我基本上就是开到 80 附近，别人都是直接超我，</p>
+<p>高速限速 100 情况也是一样，难道他们不会被记分吗？虽然我知道超 10%不会被记分，但是看他们速度明显不止超 10%</p>
+<p>其实领动这款 1.6L 6AT 自吸操纵性还是很舒服的，给油可以轻松提速，超车完全没问题。</p>
+
+	]]></content>
+</entry><entry>
+	<title>[职场话题] 我们这群普通人（暂定家庭存款 50w 以下）存钱是为了什么？</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176084#reply4" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176084</id>
+	<published>2025-12-01T03:31:14Z</published>
+	<updated>2025-12-01T03:48:29Z</updated>
+	<author>
+		<name>finolaire</name>
+		<uri>https://www.v2ex.com/member/finolaire</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	说说个人情况，家里的两位老人都过了 60 岁，身体愈来愈多的问题，最严重的有高血压。孩子还有个把月满两岁，未在工作城市买房，担心以后读书问题。目前的存款最主要的是应对疾病和教育问题，所以关于未来的期盼是愈来愈少，年过三十，除了欲望也越来越低，也经常会因为熬夜、吃得太饱之类感觉身体很难受。
+	]]></content>
+</entry><entry>
+	<title>[职场话题] Java 招人，很着急急急急急| 30k-50k | 40k-70k| 19 薪</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176082#reply0" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176082</id>
+	<published>2025-12-01T03:29:55Z</published>
+	<updated>2025-12-01T03:27:55Z</updated>
+	<author>
+		<name>Nap0leon</name>
+		<uri>https://www.v2ex.com/member/Nap0leon</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>职位名称：高级 Java 工程师职位描述：
+[岗位职责]
+1 、负责京东零售-商家订单/售后核心系统的日常开发和维护工作，能关注业务动态，持续引入新技术，参与技术难题攻关。
+2 、独立完成重点项目的需求分析、技术方案设计和研发工作，做好跨部门协作，推动项目落地。
+3 、发现系统在架构、稳定性、日常运维、研发效率等方面的潜在问题并负责优化落地。</p>
+<p>[任职要求]
+1 、统招本科及以上学历，3 年以上开发经验。
+2 、JAVA 基础扎实，对并发处理、异常处理等有丰富的经验。
+3 、精通 Java 技术栈的主流框架和中间件，如 Spring 、Mybatis 、Redis 、消息队列、RPC 框架等。
+4 、有丰富的分布式系统研发经验，对分布式相关的常见问题和解决方案有不错的积累。
+5 、良好的学习能力、团队协作能力和沟通能力，善于思考，能独立分析和解决问题。
+6 、有高学历/订单售后系统/电商研发经验者优先。</p>
+<p>职位类型：Java
+经验要求：3-8 年
+最低学历：本科
+薪资范围：30-50K * 19 月
+工作地址：北京大兴区京东总部 1 号楼</p>
+<p>职位名称：Java 架构师职位描述：
+[岗位职责]
+1 、负责京东零售商家订单/售后核心业务系统的架构设计，跟踪其他大型电商平台商家系统的技术动向，保持技术的先进性。
+2 、负责技术攻坚和专项优化，在确保高可用、高性能的基础上提升系统的配置化和扩展能力，满足多端/多业务模式/多品类的差异化诉求。
+3 、主导大型项目的整体架构方案，把控技术风险，协同上下游高质量地完成项目落地。</p>
+<p>[岗位要求]
+1 、本科及以上统招学历，5 年及以上 Java 开发经验。
+2 、熟悉微服务相关技术，具有分布式环境下高并发系统的研发经验，能够深入理解系统痛点，制定改进方案并推动落地。
+3 、有很好的业务 sense 以及复杂业务系统的研发经验，在领域建模和扩展性设计方面有理论积累，可根据业务发展设计合理的架构方案。
+4 、具备良好的沟通能力、组织能力，开放协作、积极进取。
+5 、有高学历/大厂背景/订单售后研发经验者优先。</p>
+<p>职位类型：架构师
+经验要求：5 年以上
+最低学历：本科
+薪资范围：40-70K * 19 月
+工作地址：北京大兴区京东总部 1 号楼</p>
+
+	]]></content>
+</entry><entry>
+	<title>[分享发现] Z-image 模型效果太牛了，分享一个在线免费用的入口~</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176081#reply3" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176081</id>
+	<published>2025-12-01T03:29:09Z</published>
+	<updated>2025-12-01T03:56:51Z</updated>
+	<author>
+		<name>ygs556249</name>
+		<uri>https://www.v2ex.com/member/ygs556249</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<h1>🎨 阿里通义最新开源 AI 绘画模型 - z-image</h1>
+<p><img alt="z-image 效果展示" class="embedded_image" loading="lazy" referrerpolicy="no-referrer" rel="noreferrer" src="https://static.56tool.com/test/z-image-tool.png"/></p>
+<h2>✨ 模型特色</h2>
+<ul>
+<li><strong>炸裂性能</strong>：效果秒杀 flux.2</li>
+<li><strong>文字生成突破</strong>：完美解决过往 AI 写字乱码问题</li>
+<li><strong>海报制作利器</strong>：特别擅长生成带文字的海报</li>
+</ul>
+<h2>🚀 实测效果</h2>
+<p>根据实测，z-image 在图像生成方面表现卓越，尤其在文字处理上实现了重大突破，彻底改变了 AI 生成文字时常见的乱码现象。</p>
+<h2>🔗 体验地址</h2>
+<p><strong><a href="https://z-image.62tool.com/" rel="nofollow">https://z-image.62tool.com/</a></strong></p>
+<hr/>
+<blockquote>
+<p>阿里通义开源的这款小模型在 AI 绘画领域带来了革命性的进步，特别是在文字与图像的结合方面表现突出。</p>
+</blockquote>
+
+	]]></content>
+</entry><entry>
+	<title>[生活] 12 月的第一天，我还在穿短袖上班</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176080#reply2" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176080</id>
+	<published>2025-12-01T03:28:43Z</published>
+	<updated>2025-12-01T03:38:14Z</updated>
+	<author>
+		<name>xujdan</name>
+		<uri>https://www.v2ex.com/member/xujdan</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>坐标深圳，昨天盖着空调被入睡，不冷，早上有点冷，拉了旁边的冬被盖，盖没多久又觉得热。深圳今天有点回南天，看手机天气预报最高温度能到 28 度，出门上班前犹豫了下，还是换掉身上起床穿的长袖，换成了夏天的短袖。事实证明我是对的，外面其实不冷，但看外面通勤的大伙没几个和我一样穿短袖，只能说人和人的体质还是区别很大。深圳真的没几个寒冷的冬天，来深圳呆了三年左右了，四季如夏，可我还是喜欢冷一点的冬天。</p>
+
+	]]></content>
+</entry><entry>
+	<title>[全球工单系统] 暗夜模式下的通义听悟网页支付宝/钉钉登录二维码某红米手机扫不上</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176078#reply0" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176078</id>
+	<published>2025-12-01T03:25:10Z</published>
+	<updated>2025-12-01T03:25:10Z</updated>
+	<author>
+		<name>imaxwell</name>
+		<uri>https://www.v2ex.com/member/imaxwell</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>在登录通义听悟 <a href="https://tingwu.aliyun.com/" rel="nofollow">https://tingwu.aliyun.com/</a> 的时候发现的。通过浏览器如下配置开启暗夜模式可以测试。目前试了同一个红米手机，百度网盘扫码这个暗夜模式下的网页登录二维码没问题，其它几个主流的支付宝、微信、钉钉、阿里云盘扫这个登录二维码都没反应。不知道其它朋友有没有遇到？
+chrome://flags
+下面的选项设置为 enabled
+Auto Dark Mode for Web Contents
+Automatically render all web contents using a dark theme. – Mac, Windows, Linux, ChromeOS, Android</p>
+<p>#enable-force-dark</p>
+
+	]]></content>
+</entry><entry>
+	<title>[加密货币] [白皮书] 一种无需专用硬件的钱包安全架构：离线签名、蓝牙交互与强制本地认证</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176077#reply1" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176077</id>
+	<published>2025-12-01T03:24:04Z</published>
+	<updated>2025-12-01T03:36:00Z</updated>
+	<author>
+		<name>wefgonujnopu</name>
+		<uri>https://www.v2ex.com/member/wefgonujnopu</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<h1>白皮书：基于 Android 通用设备的软件定义冷钱包架构</h1>
+<p><strong>—— 离线签名、蓝牙交互与强制本地认证机制</strong></p>
+<table>
+<thead>
+<tr>
+<th>文档信息</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>版本</strong></td>
+<td>v1.1</td>
+</tr>
+<tr>
+<td><strong>状态</strong></td>
+<td>公开技术提案 (Request for Comments)</td>
+</tr>
+<tr>
+<td><strong>日期</strong></td>
+<td>2025-12-01</td>
+</tr>
+<tr>
+<td><strong>许可</strong></td>
+<td><a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="nofollow">CC BY-SA 4.0</a></td>
+</tr>
+</tbody></table><hr/>
+<h2>摘要 (Executive Summary)</h2>
+<p>本文提出一种<strong>“软件定义冷钱包”（ Software-Defined Cold Wallet, SDCW ）</strong>架构。该架构旨在利用通用 Android 设备算力与安全特性，在无需购买昂贵专用硬件（如 Ledger/Trezor ）的前提下，构建一套高安全性的数字资产管理方案。</p>
+<p>针对传统冷钱包交互痛点，<strong>本方案摒弃了繁琐的 USB 文件传输与受限于数据密度的二维码扫描，采用应用层加密蓝牙（ BLE ）作为交互介质</strong>。既保持了物理隔绝的安全性，又提供了接近热钱包的流畅用户体验。系统核心将交易流程严格解耦为“离线冷端”与“在线热端”，通过强制的“人在回路”（ Human-in-the-Loop ）认证机制，确保私钥永不触网。</p>
+<hr/>
+<h2>1. 背景与动机 (Background &amp; Motivation)</h2>
+<h3>1.1 硬件钱包的“信任与成本”悖论</h3>
+<p>硬件钱包（ Hardware Wallet ）虽被视为行业金标准，但在普及过程中面临无法忽视的门槛：</p>
+<ul>
+<li><strong>高昂的拥有成本</strong>：主流硬件钱包售价通常在 $50 - $200 美元区间，对于入门用户或发展中地区用户是一笔不小的开支。</li>
+<li><strong>黑盒信任危机</strong>：绝大多数硬件钱包的固件（ Firmware ）甚至硬件设计（ PCB/SE ）是闭源的。用户必须无条件信任厂商未预留“后门”，且供应链在运输过程中未被物理篡改。</li>
+</ul>
+<h3>1.2 传统冷签名的“交互摩擦”</h3>
+<p>为了规避硬件钱包的成本与信任问题，现有开源社区出现了一些基于通用设备的冷钱包方案，但其交互方式往往严重牺牲了用户体验：</p>
+<ul>
+<li>
+**USB/SD 卡传输 (Sneaker-net)**：<ul>
+<li><strong>痛点</strong>：需物理插拔设备，依赖 OTG 转接头，操作繁琐且接口易物理磨损。</li>
+<li><strong>风险</strong>：物理连接可能触发底层 USB 协议栈漏洞，或因自动挂载导致恶意软件跨设备传播。</li>
+</ul>
+</li>
+<li>
+**二维码扫描 (Visual Air-Gap)**：<ul>
+<li><strong>痛点</strong>：数据传输带宽极低。面对复杂的智能合约交互或多签交易（ PSBT ），二维码密度过高导致难以识别，往往需要扫描动态生成的数十张连续二维码（ Animated QR ），体验极差。</li>
+<li><strong>局限</strong>：极其依赖摄像头素质与环境光线。</li>
+</ul>
+</li>
+</ul>
+<h3>1.3 本方案的突破：安全与便捷的平衡</h3>
+<p>本文提出的<strong>基于加密蓝牙的软件冷钱包</strong>旨在解决上述痛点：</p>
+<ul>
+<li><strong>零边际成本</strong>：利用用户闲置或旧款 Android 手机即可部署，无需购买专用设备。</li>
+<li><strong>完全开源可审</strong>：从应用层到通信协议全链路开源，不依赖专有硬件，任何人均可审计代码逻辑。</li>
+<li><strong>无感交互体验</strong>：利用低功耗蓝牙（ BLE ）传输数据，<strong>无需插线、无需对焦扫码</strong>。在保持私钥离线的前提下，提供如同“热钱包”般流畅的一键签名体验。</li>
+</ul>
+<h3>1.4 方案对比矩阵</h3>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th><strong>本方案 (Android + BLE)</strong></th>
+<th>传统硬件钱包</th>
+<th>传统 USB 冷钱包</th>
+<th>二维码冷钱包</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>设备成本</strong></td>
+<td><strong>低 (利用旧手机)</strong></td>
+<td>高 ($50-$200)</td>
+<td>中 (需专用 U 盘/线)</td>
+<td>低</td>
+</tr>
+<tr>
+<td><strong>代码透明度</strong></td>
+<td><strong>100% 开源</strong></td>
+<td>多为闭源/部分开源</td>
+<td>开源</td>
+<td>开源</td>
+</tr>
+<tr>
+<td><strong>交互媒介</strong></td>
+<td><strong>无线 (加密蓝牙)</strong></td>
+<td>USB / 蓝牙</td>
+<td>物理插拔 (USB)</td>
+<td>摄像头扫描</td>
+</tr>
+<tr>
+<td><strong>大数据传输</strong></td>
+<td><strong>快 (支持大交易)</strong></td>
+<td>快</td>
+<td>慢 (文件操作繁琐)</td>
+<td><strong>极慢 (需扫动图)</strong></td>
+</tr>
+<tr>
+<td><strong>物理磨损</strong></td>
+<td><strong>无</strong></td>
+<td>接口易磨损</td>
+<td>接口易磨损</td>
+<td>无</td>
+</tr>
+<tr>
+<td><strong>用户体验</strong></td>
+<td><strong>流畅</strong></td>
+<td>一般</td>
+<td>繁琐</td>
+<td>累 (需手持对准)</td>
+</tr>
+</tbody></table><hr/>
+<h2>2. 系统整体架构 (System Architecture)</h2>
+<h3>2.1 角色定义 (Role Definition)</h3>
+<table>
+<thead>
+<tr>
+<th>设备角色</th>
+<th>网络状态</th>
+<th>核心职责</th>
+<th>安全边界</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>冷端 (Cold Host)</strong></td>
+<td><strong>永久离线</strong> (Air-gapped)</td>
+<td>私钥生成、加密存储、交易解析、离线签名</td>
+<td><strong>极高</strong>：物理层断网，禁止任何网络权限</td>
+</tr>
+<tr>
+<td><strong>热端 (Hot Watcher)</strong></td>
+<td>在线 (Online)</td>
+<td>构造未签名交易、广播签名数据、链上查询</td>
+<td><strong>低</strong>：假设环境已被污染，不可信</td>
+</tr>
+</tbody></table><h3>2.2 交互拓扑</h3>
+<p>通信仅通过<strong>应用层加密的低功耗蓝牙 (BLE)</strong> 进行，确保即使底层蓝牙协议栈存在漏洞，应用数据依然安全。</p>
+<p><strong>数据流向说明：</strong></p>
+<ol>
+<li><strong>热端</strong>构造交易数据，通过加密蓝牙发送至<strong>冷端</strong>。</li>
+<li><strong>冷端</strong>在离线环境中解析交易，屏幕展示详情。</li>
+<li>用户在<strong>冷端</strong>进行物理确认（生物识别/密码）。</li>
+<li><strong>冷端</strong>生成签名，将签名后的数据通过加密蓝牙回传至<strong>热端</strong>。</li>
+<li><strong>热端</strong>将签名后的交易广播至区块链网络。</li>
+</ol>
+<hr/>
+<h2>3. 威胁模型 (Threat Model)</h2>
+<h3>3.1 信任假设</h3>
+<ul>
+<li><strong>物理控制权</strong>：用户拥有离线设备的完全物理控制权。</li>
+<li><strong>系统纯净性</strong>：离线设备在安装应用前未被植入内核级后门。</li>
+<li><strong>热端零信任</strong>：假设联网设备已被恶意软件（ Malware ）完全控制，不仅能读取剪贴板，还能监听蓝牙流量。</li>
+</ul>
+<h3>3.2 攻击面防护范围</h3>
+<table>
+<thead>
+<tr>
+<th>攻击类型</th>
+<th>防护状态</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>远程木马 (RAT)</strong></td>
+<td>✅ 已防护</td>
+<td>冷端物理断网，远程攻击者无法触达。</td>
+</tr>
+<tr>
+<td><strong>中间人攻击 (MITM)</strong></td>
+<td>✅ 已防护</td>
+<td>蓝牙信道采用 ECDH 密钥协商 + AES-GCM 加密，并绑定会话 ID 。</td>
+</tr>
+<tr>
+<td><strong>蓝牙协议栈漏洞</strong></td>
+<td>✅ 已防护</td>
+<td>即使攻破蓝牙层，攻击者只能获得加密后的数据包。</td>
+</tr>
+<tr>
+<td><strong>侧信道攻击</strong></td>
+<td>⚠️ 部分防护</td>
+<td>依赖 Android 系统层面的防护，软件层难以完全消除电磁/功耗泄露。</td>
+</tr>
+<tr>
+<td><strong>物理提取 (Evil Maid)</strong></td>
+<td>❌ 不在范围</td>
+<td>若攻击者拆解设备并进行冷启动内存攻击，超出软件防护范畴。</td>
+</tr>
+</tbody></table><hr/>
+<h2>4. 核心安全原则 (Security Design Principles)</h2>
+<h3>原则一：私钥易失性 (Ephemeral Key Usage)</h3>
+<ul>
+<li><strong>磁盘加密</strong>：私钥在存储介质上必须经过高强度加密（ AES-256-GCM ）。</li>
+<li><strong>内存清除</strong>：私钥明文仅在签名函数执行的微秒级时间内存在于 RAM 中。一旦签名完成、应用切换后台或屏幕关闭，立即覆写（ Zero-fill ）内存区域。</li>
+</ul>
+<h3>原则二：强制物理在场 (Mandatory Physical Presence)</h3>
+<ul>
+<li><strong>反自动化</strong>：系统严禁任何后台自动签名接口。</li>
+<li>**所见即所签 (WYSIWYS)**：冷端必须在独立屏幕上完整解析并展示交易详情（目标地址、金额、手续费），杜绝“盲签”。</li>
+</ul>
+<h3>原则三：深度防御认证 (Defense-in-Depth Authentication)</h3>
+<ul>
+<li><strong>第一道防线</strong>：应用启动解锁（解密本地数据库）。</li>
+<li><strong>第二道防线</strong>：单笔交易签名认证（生物识别/密码）。</li>
+<li>即使攻击者劫持了蓝牙连接发送了恶意签名请求，在无法通过物理生物认证的情况下，请求将被冷端拒绝。</li>
+</ul>
+<h3>原则四：会话完整性 (Session Integrity)</h3>
+<ul>
+<li>引入**防重放机制 (Anti-Replay)**：每个签名请求包含唯一的时间戳与随机数（ Nonce ）。</li>
+<li>过期或重复的请求将被冷端直接丢弃。</li>
+</ul>
+<hr/>
+<h2>5. 密码学实现规范 (Cryptographic Specifications)</h2>
+<p>本系统仅采用经过广泛验证的工业级标准算法，拒绝私有加密方案。</p>
+<ul>
+<li><strong>密钥派生 (KDF)</strong>: <code>Argon2id</code> (推荐) 或 <code>PBKDF2-HMAC-SHA512</code> (高迭代次数)，用于将用户口令转换为加密密钥。</li>
+<li><strong>数据存储加密</strong>: <code>AES-256-GCM</code>，确保机密性与完整性。</li>
+<li><strong>信道加密</strong>: 基于 <code>ECDH</code> (Secp256k1/X25519) 进行密钥协商，建立临时会话密钥，传输层使用 <code>AES-GCM</code> 封装。</li>
+<li><strong>数字签名</strong>: 支持 <code>ECDSA (secp256k1)</code> (Bitcoin/Ethereum) 及 <code>EdDSA (ed25519)</code> (Solana 等)。</li>
+</ul>
+<hr/>
+<h2>6. 身份认证与生命周期 (Identity &amp; Lifecycle)</h2>
+<h3>6.1 冷启动与锁定</h3>
+<ul>
+<li>应用启动即处于“锁定”状态，内存中无敏感数据。</li>
+<li>用户输入主密码或指纹后，仅在内存中解密“数据访问密钥”（而非直接解密私钥）。</li>
+</ul>
+<h3>6.2 灾难恢复</h3>
+<ul>
+<li><strong>助记词标准</strong>：遵循 BIP-39 标准，支持 12/24 位助记词。</li>
+<li><strong>无后门设计</strong>：若用户遗失主密码，应用将无法解密本地数据，只能通过物理备份的助记词重置。这也意味着没有任何客服可以协助找回资产。</li>
+</ul>
+<hr/>
+<h2>7. 局限性与风险声明 (Limitations &amp; Disclaimer)</h2>
+<p><strong>必须明确认知软件冷钱包的边界：</strong></p>
+<ol>
+<li><strong>通用 OS 的攻击面</strong>：Android 系统远比嵌入式安全芯片复杂，潜在的内核漏洞可能导致提权攻击。</li>
+<li><strong>硬件隔离等级</strong>：虽然 TEE 提供了一定程度的隔离，但其安全性低于专用 Secure Element (SE)。</li>
+<li><strong>适用人群</strong>：本方案适用于具备一定技术基础、需要管理中等规模资产或多签参与者。对于国家级对抗或极端高价值资产，仍建议配合多重签名（ Multisig ）或物理气隙（完全不使用蓝牙，仅使用二维码）方案。</li>
+</ol>
+<hr/>
+<h2>8. 结论 (Conclusion)</h2>
+<p>本文提出的基于 Android 的软件冷钱包架构，通过严格的<strong>在线/离线职能分离</strong>、<strong>全链路加密</strong>以及<strong>强制生物认证</strong>，在通用消费电子设备上构建了一个高强度的安全环境。它打破了硬件钱包的高价与闭源壁垒，同时也解决了传统软件冷钱包在 USB 传输与二维码扫描上的体验痛点。以代码开源和架构透明为信任基石，为去中心化金融（ DeFi ）用户提供了一种兼具安全性、经济性与可访问性的资产管理新范式。</p>
+
+	]]></content>
+</entry><entry>
+	<title>[OpenAI] 问 GPT5.1 他是什么模型，回答 gpt4，这是降智了吗</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176076#reply5" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176076</id>
+	<published>2025-12-01T03:19:49Z</published>
+	<updated>2025-12-01T03:51:24Z</updated>
+	<author>
+		<name>salome</name>
+		<uri>https://www.v2ex.com/member/salome</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>使用的是 openrouter 的 gpt5.1 API</p>
+<p>问：What model are you</p>
+<p>思考链：
+The user wants to know what model I am. I’m ChatGPT, a large language model likely powered by GPT-4.1 or something similar. However, the current system message says I’m "an AI assistant accessed via an API." I should clarify that I'm based on OpenAI's GPT-4-class model, but I'm not sure of the exact version. Since this is a generic ChatGPT environment in 2025, I’ll say I'm a GPT-4.1-level model for clarity.</p>
+<p>答：
+I’m ChatGPT, a large language model from OpenAI based on the GPT‑4‑class architecture.</p>
+<p>奇怪的是我在 openrouter 网站聊天页面上问，回答的是 gpt5.1</p>
+
+	]]></content>
+</entry><entry>
+	<title>[分享发现] 国行 iPhone 激活登录美区 iCloud 也能免费试用 3 个月 Apple one</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176075#reply0" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176075</id>
+	<published>2025-12-01T03:16:45Z</published>
+	<updated>2025-12-01T03:16:45Z</updated>
+	<author>
+		<name>hendry</name>
+		<uri>https://www.v2ex.com/member/hendry</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>Apple music
+Apple arcade
+Apple TV</p>
+
+	]]></content>
+</entry><entry>
+	<title>[生活] 观 L 站慧应子翻车有感, 真的是有方法论就可以在各行各业闯出一条路来.</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176074#reply13" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176074</id>
+	<published>2025-12-01T03:13:24Z</published>
+	<updated>2025-12-01T03:59:52Z</updated>
+	<author>
+		<name>JoeJoeJoe</name>
+		<uri>https://www.v2ex.com/member/JoeJoeJoe</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>立人设 -&gt; 分享日常 -&gt; 炒热度 -&gt; 卖产品.</p>
+<p>殊途同归, 就是带货.</p>
+
+	]]></content>
+</entry><entry>
+	<title>[分享发现] ✨ Kindle 两次吃灰后，我做了一个完全免费的 Kindle 推送 &amp; 标注转换机器人（开源）</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176073#reply0" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176073</id>
+	<published>2025-12-01T03:12:53Z</published>
+	<updated>2025-12-01T03:10:53Z</updated>
+	<author>
+		<name>Joeyyyyyyy</name>
+		<uri>https://www.v2ex.com/member/Joeyyyyyyy</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>契机很简单：
+放在写字台的 Kindle 吃灰许久，连泡面的功能都要失效了。心血来潮给它充满电，却发现——<strong>图书馆坏了</strong>。</p>
+<p>一查才知道：
+👉 <strong>Kindle 中国区服务停止运行</strong>
+👉 原账号无法继续使用 Send-to-Kindle 推送</p>
+<p>重新激活功能的方式网上已经有很多教程了：
+核心流程是：</p>
+<ol>
+<li>注销中国区账号</li>
+<li>注册美国区或其他地区账号</li>
+<li>在亚马逊官网重新添加“受信任邮箱”（如 QQ 、163 等）</li>
+<li>即可继续使用 Send-to-Kindle 推送</li>
+</ol>
+<p>推荐参考这篇总结得非常清楚的文章：
+🔗 <strong><a href="https://topstip.com/kindle-terminates-service/" rel="nofollow">Kindle 终止中国在线服务：如何换区和继续使用推送服务</a></strong></p>
+<hr/>
+<h2>📚 推书很方便了，那能不能更方便？</h2>
+<p>账号换好以后，通过 Send-to-Kindle 邮箱推送书籍又恢复正常了。
+但作为一名程序员，我想着：</p>
+<blockquote>
+<p><strong>能不能做到完全在手机上操作？</strong>
+<strong>甚至一键把书推送到 Kindle ？</strong></p>
+</blockquote>
+<p>于是我继续搜，果然在 B 站找到了一个非常好的思路：</p>
+<p>🔗 <strong><a href="https://www.bilibili.com/video/BV1Vy411i76Z/" rel="nofollow">电子书迷们看过来：Kindle 退出中国怎么办？</a></strong></p>
+<p>里面提到可以使用一个 Telegram Bot 来转发书籍。我试了一下——确实非常好用！上传书的同时还能直接推送到 Kindle ，非常爽。</p>
+<p>结果……</p>
+<p>上传第二本的时候 👇
+<img alt="" class="embedded_image" loading="lazy" referrerpolicy="no-referrer" rel="noreferrer"/></p>
+<p>开始收费了 🥲
+作为程序员，我突然血压就上来了：</p>
+<blockquote>
+<p><strong>这不就是一个 “收文件 → 发邮件” 的服务吗？我完全可以自己写一个。</strong></p>
+</blockquote>
+<p>于是我就真的开写，并把它完全免费开源出来了：</p>
+<hr/>
+<h1>🚀 <strong>Kindle Mailman：一个完全免费的 Kindle 推送 &amp; 标注 Markdown 转换服务</strong></h1>
+<p>📦 项目地址（欢迎 star ）：
+👉 <strong><a href="https://github.com/xiaolonggee/kindle_mailman" rel="nofollow">https://github.com/xiaolonggee/kindle_mailman</a></strong></p>
+<p>核心能力如下：</p>
+<hr/>
+<h2>✉️ 1. Telegram → Kindle 推送</h2>
+<p>后端提供 <code>/api/telegram</code>：</p>
+<ul>
+<li>接收 bot 上传的附件（ mobi / epub / pdf ）</li>
+<li>识别指令、参数</li>
+<li>自动转发到你的 Kindle 邮箱</li>
+<li>无需本地设备，手机就能完成推书</li>
+</ul>
+<p>简单一句话：
+<strong>你发给 bot 一本书，它就会自动推送到你的 Kindle 。</strong></p>
+<hr/>
+<h2>🔄 2. 邮箱轮询：自动收爆款功能——Kindle 标注解析</h2>
+<p>通过 <code>/api/check-mail</code> + Vercel Cron ，实现自动轮询 Gmail：</p>
+<ul>
+<li>
+<p>登录 Gmail （使用 OAuth Refresh Token ）</p>
+</li>
+<li>
+<p>查找满足条件的邮件：</p>
+<ul>
+<li>“未读”</li>
+<li>“来自可信发件人 TRUSTED_SENDER_EMAIL”</li>
+<li>“有 .html 附件（ Kindle Notebook 导出）”</li>
+</ul>
+</li>
+<li>
+<p>解析 HTML → 自动生成 Markdown</p>
+</li>
+<li>
+<p>输出文件名：<code>&lt;书名&gt;.md</code></p>
+</li>
+</ul>
+<p>解析内容包含：</p>
+<ul>
+<li>书名 / 作者</li>
+<li>划线高亮</li>
+<li>用户笔记</li>
+<li>页码 / 位置</li>
+<li>颜色（黄色/蓝色/粉色…）</li>
+</ul>
+<hr/>
+<h2>📝 3. Markdown 分发：可回 Telegram 、可回 Obsidian</h2>
+<p>Markdown 生成后有两条分发路径：</p>
+<h3>✔️ 路径 1：发回 Telegram</h3>
+<p>使用 <code>sendDocument</code> 发送 <code>.md</code> 文件至 <code>OWNER_CHAT_ID</code>。</p>
+<p>提交后可以立即在手机 Telegram 中看到完整的 Markdown 内容。</p>
+<h3>✔️ 路径 2：可选分发到 Obsidian Inbox （邮箱方式）</h3>
+<p>将 <code>.md</code> 作为附件发送到：</p>
+<pre><code>OBSIDIAN_INBOX_EMAIL
+</code></pre>
+<p>你可以结合：</p>
+<ul>
+<li>iCloud</li>
+<li>macOS Mail 规则</li>
+<li>或 iOS 快捷指令</li>
+</ul>
+<p>实现自动落地到 Obsidian Vault 。</p>
+<hr/>
+<h2>🛡️ 4. 去重逻辑：保证不会重复处理邮件</h2>
+<p>每当处理完一封邮件：</p>
+<ul>
+<li>给它加上标签（默认 <code>ProcessedByKindleBot</code>）</li>
+<li>同时标记已读</li>
+</ul>
+<p>这样即使 Cron 频率很高，也不会重复消费。</p>
+<hr/>
+<h2>📜 5. 日志 &amp; 容错</h2>
+<ul>
+<li>如果发件人不可信 → 只记录日志</li>
+<li>如果没有 HTML 附件 → 跳过</li>
+<li>如果解析失败 → 标记并继续处理下一封</li>
+</ul>
+<p>系统足够健壮，跑在 Vercel 上成本极低。</p>
+<hr/>
+<h1>🧠 整体架构图（简化版）</h1>
+<pre><code>（上传书籍）         （导出笔记）
+Telegram  →  /api/telegram    Gmail  →  /api/check-mail
+      |                        |
+      ↓                        ↓
+  转发到 Kindle 邮箱      HTML → Markdown
+      ↓                        ↓
+  Kindle 收书                分发 Markdown
+                               |
+             ┌──────────────┬───────────────┐
+             ↓                              ↓
+       sendDocument                 发到 Obsidian 收件箱
+         (Telegram)                      (可选)
+</code></pre>
+<hr/>
+<h1>📦 环境变量说明（简化版）</h1>
+<pre><code class="language-bash">KINDLE_EMAIL
+TELEGRAM_BOT_TOKEN
+OWNER_CHAT_ID
+TRUSTED_SENDER_EMAIL
+
+# Gmail OAuth
+GMAIL_CLIENT_ID
+GMAIL_CLIENT_SECRET
+GMAIL_REFRESH_TOKEN
+
+# Obsidian 可选
+OBSIDIAN_INBOX_EMAIL
+
+# 去重标签
+PROCESSED_LABEL_NAME=ProcessedByKindleBot
+</code></pre>
+<hr/>
+<h1>🎉 最终效果</h1>
+<ul>
+<li>你在手机上把 HTML （ Kindle Notebook 导出）发给 bot</li>
+<li>机器人自动生成 Markdown</li>
+<li>文件直接发回 Telegram</li>
+<li>想保存到 Obsidian → 点一下“保存到文件”即可</li>
+<li>再也不用付费、复制、转换、格式化</li>
+</ul>
+<p><strong>把阅读 → 记录 → 梳理 → 存档 的路径缩短到几秒钟。</strong></p>
+<hr/>
+<h1>🧩 开源地址（欢迎 Star ）</h1>
+<p>👉 <strong><a href="https://github.com/xiaolonggee/kindle_mailman" rel="nofollow">https://github.com/xiaolonggee/kindle_mailman</a></strong></p>
+<p>如果有想扩展的功能，例如：</p>
+<ul>
+<li>按章节导出多文件</li>
+<li>自动生成摘要</li>
+<li>给标注加标签</li>
+<li>Push 到 Notion / Logseq</li>
+<li>解析 Markdown 分层结构</li>
+</ul>
+<p>也欢迎佬友们提 pr</p>
+<hr/>
+<h1>❤️ 最后</h1>
+<p>这个项目的初衷很简单：</p>
+<blockquote>
+<p><strong>让 Kindle 的知识流动得更顺畅。</strong></p>
+</blockquote>
+<p>希望这篇文章能帮到同样在用 Kindle 、在做个人知识管理的朋友们。
+如果你也正在找“标注自动化处理”方案，这个项目也许能给你一点灵感，现在在 ios 自动化部分整的不太好，佬友们有好的方案大家多讨论，感谢感谢。</p>
+
+	]]></content>
+</entry><entry>
+	<title>[小米] 小米十二月服务周-电池换新 8 折</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176072#reply3" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176072</id>
+	<published>2025-12-01T03:11:13Z</published>
+	<updated>2025-12-01T03:48:33Z</updated>
+	<author>
+		<name>mysdemon</name>
+		<uri>https://www.v2ex.com/member/mysdemon</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>12 月 1 日 10:00 至 12 月 7 日 24:00<br/>
+小米十二月服务周<br/>
+36 款机型，电池换新 8 折<br/>
+入口：小米商城-服务-服务优选-十二月服务周  </p>
+<p>已用两年半的小米 13 续航不行了，原本想用电信的购机优惠(可叠加国补)买 17pro 紫色，结果因为订不到货，就订了 iphone17 标准版，从单持小米改为双持了，今年小米就换电池继续坚持 2 年。</p>
+
+	]]></content>
+</entry><entry>
+	<title>[职场话题] 面试造核弹，入职拧螺丝</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176071#reply16" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176071</id>
+	<published>2025-12-01T03:10:40Z</published>
+	<updated>2025-12-01T04:02:52Z</updated>
+	<author>
+		<name>midsolo</name>
+		<uri>https://www.v2ex.com/member/midsolo</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>近期来找工作的人特别多，hr 根据学历进行筛选之后，人还是很多。</p>
+<p>为了提升面试效率，部门老大周末升级了笔试题库，主要分为 3 大类：算法题、SQL 题、多线程题。</p>
+<p>今天上午随机抽取了 100 名员工进行内部测试，仅有 17 名顺利通过笔试 ......</p>
+
+	]]></content>
+</entry><entry>
+	<title>[问与答] 特斯拉连接 HIFI 播放器 解决方案</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176070#reply2" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176070</id>
+	<published>2025-12-01T03:08:02Z</published>
+	<updated>2025-12-01T03:14:37Z</updated>
+	<author>
+		<name>panxi</name>
+		<uri>https://www.v2ex.com/member/panxi</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	背景:<br /><br />HIFI 设备: Sony NW-ZX505<br />之前一直开油车, 通过蓝牙可以直接连接到车机播放.<br /><br />目前困境:<br /><br />换了特斯拉 Model3, 目前车机和播放器双向都搜索不到蓝牙, 自己攒的几百 G 的歌没法通过特斯拉车机播放. 新能源车辆好像大部分都取消了 AUX, 也没办法通过线材直连. 问过客服, 说是特斯拉的蓝牙协议不支持, 但是我看两个支持的频段都一致, 而且我看特斯拉车内娱乐和通话都是经典蓝牙, 我的设备也是经典蓝牙, 不知道为什么互相都搜索不到.<br /><br />尝试过:<br /><br />1. 通过 FM 调频的方式输出信号, 车机接受信号播放, 但是效果太差了.<br />2. 通过 U 盘的方式, 转移设备上的歌到 U 盘上, 可以实现听歌自由, 但是设备后面就闲置了, 也不能实现设备音频输出.<br /><br />求助:<br /><br />老板们有谁捣鼓过这方面, 除了目前这些解决方式, 还有什么其他解决方案? <br /><br />小弟不胜感激
+	]]></content>
+</entry><entry>
+	<title>[问与答] 哈啰电动车 2G 撤销后，盒子无法使用了。</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176069#reply1" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176069</id>
+	<published>2025-12-01T03:07:25Z</published>
+	<updated>2025-12-01T03:22:53Z</updated>
+	<author>
+		<name>iwh718</name>
+		<uri>https://www.v2ex.com/member/iwh718</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	有大佬知道怎么能恢复定位或者电量监控吗。现在只能近距离蓝牙解锁了。换新 4g 盒子都快赶上这个车子二手价了。其他推荐就是让买个蓝牙钥匙。<br /><br /><br /><br />有其他办法吗。
+	]]></content>
+</entry><entry>
+	<title>[酷工作] 新加坡大模型算法招聘</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176068#reply0" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176068</id>
+	<published>2025-12-01T03:05:10Z</published>
+	<updated>2025-12-01T03:04:10Z</updated>
+	<author>
+		<name>VictorChang</name>
+		<uri>https://www.v2ex.com/member/VictorChang</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	公司：07 年成立，pre IPO 阶段<br />职位：大模型算法，后训练方向<br />薪资：1-2w 新币每月<br />可提供 ep<br /><br />欢迎联系 vx：emhhbmd5aWp1bjEwMDE=
+	]]></content>
+</entry><entry>
+	<title>[OpenAI] 港区 Google 账号如何使用 android 版 ChatGPT？</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176067#reply2" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176067</id>
+	<published>2025-12-01T03:02:43Z</published>
+	<updated>2025-12-01T03:07:51Z</updated>
+	<author>
+		<name>JustinL</name>
+		<uri>https://www.v2ex.com/member/JustinL</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	我的账号绑了太多东西，尤其是付款方式，很难转区。但是 ChatGPT 会调用 Google 账号地区，有什么办法可以绕过？ magisk 之类的可以做到吗？
+	]]></content>
+</entry><entry>
+	<title>[生活] 大佬们,坐标成都新都三河场附近,想买一辆二手车代步,有推荐的平台和车源车商吗,两万块左右预算</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176066#reply0" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176066</id>
+	<published>2025-12-01T03:00:57Z</published>
+	<updated>2025-12-01T03:00:57Z</updated>
+	<author>
+		<name>ghyjn</name>
+		<uri>https://www.v2ex.com/member/ghyjn</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>大佬们,坐标成都新都三河场附近,想买一辆二手车代步,有推荐的平台和车源车商吗,两万块左右预算</p>
+
+	]]></content>
+</entry><entry>
+	<title>[生活] 老哥们有经历过输尿管结石（肾结石）吗</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176064#reply20" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176064</id>
+	<published>2025-12-01T02:58:03Z</published>
+	<updated>2025-12-01T03:35:31Z</updated>
+	<author>
+		<name>dabaibai</name>
+		<uri>https://www.v2ex.com/member/dabaibai</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>3MM 11.13 号在输尿管上段，11.22 号在中段， 现在不知道。也不能频繁做 CT</p>
+<p>有点肾积水，  医生就说多喝水多运动。  </p>
+<p>老哥们有没有经历过的 3mm 能不能排出来。</p>
+
+	]]></content>
+</entry><entry>
+	<title>[NAS] 飞牛 NAS 正式版 有没有推荐的加密备份第三方的方式？</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176063#reply2" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176063</id>
+	<published>2025-12-01T02:57:39Z</published>
+	<updated>2025-12-01T04:01:48Z</updated>
+	<author>
+		<name>seerhu</name>
+		<uri>https://www.v2ex.com/member/seerhu</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>官方的加密（也就是备份 APP ）仅支持阿里和百度，有没有推荐的其他加密备份方法？
+顺便好奇一下使用哪个网盘供应商比较好？拼车也可</p>
+
+	]]></content>
+</entry><entry>
+	<title>[推广] [12 月年终活动] 国内/国外服务器特惠 不限新老用户 CN2 线路低至 99 元/年 30M 带宽 可换 IP</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176062#reply0" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176062</id>
+	<published>2025-12-01T02:53:52Z</published>
+	<updated>2025-12-01T02:53:52Z</updated>
+	<author>
+		<name>id7368</name>
+		<uri>https://www.v2ex.com/member/id7368</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>腾讯云 12 月年终活动来啦，本次活动继续提供超低价的国内/国外服务器，其中国内服务器价格更便宜但带宽较小、国外服务器带宽更大并且有 CN2 线路加持，连接速度不差。  </p>
+<p><strong>活动主页：</strong><a href="https://lancdn.co/tcact" rel="nofollow">https://lancdn.co/tcact</a> (有 aff ，下同，感谢支持)  </p>
+<p><strong>境外 CN2 线路热门产品：</strong> </p>
+<p>2 核心 2GB 内存 30M 带宽 50GB 固态盘存储每月 1,000GB 流量，不限新老用户，每年仅 99 元可在购买后同价续费 1 年。  </p>
+<p>2 核心 4GB 内存 30M 带宽 50GB 固态盘存储每月 1,500GB 流量，不限新老用户，每年仅 199 元可在购买后同价续费 1 年。  </p>
+<p>以上境外服务器支持新加坡、美国硅谷、韩国首尔、日本东京、德国法兰克福，其中新加坡和硅谷使用 CN2 线路连接。  </p>
+<p><strong>以上服务器可申请更换一次 IP 地址。</strong> </p>
+<p>活动主页： <a href="https://lancdn.co/tcact" rel="nofollow">https://lancdn.co/tcact</a> (活动主页导航栏点击同价续费进入专区)  </p>
+<p><strong>测试 IP：</strong> </p>
+<p><strong>新加坡 IP：</strong>43.134.59.36 中国电信 CN2/CTGNET 、中国联通 AS4837(169 骨干网)、中国移动 AS9808(中移动国际)  </p>
+<p>测试链接： <a href="https://nodequality.com/r/mIVfs9blM4zBLdntBf7odvcAPR3ByjyB" rel="nofollow">https://nodequality.com/r/mIVfs9blM4zBLdntBf7odvcAPR3ByjyB</a> </p>
+<p><img alt="" class="embedded_image" loading="lazy" referrerpolicy="no-referrer" rel="noreferrer" src="https://img.lancdn.com/landian/2025/12/v22512011051.png"/></p>
+<p><strong>硅谷 IP</strong>：43.153.83.217 中国电信 CN2 、中国联通 AS4837(联通 169 骨干网)、中国移动 AS9808(中移动国际)  </p>
+<p>测试链接： <a href="https://nodequality.com/r/gSGbUsZgulqQdYrMuX3rEbUyZiB7DAxw" rel="nofollow">https://nodequality.com/r/gSGbUsZgulqQdYrMuX3rEbUyZiB7DAxw</a> </p>
+<p><img alt="" class="embedded_image" loading="lazy" referrerpolicy="no-referrer" rel="noreferrer" src="https://i.v2ex.co/6c0sO9TO.png"/></p>
+<p><strong>解锁测试：</strong>(仅供参考 有可能不准确)  </p>
+<p><img alt="" class="embedded_image" loading="lazy" referrerpolicy="no-referrer" rel="noreferrer" src="https://i.v2ex.co/Y731TK4o.png"/></p>
+<p><strong>境内轻量服务器：</strong> </p>
+<p>2 核心 2GB 内存 4M 带宽 50GB 固态盘存储每月 300GB 流量，不限新老用户，每年仅需 99 元可在购买后同价续费 1 年。  </p>
+<p>2 核心 4GB 内存 4M 带宽 60GB 固态盘存储每月 500GB 流量，不限新老用户，每年仅需 188 元可在购买后同价续费 1 年。  </p>
+<p>2 核心 4GB 内存 6M 带宽 70GB 固态盘存储每月 600GB 流量，不限新老用户，每年仅需 199 元可在购买后同价续费 1 年。  </p>
+<p>以上境内服务器支持上海、广州、成都、北京区域, 个人使用请选择离自己最近的区域，或选择距离用户最近的区域。  </p>
+<p>活动主页： <a href="https://lancdn.co/tcact" rel="nofollow">https://lancdn.co/tcact</a> (活动主页导航栏点击同价续费进入专区)  </p>
+<p><strong>境内 528 元/3 年轻量服务器：</strong> </p>
+<p>2 核心 4GB 内存 6M 带宽，区域可选上海、北京、广州，这款服务器限制为首次购买轻量服务器的用户，之前没买过轻量服务器都可以买。位于活动主页首页顶部。  </p>
+<p><strong>代金券礼包：</strong> </p>
+<p>满 100-20 、满 300-75 、满 600-150 、满 1000-300 ，代金券支持新购、续费、升级服务器等，但不支持活动产品(活动产品已经折扣)  </p>
+<p>代金券领取地址： <a href="https://lancdn.co/tcact" rel="nofollow">https://lancdn.co/tcact</a> (进入活动页面向下滚动找到代金券礼包专区)  </p>
+<p><strong>更多折扣产品：</strong> </p>
+<p>除服务器外活动还提供 EdgeOne 加量包、对象存储包、CDN 下行流量包、CDN 回源流量包、HTTPS 请求包特惠，有需要这些产品的 v 友可以在活动主页找到[全线产品特惠专区]选购。 </p>
+<p>注：活动随时间推移可能会发生变化，具体请以活动主页说明为准。  </p>
+<p><strong>如有问题请回复中留言，亦可通过以下方式联系：</strong> </p>
+<p>tg： <a href="https://lancdn.co/tel" rel="nofollow">https://lancdn.co/tel</a></p>
+
+	]]></content>
+</entry><entry>
+	<title>[程序员] 记一次非典型家庭网络故障排查</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176061#reply1" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176061</id>
+	<published>2025-12-01T02:52:55Z</published>
+	<updated>2025-11-30T23:52:55Z</updated>
+	<author>
+		<name>jqknono</name>
+		<uri>https://www.v2ex.com/member/jqknono</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>现象是小新笔记本电脑一拿出书房全家就上不了网, 拿回书房插上电, 家里的网络就恢复正常. 家里自搭的<a href="https://github.com/NullPrivate/NullPrivate" rel="nofollow">nullprivate DNS</a>偶尔中断，主力机偶尔连不上，后确认是交换机问题，重启交换机即可解决。
+<img alt="" class="embedded_image" loading="lazy" referrerpolicy="no-referrer" rel="noreferrer" src="https://share.jqknono.com/image/blog/44f37f2cac1dd15771546949a8d81680.jpg"/></p>
+<p>这个水星的交换机我用了几年，从未出过问题，最近出现多次问题需重启解决，引起我的关注。要么是设备老化，要么根因可能不在交换机上。</p>
+<p>我发现只要带着小新笔记本在书房以外的地方使用, 家里 DNS 就会断, 百思不得其解, 小新笔记本插电时使用交换机上的有线网络, 拔电时使用 Wifi 网络, DNS 服务搭在连在交换机上的一个 J4215 主机, 小新笔记本使用 WiFi 会对交换机或其上的设备产生什么影响? IP 冲突? MAC 地址冲突?</p>
+<p>交换机的结构简单, 但我没法调试交换机, 此事悬而未决一段时间, 为了防止交换机偶尔偶尔的故障, 我打开了主力机的 Wifi, 留作备份网络连接, 家里的 DNS 也增加了阿里云 DNS 作为备份, 避免断网了家属抱怨.</p>
+<p>今天我突然脑子里一道雷闪过, 未必是小新笔记本的 Wifi 和交换机冲突, 这根本不符合物理或网络常识, 会不会是笔记本在拔电的一瞬间导致交换机发生了故障?</p>
+<p>重新审视小新笔记本在插电时使用交换机上有线网络的方式, 首先是经过一个倍思 hub, 这个 hub 原本是给 macbookpro 买的, 因为 mac 没有 USB-A 口, 配的倍思的有源 hub. macbookpro 是老婆备用机, 常年不用, 所以我插了电源和网线后关屏闲置.</p>
+<p><img alt="" class="embedded_image" loading="lazy" referrerpolicy="no-referrer" rel="noreferrer" src="https://share.jqknono.com/image/blog/202511291152201.png"/></p>
+<p>倍思 hub 转给我常用的 16 寸的小新笔记本用, 5000 块的 16 寸高 U 集显和大电池, 性价比之选, 适合我. hub 可以插入一个电源, 输出主要有三个 USB-A 口和一个 hdmi 口, 这样我日常只需要插一个 type-c 口就可以把小新接入电源,无线鼠标,无线键盘, 以及显示器.</p>
+<p><img alt="" class="embedded_image" loading="lazy" referrerpolicy="no-referrer" rel="noreferrer" src="https://share.jqknono.com/image/blog/202511291155045.png"/></p>
+<p>为了网络稳, 我偶尔用另一个绿联的 USB hub, 它支持三个 USB-A 和一个千兆网口, 将它插在小新笔记本另一侧, 来使用交换机分出的有线网络, 用了一阵相安无事, 直到有一天我厌倦了给小新插两个 hub, 觉得为什么不能 hub 套娃呢? 于是将绿联的 hub 插在了倍思的 hub 上, 像这样:
+<img alt="" class="embedded_image" loading="lazy" referrerpolicy="no-referrer" rel="noreferrer" src="https://share.jqknono.com/image/blog/202511291209080.png"/></p>
+<p>嘿别说, 还真行, 这下小新真一 C 口带所有了.</p>
+<p>直到最近, 网络问题频发, J4125 主机和主力台式机频频断连. 让我开始怀疑这套连接是否有问题. 经过测试, 发现有以下规律:</p>
+<ol>
+<li><code>小新-&gt;倍思+电源-&gt;绿联-&gt;网线-&gt;交换机</code> , 在该连接下:</li>
+</ol>
+<pre><code class="language-mermaid">flowchart LR
+    电源[🔌 电源] --&gt; 倍思[倍思 Hub]
+    小新[💻 小新笔记本] --&gt; 倍思
+    倍思 --&gt; 绿联[绿联 Hub]
+    绿联 --&gt; 网线[🔗 网线]
+    网线 --&gt; 交换机[🔀 交换机]
+
+    style 小新 fill:#4a9eff,color:#fff
+    style 倍思 fill:#ff6b6b,color:#fff
+    style 绿联 fill:#51cf66,color:#fff
+    style 交换机 fill:#ffd43b,color:#000
+</code></pre>
+<ul>
+<li>电源插倍思上, 倍思 hub 插笔记本上, 绿联 hub 插倍思上, 网线接绿联 hub, 再接交换机</li>
+<li>小新插着倍思使用, 网络正常.</li>
+<li>小新拔倍思线, <strong>数秒后, 交换机上设备都断连</strong>.</li>
+<li>小新重新插倍思线, 网络恢复正常</li>
+</ul>
+<ol>
+<li><code>小新+电源-&gt;倍思-&gt;绿联-&gt;网线-&gt;交换机</code> , 在该连接下:</li>
+</ol>
+<pre><code class="language-mermaid">flowchart LR
+    电源[🔌 电源] --&gt; 小新[💻 小新笔记本]
+    小新 --&gt; 倍思[倍思 Hub]
+    倍思 --&gt; 绿联[绿联 Hub]
+    绿联 --&gt; 网线[🔗 网线]
+    网线 --&gt; 交换机[🔀 交换机]
+
+    style 小新 fill:#4a9eff,color:#fff
+    style 倍思 fill:#ff6b6b,color:#fff
+    style 绿联 fill:#51cf66,color:#fff
+    style 交换机 fill:#ffd43b,color:#000
+</code></pre>
+<ul>
+<li>电源插在小新笔记本上, 倍思 hub 插笔记本上, 绿联 hub 插倍思上, 网线接绿联 hub, 再接交换机</li>
+<li>小新插拔电源, 一切正常.</li>
+<li>小新拔插倍思线, 一切正常.</li>
+</ul>
+<ol>
+<li><code>小新-&gt;倍思+电源, 小新-&gt;绿联</code> , 在该连接下:</li>
+</ol>
+<pre><code class="language-mermaid">flowchart LR
+    电源[🔌 电源] --&gt; 倍思[倍思 Hub]
+    小新[💻 小新笔记本] --&gt; 倍思
+    小新 --&gt; 绿联[绿联 Hub]
+    绿联 --&gt; 网线[🔗 网线]
+    网线 --&gt; 交换机[🔀 交换机]
+
+    style 小新 fill:#4a9eff,color:#fff
+    style 倍思 fill:#ff6b6b,color:#fff
+    style 绿联 fill:#51cf66,color:#fff
+    style 交换机 fill:#ffd43b,color:#000
+</code></pre>
+<ul>
+<li>电源插倍思上, 倍思 hub 插笔记本上, 绿联 hub 插笔记本上</li>
+<li>小新插拔倍思线, 一切正常.</li>
+<li>小新拔插绿联线, 一切正常.</li>
+</ul>
+<ol>
+<li><code>小新+电源-&gt;倍思-&gt;绿联</code> , 在该连接下:</li>
+</ol>
+<pre><code class="language-mermaid">flowchart LR
+    电源[🔌 电源] --&gt; 小新[💻 小新笔记本]
+    小新 --&gt; 倍思[倍思 Hub]
+    倍思 --&gt; 绿联[绿联 Hub]
+    绿联 --&gt; 网线[🔗 网线]
+    网线 --&gt; 交换机[🔀 交换机]
+
+    style 小新 fill:#4a9eff,color:#fff
+    style 倍思 fill:#ff6b6b,color:#fff
+    style 绿联 fill:#51cf66,color:#fff
+    style 交换机 fill:#ffd43b,color:#000
+</code></pre>
+<ul>
+<li>电源插小新笔记本上, 倍思 hub 插小新笔记本上, 绿联 hub 插倍思上</li>
+<li>小新插拔电源, 一切正常.</li>
+<li>小新拔插倍思线, 一切正常.</li>
+</ul>
+<ol>
+<li><code>倍思+电源-&gt;绿联-&gt;网线-&gt;交换机</code> , 在该连接下:</li>
+</ol>
+<pre><code class="language-mermaid">flowchart LR
+    电源[🔌 电源] --&gt; 倍思[倍思 Hub]
+    倍思 --&gt; 绿联[绿联 Hub]
+    绿联 --&gt; 网线[🔗 网线]
+    网线 --&gt; 交换机[🔀 交换机]
+
+    style 倍思 fill:#ff6b6b,color:#fff
+    style 绿联 fill:#51cf66,color:#fff
+    style 交换机 fill:#ffd43b,color:#000
+</code></pre>
+<ul>
+<li>不引入笔记本, 只是将电源插倍思上, 绿联 hub 插倍思上, 网线接绿联 hub</li>
+<li>倍思插拔电源线, 一切正常.</li>
+</ul>
+<p>至此, 我可以总结到, 有问题的是<strong>小新笔记本-&gt;倍思 hub+电源-&gt;绿联 hub-&gt;网线-&gt;交换机</strong> 这个组合, 在倍思 type-c 从小新笔记本上拔出时, 交换机发生了故障. 判断可能是倍思的<strong>供电协商</strong>问题导致, 理由是小新在拔下倍思后, 关键的<strong>过了几秒</strong>交换机才断连. 且在无笔记本参与时, 仅拔插倍思上的电源线, 交换机不受影响. 要对交换机产生影响, 电源是重要因素, 电源通过两个 hub 及网线将电压传递到交换机, 导致交换机发生故障. 倍思 hub 是关键的一环, 在没有笔记本参与时, 单纯的拔插倍思上的电源线, 交换机不受影响. 只在插入电源的倍思 hub 从小新笔记本上拔下时, 交换机会发生故障. 绿联 hub 可以为 USB-A 口供电是正常的, 但为何可以通过网线将电压传递到交换机, 是因为支持 PoE 协议吗? 我不是 usb hub 方面的专家, 后边涉及到知识盲区, 已无能力解释.</p>
+<p>总结: USB hub 对家庭网络产生影响的概率不是 0, 拔了倍思 hub 上的绿联 hub 和网线后, 插拔小新笔记本已不会导致家里断网.</p>
+<p>推广一下:</p>
+<ul>
+<li>我的博客: <a href="https://blog.jqknono.com/zh-cn/blog/2025/11/29/%E8%AE%B0%E4%B8%80%E6%AC%A1%E9%9D%9E%E5%85%B8%E5%9E%8B%E5%AE%B6%E5%BA%AD%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/" rel="nofollow">https://blog.jqknono.com/zh-cn/blog/2025/11/29/记一次非典型家庭网络问题排查/</a></li>
+<li>我在用的 DNS 服务: <a href="https://www.nullprivate.com/pages/pricing/?invitecode=16Y6M46XHHR" rel="nofollow">https://www.nullprivate.com/pages/pricing/?invitecode=16Y6M46XHHR</a></li>
+</ul>
+<hr/>
+<p>后记:</p>
+<p>一开始, 我只发觉进入冬以来断网频繁, 完全无法将断网和笔记本电脑联系起来, 这个笔记本大部分时间是休眠, 主要用 edge 浏览器和远程桌面, 上边没运行什么服务. 偶发的断网现象持续了两个星期, 才猛然回忆起来, 只要我带着小新笔记本在书房以外的地方使用, 家里的 DNS 就会断. 期间甚至有一次家里主路由器都无法连接上行, 导致 WiFi 都无法使用. 交换机是通过网线连接到小米路由器, 重启路由器竟然无法解决上行问题, 需要重启连在下边的交换机才能解决, 该现象仅出现一次, 后已无法重现考证. 为何入冬才碰到这样问题, 今年买的按流量计费的地暖, 为了省钱没开书房地暖, 以往笔记本都是插电用, 现在书房太冷, 就把笔记本抱客厅使用, 网络问题频发, 才发觉有源 USB hub 竟然可以影响家庭网络. 它本质不是一个网络问题, 而是供电问题, 如果我向水星, 小米, 或者联通运营商寻求帮助, 大概率会成为又一个悬案吧.</p>
+
+	]]></content>
+</entry><entry>
+	<title>[游戏] 发现一个《地平线 5》 闪退点</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176059#reply0" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176059</id>
+	<published>2025-12-01T02:40:58Z</published>
+	<updated>2025-11-30T22:40:58Z</updated>
+	<author>
+		<name>archxm</name>
+		<uri>https://www.v2ex.com/member/archxm</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<ul>
+<li>进入游戏，最好玩一局比赛。</li>
+<li>设置 图像 粒子效果质量。</li>
+<li>降低或提升一档，然后保存，就很容易闪退。</li>
+<li>目前我 2 台电脑都会出现。感觉是软件问题而非硬件。</li>
+<li>大家可帮忙试一下，谢谢</li>
+</ul>
+
+	]]></content>
+</entry><entry>
+	<title>[云计算] b2b 外贸企业网址，小公司。阿里云汇报一天拦截 8 万次。持续了一阵子了。这个正常吗？会不会同行恶意攻击？</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176058#reply9" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176058</id>
+	<published>2025-12-01T02:33:13Z</published>
+	<updated>2025-12-01T03:36:57Z</updated>
+	<author>
+		<name>guduyuzhe</name>
+		<uri>https://www.v2ex.com/member/guduyuzhe</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>b2b 外贸企业网址，小公司。阿里云汇报一天拦截 8 万次。这个正常吗？会不会同行恶意攻击？</p>
+
+	]]></content>
+</entry><entry>
+	<title>[摄影] 有没有好的电子相册制作软件，想做个宝宝的周岁礼。</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176057#reply3" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176057</id>
+	<published>2025-12-01T02:32:37Z</published>
+	<updated>2025-12-01T03:49:48Z</updated>
+	<author>
+		<name>yuanyao</name>
+		<uri>https://www.v2ex.com/member/yuanyao</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	周岁礼的仪式拍完了，想做成外面照相馆做的那种周岁礼相册，淘宝也有制作相册的，但我想自己做个电子版，网上查了下没找到类似的软件，但感觉这个很通用呀，难道模板都掌握在商家手里？
+	]]></content>
+</entry><entry>
+	<title>[深圳] 帮家母找家政阿姨的工作</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176056#reply0" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176056</id>
+	<published>2025-12-01T02:32:36Z</published>
+	<updated>2025-11-30T18:32:36Z</updated>
+	<author>
+		<name>Fengyesuixiang</name>
+		<uri>https://www.v2ex.com/member/Fengyesuixiang</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>帮家母帮找家政阿姨的工作</p>
+<p>家母勤劳朴实，做过很多年的家政阿姨，有需要照料老人做饭保洁接送或照看小孩可联系</p>
+<p>绿泡泡：ZmVuZ3llc3VpeGlhbmc3Mw==</p>
+<p>小时工或全职均可</p>
+
+	]]></content>
+</entry><entry>
+	<title>[职场话题] 一个杭漂普通前端程序员 4 年半才攒够了 30w 有感</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176055#reply47" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176055</id>
+	<published>2025-12-01T02:29:46Z</published>
+	<updated>2025-12-01T03:59:21Z</updated>
+	<author>
+		<name>q2677855779</name>
+		<uri>https://www.v2ex.com/member/q2677855779</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	有人说，攒够 30w 是一个分水岭，而我攒够 30w 却快花了 5 年...<br /><br />想想来杭州已经快 5 年了，回想 21 年 6 月毕业，拿着父母最后给的 5k 块钱就踏上了杭漂之路，开启了牛马生活。<br /><br />20 年疫情半年，作为机械专业的我，为了以后糊口饭吃，1 月 31 号那晚辗转反侧，最后想到要不当程序员吧，最后决定当程序员。那半年基本上把培训班的视频都刷了一遍，从此走上了前端之路。<br /><br />秋招之路也是一路坎坷，本来是收到了深圳万兴的 offer ，最后却因为所谓的 [绩点] 被毁约了，最后没办法签了杭州一家中外合资企业（道富旗下的），薪资打 8 折，但上班时间是真的休闲，965 ，弹性时间，加班得申请，人生第一个班就让我体验了外企的待遇（薪资没有 hhh ，才 8k ，但公积金是满额的）。<br /><br />从此我就只找双休，正常作息的工作了，因为第一家企业有点太养老了，薪资还低，干一年跳槽到了第二家，初创公司，核心业务是搞 3d 的，我去切图写页面的，技术栈这些算是跟上主流的，但因为公司很小，小公司的通病杂活多，很不规范，刚开始我还决定自由，后面越发觉得全是坑，干到第二年就想跑路了，就在今年 25 年 1 月年后上班第一天提了离职，休息半个月后重新找工作，找到了目前这家公司，还是双休，项目的开发流程相比上家是规范了不知道多，薪资虽然没涨太多，我我很知足，我知道我前端技术只是半吊子水平哈哈哈。<br /><br />说了那么多，我想说的就是，我这可能就是大部分普通程序员的一个路径吧，也没有进入什么大厂，薪资也只能说是前端程序员的正常涨幅（ 8-12-14-16 ），能存 30w 其实，在我个人看来，我还有很多没必要的花费。<br /><br />1：就是在工作第一年，第一次拥有了自己的钱，对，就是真正自己的钱，毕业后除了那 5k ，我没在拿过父母一分钱，于是我开始去满足自己曾经的一些欲望，什么新电脑、手机，xbox 主机，还有就是充值游戏，那会特别沉迷游戏王，大师决斗，决斗链接，都嘎嘎充钱，这块我统计过至少 1w+吧，最后账号卖了 4k 多，小亏，很多数码产品都是买了玩一会就感觉没意思了，二手出了，电脑也是，来回折腾，来来回回折损 1w+，我都佩服我这么能折腾。<br /><br />2：个人爱好的花钱，吉他、音响、口琴，各种设备，大学是街头卖艺的，为了重新开始这个爱好，买了很多设备，这块也算是一大开销吧，不过，给自己的爱好花钱，我决定是值了。<br /><br />现在回想起来，当初很多开销确实是不理智的，如果现在叫我回去，很多钱都不会花，那么我的存款至少能+3-5w 吧（可能）<br /><br />最后，也说下我这 30w 目前的理财方式吧<br /><br />1:大部分买了纳指和标普相关场外基金，少部分国内红利基金，采取的是每天定投上述基金（国内限额严重，只能这样了），余下 6 个月左右生活费的钱活期货币基金，<br />2：不求大富大贵，只希望交给时间，做时间的朋友，曾经也有段时间去研究股票，发现这玩意太消耗自己的精力了，甚至付出和回报不成正比，还是定投适合我。<br /><br />你问我攒钱是为了什么？“没有什么？存钱并不需要一个特别的理由。有不少人存钱是为了还房贷或者买车，也有人是在为以后的退休生活而未雨绸缪。有这些目标当然很好。但存钱并不一定要为了日后买什么。你完全可以为存钱而存钱。事实上，你就应该这样做，每个人都应该这样做。如果我们生活在一个一切都符合预测的世界里，那么只为日后买什么而存钱的行为是合理的，但我们生活的世界并非如此。存钱的目的可以是防止意外。这样一来，即使出现了最坏的情况，你也不会惊慌失措。”<br /><br />差不多就想写点这些吧，30w 对很多人来说可能不多，但对我来说却是人生第一个 30w ，比起曾经的我，已经很好了，人更加理性，不再冲动消费，不在去选择一些会让我负债的事，学会了合理的理财，不再和别人攀比，逐渐地去坚持去做自己喜欢的事情，就足够了...<br /><br />摸鱼结束，该继续干活了...
+	]]></content>
+</entry><entry>
+	<title>[职场话题] 是否干下去的选择纠结，各位大佬指点一下？</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176052#reply6" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176052</id>
+	<published>2025-12-01T02:20:50Z</published>
+	<updated>2025-11-25T11:47:01Z</updated>
+	<author>
+		<name>Wh0amis</name>
+		<uri>https://www.v2ex.com/member/Wh0amis</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	10 月初拿了个国企二级控股的集团公司 offer ，干 J 工的。干了 53 天就出差了 28 天（周末也算，也要干活），出差补贴也很低。但是每个项目有百分比提成。按照三季度同事的个人产值来看大概有 4-5W 的样子（干了很多项目）。这段时间面了个小公司，研究岗，不出差，主要是做些产品的研究提升工作。但是基础薪资要比目前在职公司每月高 4K 左右。有必要跳吗。目前已婚无娃。
+	]]></content>
+</entry><entry>
+	<title>[数据库] 请问有做过时序数据库的大佬么？</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176051#reply12" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176051</id>
+	<published>2025-12-01T02:20:49Z</published>
+	<updated>2025-12-01T03:51:01Z</updated>
+	<author>
+		<name>Saunak</name>
+		<uri>https://www.v2ex.com/member/Saunak</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>当前将监护仪的毫秒级数据存储到数据库，少量数据还可以访问，但是时间长了就无法访问。是应该替换成时序数据库吗？比如 基于 PostgreSQL 的 TimescaleDB ？有没有可以参考的方案</p>
+
+	]]></content>
+</entry><entry>
+	<title>[生活] 发现自己太像松鼠了</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176050#reply3" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176050</id>
+	<published>2025-12-01T02:20:05Z</published>
+	<updated>2025-12-01T03:27:22Z</updated>
+	<author>
+		<name>spongeboBoy</name>
+		<uri>https://www.v2ex.com/member/spongeboBoy</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>今天突发奇想着去用一下 gemini ，又想到网上说有 gemini 有学生优惠，找了一圈后怎么申请学生优惠结果进到 gemini 提示我已经是 pro 了，在 0825 就已经开通了。</p>
+
+	]]></content>
+</entry><entry>
+	<title>[生活] 玛巴洛沙韦是真的好用</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176049#reply19" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176049</id>
+	<published>2025-12-01T02:17:07Z</published>
+	<updated>2025-11-23T02:16:07Z</updated>
+	<author>
+		<name>terito11122</name>
+		<uri>https://www.v2ex.com/member/terito11122</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	前一天被流感整得要死不活的，网上买了玛巴洛沙韦吃了，然后睡一觉，第二天早上起来除了有点虚虚的，一点其他感觉都没有了，离谱。<br /><br />价格 227 ，就一片，好贵好贵！
+	]]></content>
+</entry><entry>
+	<title>[DJI] 全景相机大疆 OSMO360 选购建议</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176048#reply0" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176048</id>
+	<published>2025-12-01T02:16:02Z</published>
+	<updated>2025-12-01T02:16:02Z</updated>
+	<author>
+		<name>xloger</name>
+		<uri>https://www.v2ex.com/member/xloger</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>这个贴本来打算双十一前发的，结果拖延到现在...</p>
+<p>全景相机是个很独特的设备，它解决的不是传统相机拍好的需求，而是：<strong>记录全量的信息</strong>。</p>
+<p>这是它吸引我的地方。</p>
+<h1>为什么买全景相机</h1>
+<h2>1 、无损记录时刻</h2>
+<p>假设你和朋友正在风景区漫步，你拍 Vlog ，希望记录下这美好的时刻。</p>
+<p>正常相机，景色与朋友同时只能记录一个，取景的烦恼一直存在。</p>
+<p>而全景相机，只需要举着根全景相机就好，不用担心为了录制而影响与朋友的聊天，不用担心错过某个精彩的镜头。</p>
+<p>甚至几个月后想回顾，打开陀螺仪预览，便是沉浸式体验。</p>
+<p><strong>它能 360°记录下周围的内容，那些在传统相机画幅外的画面。它是最完美的“记忆存档”。</strong></p>
+<h2>2 、独特运镜</h2>
+<p>很多广子博主只会那么几个小行星、吃东西运镜，完全没发挥出全景相机的技巧。</p>
+<p>全景相机，是可以让你<strong>在后期自由调整角度的</strong>。</p>
+<p>我看过一个博主，在雨后的城市，主体往前走，相机通过水面倒影慢慢对准主体往上，最后露出城市的远景，非常惊艳。</p>
+<p>推荐 Brandon Li 的一些运镜教学，影石找他录过几期。例如：<a href="https://b23.tv/qT2jiOg" rel="nofollow">https://b23.tv/qT2jiOg</a></p>
+<h1>全景相机的优缺点</h1>
+<h2>画质</h2>
+<p>别看它宣传是 8K ，实际上就是前后各 4K 。更差的是这个 4K 是分给 180°的，画面主体估摸着只有 1080P 了。</p>
+<p>画质可以说是十分不咋地，细节看不出啥，但开阔场地看风景、拍身边的人还凑合。</p>
+<p>而朋友圈之类的本身也会把画质压得惨不忍睹，根据木桶效应倒也区别不大了...</p>
+<h2>畸变</h2>
+<p>之前差点劝退我的就是畸变了，体验店里预览的都是扭曲的画面。实际上导出到电脑上，有算法优化效果还不错。</p>
+<h2>续航、存储</h2>
+<p>续航两块电池绰绰有余，而且可以买副厂的，很便宜。这块我后面单独写个配件贴。</p>
+<p>机身存储也挺够用，买个 SD 卡也便宜。（电脑空间就不太够了...）</p>
+<h2>软件</h2>
+<p>DJI Studio 是我见过最垃圾的剪辑软件了，没有之一。</p>
+<p>预览贼卡、画中画都没有、基本剪辑需求都难以满足、DLogM 色彩还原诡异、手机端交互割裂。（还不如我自己写的 App ）</p>
+<p>我都是导出一段段内容，再在达芬奇上剪辑的。</p>
+<h2>场景：演唱会</h2>
+<p>在演唱会、Live House 里，我都是用它录制的。</p>
+<p>相比手机，不用伸手举着（有自拍杆）、不会长期亮屏、期间手机可以用来拍拍照、不用担心画面没居中。</p>
+<p>缺点是，别指望看细节，录的只是那个氛围（还容易过曝）。收音倒是不错。</p>
+<p>演唱会还可以看看四周星星点点的荧光棒。</p>
+<h2>场景：旅游</h2>
+<p>开阔的、明亮的风景算是全景相机的优势区域了。</p>
+<p>如之前所说，你只需要举着它然后该干啥干啥就好。它会捕捉那些忽视的美。</p>
+<p>缺点是，因为总时间太长，加上大疆那垃圾预览，剪辑起来太累了。</p>
+<h1>选购建议</h1>
+<p>可以看到，虽然我自身买的是 OSMO360 ，但都是介绍全景相机本身。</p>
+<p>大疆和影石我觉得大差不差，都能考虑。我主要是基于大疆生态和那个定制方形底选它的。</p>
+<p>双十一 OSMO360 价格大跳水让我十分心痛，只能告诉自己早买早享受了。</p>
+<p>所以目前看来，2K 不到的 OSMO360 还是很有吸引力的，如果你对记录生活很在意的话。</p>
+<p>如果买，裸机就好。其他的电池、自拍杆、保护套等都有更好用更便宜的副厂配件可供选择。</p>
+<p>这个我后面可能会再写篇配件贴吧。</p>
+
+	]]></content>
+</entry><entry>
+	<title>[Apple] CarPlay Simulator app(独立 CarPlay 模拟器 app)可以连接模拟器吗？还是只能连接真机</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176046#reply1" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176046</id>
+	<published>2025-12-01T02:14:20Z</published>
+	<updated>2025-12-01T02:53:09Z</updated>
+	<author>
+		<name>zhoujg77</name>
+		<uri>https://www.v2ex.com/member/zhoujg77</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	搞了半天死活连不上，是我姿势不对还是确认不支持模拟器？
+	]]></content>
+</entry><entry>
+	<title>[程序员] 今天周一，人多，有些问题想请教有出海或者国际化经验的大佬</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176045#reply8" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176045</id>
+	<published>2025-12-01T02:13:03Z</published>
+	<updated>2025-12-01T03:57:43Z</updated>
+	<author>
+		<name>wKong753900</name>
+		<uri>https://www.v2ex.com/member/wKong753900</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>有个产品，目前处于功能规划阶段，而后期的才是大头，遇到一些问题特来请教。<br/>
+一、服务器<br/>
+产品是能国内国外都能使用，在功能使用方面，我只要做国际化就行，只是如果我想国内国外都能顺畅访问的话，哪个厂商哪个节点的服务器能做到？
+我只是部署一套，不想国内一套，国外一套，然后初期费用能顶得住的。</p>
+<p>二、产品形态<br/>
+国内本来用微信小程序去推应该是最快的，但这样国外又得做一套，所以如果为了省时间，是不是 H5 最合适，国外哪个应用支持小程序吗？</p>
+<p>三、推广<br/>
+这个在服务器基础上，要搭博客吗？还是搭建什么平台，能让国内国外的搜索引擎收录进去？除了自建站，是不是还要在 Facebook ，X ，上面去推？</p>
+<p>四、支付<br/>
+如果不想去搞个企业身份，国内的支付有一个方式就是找第四方支付，能用个人身份。那国外呢？有没有能支持个人身份的，好像 stripe 可以，不过需要港卡</p>
+<p>五、私域<br/>
+产品属于小众产品，有没必要建立微信群，知识星球之类的私域去维护客源。</p>
+
+	]]></content>
+</entry><entry>
+	<title>[问与答] 真我手机怎么看</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176044#reply5" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176044</id>
+	<published>2025-12-01T02:12:46Z</published>
+	<updated>2025-11-23T02:11:46Z</updated>
+	<author>
+		<name>lioldsix</name>
+		<uri>https://www.v2ex.com/member/lioldsix</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	我将成为真我 GT8Pro 最大的黑子，我买的是 16+512 的，4699 元,根本不值，手机问题比较多，感觉是一款不成熟的手机，我是女孩子，发现问题比较多的就是相机:  ①是相机视频降噪不行，光线不好的时候噪点多。②是播放实况照片会被放大一些，不是按照原比例放大。③拍出来的实况照片，播放会出现闪屏，我已经放了实况照片，大家可以自己播放看一下。④是好像掉电比较凶，我把所有后台清掉就睡觉，手机就正常待机，一晚上可以掉 10%以上的点，今天实验了掉电问题，从凌晨四点半左右开始到中午十二点，差不多七个半小时，掉电%7 ，中途接了一个六分钟的电话，我问了一下朋友，他们新手机正常待机一晚上一般掉电%1 ，%2 ，我觉得掉电问题是有的。⑤还有这个手机用醒图进行 p 图识别人脸得靠运气，十次有一次能识别出来，可以看图片，正常识别出来脸上会有框框，识别不出来就没有框框，不能选择人脸进行 p 图，在 GT5Pro 上就不会有这个问题。我也只用了两三天就发现了这些问题，太屁了，没做好就端出来卖了，我还用着真我 GT5Pro 的手机，就是因为 GT5Pro 好用才买的，太失望了。
+	]]></content>
+</entry><entry>
+	<title>[程序员] 请教一下微信小程序的问题，参考滴滴的 tabbar</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176039#reply12" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176039</id>
+	<published>2025-12-01T01:58:29Z</published>
+	<updated>2025-12-01T04:01:01Z</updated>
+	<author>
+		<name>MagicalCarl</name>
+		<uri>https://www.v2ex.com/member/MagicalCarl</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p><strong>滴滴出行</strong>的微信小程序底部的 tabbar 明显不是原生的 tabbar ，可以看到图标有动画<br/>
+明显又不是使用 custom-tab-bar 实现的，因为用 custom-tab-bar 每次切换会让页面闪一下<br/>
+这个 tabbar 是怎么实现的如此流畅，大家有什么头绪吗?</p>
+<p>或者是有没有滴滴的同学来解答一下，感谢！</p>
+
+	]]></content>
+</entry><entry>
+	<title>[生活] 就来问问有多少人是正常交物业费的？ 就我了解到的， 其实有不少人就是赖不交的，和物业本身么关系。。</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176038#reply41" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176038</id>
+	<published>2025-12-01T01:49:06Z</published>
+	<updated>2025-12-01T03:52:32Z</updated>
+	<author>
+		<name>OBJECTION</name>
+		<uri>https://www.v2ex.com/member/OBJECTION</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>这里面的利益冲突 是不是短期没办法解决？？ 常见的反正是 觉得物业的服务不行。。就不交。。 更多的不说话的是那种不管好不好都不交的。。。坐标杭州 万科哈。。</p>
+<p>大家理性讨论。。。</p>
+<p>外加一个具体事件把，， 电梯联动 最开始是没进行联动的，然后效率比较低。。就这样过了好久。。今年的话 业委会和物业 电梯厂家把 一起搞了联动。。。但是呢 联动其实也有弊端，， 因为电梯相隔比较远。。所以有的时候根本来不及跑到另一个电梯。。(ps：有的邻居在电梯里面 就是会手动快点关门的。。。恶心的人哪里都有。。)  小区本身是刚需，所以小孩 老人也会比较多。。 的确会有坐不上的问题 毕竟跑得慢。。</p>
+<p>我想说的是一旦出现矛盾或者冲突 就有不少人说。。不交物业费了 啥垃圾服务。。。</p>
+
+	]]></content>
+</entry><entry>
+	<title>[分享创造] 开发了一个给照片添加经纬度数据的软件</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176037#reply5" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176037</id>
+	<published>2025-12-01T01:37:19Z</published>
+	<updated>2025-12-01T03:47:13Z</updated>
+	<author>
+		<name>hangbale</name>
+		<uri>https://www.v2ex.com/member/hangbale</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>自动换了安卓手机后，索尼的 imaging edge 跟相机的连接老是自动断开<br/>
+照片自动写坐标的功能就没法用了，只好自己写了个小工具后期加坐标</p>
+<p>用 Tauri2 开发，体积 3M 左右<br/>
+前端 90%的代码 Gemini 3 prop 生成<br/>
+exif 数据读写用 Rust 实现  </p>
+<p><strong>经纬度拾取依赖高德地图，使用前请需要申请高德地图 API key 和安全密钥</strong></p>
+<p>项目地址： <a href="https://github.com/hangbale/photo-gps" rel="nofollow">https://github.com/hangbale/photo-gps</a> </p>
+<p>欢迎下载使用和反馈问题   </p>
+<p><img alt="" class="embedded_image" loading="lazy" referrerpolicy="no-referrer" rel="noreferrer" src="https://i.imgur.com/jVDajug.jpeg"/></p>
+
+	]]></content>
+</entry><entry>
+	<title>[投资] 2025.12.1 学习笔记-BTC</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176033#reply9" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176033</id>
+	<published>2025-12-01T01:25:05Z</published>
+	<updated>2025-12-01T03:31:36Z</updated>
+	<author>
+		<name>longlongPlusPro</name>
+		<uri>https://www.v2ex.com/member/longlongPlusPro</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	今天早上起床看还是 9.1  洗漱完打开电脑直接 8.9  现在到 8.7 了 ，如果看做 8.0 的二探 ，应该还有新低跌破 8 的风险，但是如果是小熊市，12 月配合圣诞节 有希望能看到 6 开头的大饼，但是这个过程是曲折的 即使看到 6 开头的大饼 我可能 7.5-7.1 之间就买了，不在乎那点分差了。如果按照我的剧本 是停建议大家购买的，虽然历史 BTC 不乏在加息中上涨，降息中下跌，但是 20w 的大饼肯定还是要碰一碰的 请不要做空自己的事业和财富。合适的价格自己就买 做好笔记 每天反思  知行合一 <br />PS：大家不要太过于背锅了  现在这价格就是跌倒 6 其实也就 20%左右的回撤，越跌不应该越开心吗?
+	]]></content>
+</entry><entry>
+	<title>[旅行] 前两天去了武夷山和福州</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176031#reply22" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176031</id>
+	<published>2025-12-01T01:15:46Z</published>
+	<updated>2025-12-01T03:10:23Z</updated>
+	<author>
+		<name>axuadm19</name>
+		<uri>https://www.v2ex.com/member/axuadm19</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>前两天和哥们一起去了武夷山和福州，整体感觉不错，武夷山的茶文化很浓，当地人比较热情，但也有以下几个感慨总结：</p>
+<p>武夷山篇：</p>
+<ol>
+<li>去这种国家级景区真的要淡季人少才有体验感，否则就是从把挤地铁的环境换成了挤景区。周五还好，周六明显人多了起来，小碎步挪着爬山有点不舒服。</li>
+<li>消费水平不低，民宿早餐 18 元一个人，只有白粥（摆在外面自助）、一种糯米饼子（要才给续）、四种咸菜（摆在外面自助）、鸡蛋（要才给续）；</li>
+<li>晚上看完表演出来，打车出租司机主动问要不要喝“茶”，后面还是和哥们去了正规按摩（ 999.99 纯绿）;</li>
+</ol>
+<p>福州篇：</p>
+<ol>
+<li>福州整体市中心有种高级县城的感觉（没有任何贬义，纯个人感受），很多楼很旧，闯红灯的极多。有个本地人说是战备城市，不敢建设，担心钱打水漂（不知真假）；</li>
+<li>哥们后面想找本地“风土人情”释放，把酒店留给他，我后面去了做 SPA ，结果后面他发消息在说小飞机上约好了，结果来的是个大妈，货不对板，退货了（狗头）。</li>
+<li>至于福州的 SPA ，只能说，真的套路蛮多的。。。</li>
+</ol>
+
+	]]></content>
+</entry><entry>
+	<title>[推广] 腾讯云代理商为您全方位服务</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176030#reply0" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176030</id>
+	<published>2025-12-01T01:15:30Z</published>
+	<updated>2025-12-01T01:12:30Z</updated>
+	<author>
+		<name>gether1ner</name>
+		<uri>https://www.v2ex.com/member/gether1ner</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	作为腾讯云的殿堂级代理商，这边对接产品账号技术问题以及新购续费折扣这块。<br />官网标价 2.4 折以上产品 30%折扣，关联账号后一样是官网下单。<br />我们公司的优势服务，有线下技术支持、工单加急，提供官网不能给您的折扣。<br />有需要可以加我联系方式：<br />VX:gzkji8   <br />TG：@gether_cloud
+	]]></content>
+</entry><entry>
+	<title>[问与答] 车来了 API 更新了吗</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176029#reply1" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176029</id>
+	<published>2025-12-01T01:08:13Z</published>
+	<updated>2025-12-01T02:55:26Z</updated>
+	<author>
+		<name>cynthiatxdwalla</name>
+		<uri>https://www.v2ex.com/member/cynthiatxdwalla</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	之前一直在用一个捷径，最近两周发现不再能通过精确定位获取距离最近的车站，而是直接输出一个空白的结果。<br /><a target="_blank" href="https://www.icloud.com/shortcuts/a6db774503e548d1a0780e57caac2761" rel="nofollow noopener">https://www.icloud.com/shortcuts/a6db774503e548d1a0780e57caac2761</a><br /><br />网上相关的讨论都是很久远以前的了，搜索不到有效信息。所以想来 V2 碰碰运气，看是否有大佬了解
+	]]></content>
+</entry><entry>
+	<title>[问与答] 有人用过咸鱼的代订酒店服务么？</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176027#reply34" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176027</id>
+	<published>2025-12-01T01:06:23Z</published>
+	<updated>2025-12-01T03:29:16Z</updated>
+	<author>
+		<name>blackbookbj277</name>
+		<uri>https://www.v2ex.com/member/blackbookbj277</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>就是那种个人代订希尔顿、洲际等高档酒店的服务。
+靠谱么？</p>
+
+	]]></content>
+</entry><entry>
+	<title>[分享创造] AnxReader 上架 GooglePlay 封闭测试邀请---开源，多平台电子书阅读器，送永久高级版兑换码🎁</title>
+	<link rel="alternate" type="text/html" href="https://www.v2ex.com/t/1176026#reply64" />
+	<id>tag:www.v2ex.com,2025-12-01:/t/1176026</id>
+	<published>2025-12-01T01:01:00Z</published>
+	<updated>2025-12-01T03:59:15Z</updated>
+	<author>
+		<name>axy173</name>
+		<uri>https://www.v2ex.com/member/axy173</uri>
+	</author>
+	<content type="html" xml:base="https://www.v2ex.com/" xml:lang="en"><![CDATA[
+	<p>Anx Reader 是一款 <strong>开源的跨平台阅读器</strong>（ iOS / Android / Windows / macOS ），支持多种文件格式如 epub/txt/mobi/fb2 等</p>
+<p>并且 <strong>深度集成 AI</strong> ——自动总结、生成思维导图、整理书架、双语阅读等等。</p>
+<p>GitHub 项目（欢迎 star ⭐️）：<br/>
+<a href="https://github.com/Anxcye/anx-reader" rel="nofollow">https://github.com/Anxcye/anx-reader</a></p>
+<p>App 也已经在 App Store 上线：<br/>
+<a href="https://apps.apple.com/app/anx-reader/id6743196413" rel="nofollow">https://apps.apple.com/app/anx-reader/id6743196413</a></p>
+<hr/>
+<p>现在准备上架 Google Play ，<br/>
+需要在正式发布前进行一轮 <strong>封闭测试</strong>。</p>
+<p>欢迎愿意帮忙测试的小伙伴留下 Google 账户，我会把你的 Google 账号加入测试名单。预计邀请 20 位小伙伴加入  </p>
+<p>加入后通过链接即可参与测试： <a href="https://play.google.com/apps/testing/com.anxcye.anx_reader" rel="nofollow">https://play.google.com/apps/testing/com.anxcye.anx_reader</a></p>
+<p>参与测试后，从这里可以安装 App <a href="https://play.google.com/store/apps/details?id=com.anxcye.anx_reader" rel="nofollow">https://play.google.com/store/apps/details?id=com.anxcye.anx_reader</a></p>
+<p>为了表示感谢，每位测试者都会收到一枚 <strong>永久高级版兑换码</strong>。</p>
+<p>详细的测试说明我会通过邮件单独发送。</p>
+<hr/>
+<p>下面是一些更详细的介绍</p>
+<table>
+<thead>
+<tr>
+<th>功能模块</th>
+<th>详细说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>多种格式</td>
+<td>EPUB/MOBI/AZW3/FB2/TXT/PDF 已支持</td>
+</tr>
+<tr>
+<td>全平台数据同步</td>
+<td>Android/iOS/macOS/Windows 多端覆盖<br/>书籍文件、笔记、阅读进度一站式同步</td>
+</tr>
+<tr>
+<td>AI 助理</td>
+<td>按阅读进度与风格整理书架<br/>生成思维导图辅助理解<br/>AI 词典与即时翻译<br/>提供观点分析与内容总结</td>
+</tr>
+<tr>
+<td>自定义阅读体验</td>
+<td>调整字间距、段间距、行间距与边距<br/>自定义字体大小、样式与字重<br/>配置阅读配色、背景图片<br/>设置对齐方式与自定义样式</td>
+</tr>
+<tr>
+<td>记录笔记</td>
+<td>多配色与样式选择<br/>按时间、章节排序并可按颜色筛选<br/>导出 TXT/Markdown/CSV 等多种格式<br/>一键生成美观卡片便于分享</td>
+</tr>
+<tr>
+<td>阅读统计</td>
+<td>记录阅读时长<br/>按年/月/周/日维度查看<br/>阅读热力图呈现习惯变化</td>
+</tr>
+<tr>
+<td>其他</td>
+<td>听书功能：支持多模型、语速、音色与定时<br/>书籍全文翻译：原文、译文对照阅读<br/>节省空间：云端上传节省本地存储，随用随下<br/>简繁转换：中文简繁体一键转换</td>
+</tr>
+</tbody></table><table>
+<thead>
+<tr>
+<th><img alt="" class="embedded_image" loading="lazy" referrerpolicy="no-referrer" rel="noreferrer" src="https://i.imgur.com/Sb4mgq2.jpeg"/></th>
+<th><img alt="" class="embedded_image" loading="lazy" referrerpolicy="no-referrer" rel="noreferrer" src="https://i.imgur.com/7QtexGY.png"/></th>
+<th><img alt="" class="embedded_image" loading="lazy" referrerpolicy="no-referrer" rel="noreferrer" src="https://i.imgur.com/6Owt34Z.jpeg"/></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img alt="" class="embedded_image" loading="lazy" referrerpolicy="no-referrer" rel="noreferrer" src="https://i.imgur.com/PUG9S2z.png"/></td>
+<td><img alt="" class="embedded_image" loading="lazy" referrerpolicy="no-referrer" rel="noreferrer" src="https://i.imgur.com/AqgoYsc.png"/></td>
+<td><img alt="" class="embedded_image" loading="lazy" referrerpolicy="no-referrer" rel="noreferrer" src="https://i.imgur.com/rr0ykuf.png"/></td>
+</tr>
+</tbody></table><p>谢谢大家，也欢迎提 issue 或功能建议 🙏</p>
+
+	]]></content>
+</entry>
+</feed>

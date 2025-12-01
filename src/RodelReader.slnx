@@ -4,7 +4,9 @@
     <Project Path="Utilities/EpubGenerator/EpubGenerator.csproj" Id="fc724acf-dc31-4037-9c88-01eb14ce8a7f" />
     <Project Path="Utilities/EpubParser.Test/EpubParser.Test.csproj" Id="ef642972-69a8-43f4-bb4a-b275ff6f662d" />
     <Project Path="Utilities/EpubParser/EpubParser.csproj" Id="21d0369c-7870-4e63-8dba-bee9bd73c5d9" />
-    <Project Path="Utilities/MobiParser/MobiParser.csproj" Id="a1b2c3d4-e5f6-7890-abcd-ef1234567890" />
+    <Project Path="Utilities/FeedParser.Test/FeedParser.Test.csproj" Id="921acf3b-0a23-4f81-8767-b04b6c96c18e" />
+    <Project Path="Utilities/FeedParser/FeedParser.csproj" Id="40214b69-4feb-4cad-a6ea-0be5c972f9e4" />
     <Project Path="Utilities/MobiParser.Test/MobiParser.Test.csproj" Id="b2c3d4e5-f6a7-8901-bcde-f12345678901" />
+    <Project Path="Utilities/MobiParser/MobiParser.csproj" Id="a1b2c3d4-e5f6-7890-abcd-ef1234567890" />
   </Folder>
 </Solution>
