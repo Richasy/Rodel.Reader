@@ -71,4 +71,19 @@ public sealed record BookItem
     /// 获取质量评分.
     /// </summary>
     public string? Quality { get; init; }
+
+    /// <summary>
+    /// 获取下载链接.
+    /// </summary>
+    public string? DownloadUrl { get; init; }
+
+    /// <summary>
+    /// 获取描述.
+    /// </summary>
+    public string? Description { get; init; }
+
+    /// <summary>
+    /// 获取哈希值.
+    /// </summary>
+    public string? Hash { get; init; }
 }

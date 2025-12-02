@@ -10,9 +10,16 @@ namespace Richasy.RodelReader.Sources.ZLibrary.Test.Integration;
 [TestCategory("Integration")]
 public class ZLibraryIntegrationTests
 {
-    private const string TestEmail = "z.richasy@gmail.com";
-    private const string TestPassword = "Shar6501209!";
-    private const string TestMirror = "https://zh.z-lib.fm";
+    private const string TestEmail = "zar234@qq.com";
+    private const string TestPassword = "w123456w";
+    private const string TestMirror = "https://zlib.by";
+
+    // 从浏览器抓取的 cookies，用于绕过 Cloudflare 检测
+    private static readonly Dictionary<string, string> TestCookies = new()
+    {
+        ["siteLanguage"] = "en",
+        ["refuseChangeDomain"] = "1",
+    };
 
     private static ZLibraryClient? _client;
     private static bool _isLoggedIn;
@@ -22,7 +29,8 @@ public class ZLibraryIntegrationTests
     {
         var options = new ZLibraryClientOptions
         {
-            CustomMirror = TestMirror
+            CustomMirror = TestMirror,
+            InitialCookies = TestCookies,
         };
 
         _client = new ZLibraryClient(options);
@@ -68,7 +76,8 @@ public class ZLibraryIntegrationTests
         // Arrange
         var options = new ZLibraryClientOptions
         {
-            CustomMirror = TestMirror
+            CustomMirror = TestMirror,
+            InitialCookies = TestCookies,
         };
         using var client = new ZLibraryClient(options);
 
@@ -87,7 +96,7 @@ public class ZLibraryIntegrationTests
         EnsureLoggedIn();
 
         // Act
-        var result = await _client!.Search.SearchAsync("clean code", 1);
+        var result = await _client!.SearchAsync("clean code", 1);
 
         // Assert
         Assert.IsNotNull(result);
@@ -111,7 +120,7 @@ public class ZLibraryIntegrationTests
         };
 
         // Act
-        var result = await _client!.Search.SearchAsync("programming", 1, options);
+        var result = await _client!.SearchAsync("programming", 1, options);
 
         // Assert
         Assert.IsNotNull(result);
@@ -124,24 +133,11 @@ public class ZLibraryIntegrationTests
         EnsureLoggedIn();
 
         // Act
-        var result = await _client!.Search.SearchAsync("xyznonexistentbookquery12345", 1);
+        var result = await _client!.SearchAsync("xyznonexistentbookquery12345", 1);
 
         // Assert
         Assert.IsNotNull(result);
         Assert.AreEqual(0, result.Items.Count);
-    }
-
-    [TestMethod]
-    public async Task FullTextSearch_WithValidQuery_ReturnsResults()
-    {
-        EnsureLoggedIn();
-
-        // Act
-        var result = await _client!.Search.FullTextSearchAsync("design patterns", 1);
-
-        // Assert
-        Assert.IsNotNull(result);
-        // Full text search may or may not return results depending on index
     }
 
     #endregion
@@ -149,24 +145,24 @@ public class ZLibraryIntegrationTests
     #region Book Detail Tests
 
     [TestMethod]
-    public async Task GetBookDetail_WithValidId_ReturnsDetail()
+    public async Task Search_ReturnsBookWithDownloadUrl()
     {
         EnsureLoggedIn();
 
-        // First, search for a book to get a valid ID
-        var searchResult = await _client!.Search.SearchAsync("clean code", 1);
-        Assert.IsTrue(searchResult.Items.Count > 0, "Need at least one search result to test book detail");
-
-        var bookUrl = searchResult.Items[0].Url;
-        Assert.IsNotNull(bookUrl, "Book URL should not be null");
-
-        // Act
-        var detail = await _client!.Books.GetByUrlAsync(bookUrl);
+        // Act - search for a book
+        var searchResult = await _client!.SearchAsync("clean code", 1);
 
         // Assert
-        Assert.IsNotNull(detail);
-        Assert.IsNotNull(detail.Name);
-        Assert.IsNotNull(detail.DownloadUrl);
+        Assert.IsTrue(searchResult.Items.Count > 0, "Search should return at least one result");
+
+        var book = searchResult.Items[0];
+        Assert.IsNotNull(book.Id, "Book ID should not be null");
+        Assert.IsNotNull(book.Name, "Book name should not be null");
+        Assert.IsNotNull(book.DownloadUrl, "Book download URL should not be null");
+        Assert.IsNotNull(book.Url, "Book URL should not be null");
+
+        Console.WriteLine($"Book: {book.Name}");
+        Console.WriteLine($"Download URL: {book.DownloadUrl}");
     }
 
     #endregion
@@ -174,77 +170,102 @@ public class ZLibraryIntegrationTests
     #region Profile Tests
 
     [TestMethod]
-    public async Task GetDownloadLimits_WhenAuthenticated_ReturnsLimits()
+    public async Task GetProfile_WhenAuthenticated_ReturnsProfile()
     {
         EnsureLoggedIn();
 
         // Act
-        var limits = await _client!.Profile.GetDownloadLimitsAsync();
+        var profile = await _client!.GetProfileAsync();
 
         // Assert
-        Assert.IsNotNull(limits);
-        Assert.IsTrue(limits.DailyAllowed > 0, "Daily limit should be greater than 0");
-        Assert.IsTrue(limits.DailyUsed >= 0, "Downloaded count should be non-negative");
-        Assert.IsTrue(limits.DailyRemaining >= 0, "Remaining should be non-negative");
-    }
+        Assert.IsNotNull(profile);
+        Assert.IsTrue(profile.Id > 0, "User ID should be greater than 0");
+        Assert.IsNotNull(profile.Email, "Email should not be null");
+        Assert.IsTrue(profile.DownloadsLimit > 0, "Downloads limit should be greater than 0");
+        Assert.IsTrue(profile.DownloadsToday >= 0, "Downloads today should be non-negative");
+        Assert.IsTrue(profile.DownloadsRemaining >= 0, "Downloads remaining should be non-negative");
 
-    [TestMethod]
-    public async Task GetDownloadHistory_WhenAuthenticated_ReturnsHistory()
-    {
-        EnsureLoggedIn();
-
-        // Act
-        var history = await _client!.Profile.GetDownloadHistoryAsync(1);
-
-        // Assert
-        Assert.IsNotNull(history);
-        // History may be empty if user hasn't downloaded anything
-    }
-
-    [TestMethod]
-    public async Task GetDownloadHistory_WithDateRange_ReturnsFilteredHistory()
-    {
-        EnsureLoggedIn();
-
-        // Arrange
-        var fromDate = new DateOnly(2024, 1, 1);
-        var toDate = DateOnly.FromDateTime(DateTime.Now);
-
-        // Act
-        var history = await _client!.Profile.GetDownloadHistoryAsync(1, fromDate, toDate);
-
-        // Assert
-        Assert.IsNotNull(history);
+        Console.WriteLine($"User: {profile.Name} ({profile.Email})");
+        Console.WriteLine($"Downloads: {profile.DownloadsToday}/{profile.DownloadsLimit}");
+        Console.WriteLine($"Premium: {profile.IsPremium}");
     }
 
     #endregion
 
-    #region Booklist Tests
+    #region Download Tests
 
     [TestMethod]
-    public async Task SearchBooklists_WithValidQuery_ReturnsResults()
+    public async Task GetDownloadInfo_WithValidBook_ReturnsDownloadInfo()
     {
         EnsureLoggedIn();
 
-        // Act
-        var result = await _client!.Booklists.SearchPublicAsync("programming", 1);
+        // Act - search for a book first
+        var searchResult = await _client!.SearchAsync("clean code", 1);
+        Assert.IsTrue(searchResult.Items.Count > 0, "Search should return at least one result");
+
+        var book = searchResult.Items[0];
+        Assert.IsNotNull(book.Id, "Book ID should not be null");
+        Assert.IsNotNull(book.Hash, "Book Hash should not be null");
+
+        Console.WriteLine($"Book ID: {book.Id}");
+        Console.WriteLine($"Book Hash: {book.Hash}");
+        Console.WriteLine($"Book Name: {book.Name}");
+
+        // 直接测试 API URL
+        var url = $"{_client.Mirror}/eapi/book/{book.Id}/{book.Hash}/file";
+        Console.WriteLine($"API URL: {url}");
+
+        // Get download info
+        var downloadInfo = await _client!.GetDownloadInfoAsync(book);
+
+        if (downloadInfo == null)
+        {
+            Console.WriteLine("Download info is null - this could be due to download limit reached or API response format issue");
+        }
+        else
+        {
+            Console.WriteLine($"Download Link: {downloadInfo.DownloadLink}");
+            Console.WriteLine($"Full File Name: {downloadInfo.FullFileName}");
+        }
+
+        // 如果下载信息为空，可能是因为达到了下载限制，这种情况下跳过测试
+        if (downloadInfo == null)
+        {
+            Assert.Inconclusive("Download info is null - possibly download limit reached or API format changed");
+            return;
+        }
 
         // Assert
-        Assert.IsNotNull(result);
-        // Booklists may or may not exist for the query
+        Assert.IsFalse(string.IsNullOrEmpty(downloadInfo.DownloadLink), "Download link should not be empty");
+        Assert.IsFalse(string.IsNullOrEmpty(downloadInfo.FileName), "File name should not be empty");
+        Assert.IsFalse(string.IsNullOrEmpty(downloadInfo.Extension), "Extension should not be empty");
     }
 
     [TestMethod]
-    public async Task SearchPrivateBooklists_WhenAuthenticated_ReturnsBooklists()
+    public async Task GetDownloadInfo_WithBookIdAndHash_ReturnsDownloadInfo()
     {
         EnsureLoggedIn();
 
-        // Act
-        var result = await _client!.Booklists.SearchPrivateAsync(string.Empty, 1);
+        // Act - search for a book first
+        var searchResult = await _client!.SearchAsync("clean code", 1);
+        Assert.IsTrue(searchResult.Items.Count > 0, "Search should return at least one result");
+
+        var book = searchResult.Items[0];
+
+        // Get download info using ID and Hash
+        var downloadInfo = await _client!.GetDownloadInfoAsync(book.Id!, book.Hash!);
+
+        // 如果下载信息为空，可能是因为达到了下载限制
+        if (downloadInfo == null)
+        {
+            Assert.Inconclusive("Download info is null - possibly download limit reached");
+            return;
+        }
 
         // Assert
-        Assert.IsNotNull(result);
-        // User may or may not have any booklists
+        Assert.IsFalse(string.IsNullOrEmpty(downloadInfo.DownloadLink), "Download link should not be empty");
+
+        Console.WriteLine($"Download Link: {downloadInfo.DownloadLink}");
     }
 
     #endregion
@@ -257,14 +278,15 @@ public class ZLibraryIntegrationTests
         // Arrange
         var options = new ZLibraryClientOptions
         {
-            CustomMirror = TestMirror
+            CustomMirror = TestMirror,
+            // 不设置 InitialCookies，确保未认证状态
         };
         using var client = new ZLibraryClient(options);
         // Don't login
 
         // Act & Assert
         await Assert.ThrowsExactlyAsync<NotAuthenticatedException>(
-            async () => await client.Search.SearchAsync("test", 1));
+            async () => await client.SearchAsync("test", 1));
     }
 
     #endregion

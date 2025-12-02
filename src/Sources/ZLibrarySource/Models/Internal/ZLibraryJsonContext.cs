@@ -7,13 +7,14 @@ namespace Richasy.RodelReader.Sources.ZLibrary.Models.Internal;
 /// </summary>
 [JsonSerializable(typeof(LoginResponse))]
 [JsonSerializable(typeof(LoginResponseData))]
-[JsonSerializable(typeof(BooklistApiResponse))]
-[JsonSerializable(typeof(BooklistBookWrapper))]
-[JsonSerializable(typeof(BooklistBookData))]
-[JsonSerializable(typeof(BooklistPagination))]
-[JsonSourceGenerationOptions(
-    PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
-    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]
+[JsonSerializable(typeof(ProfileApiResponse))]
+[JsonSerializable(typeof(ProfileApiUser))]
+[JsonSerializable(typeof(SearchApiResponse))]
+[JsonSerializable(typeof(SearchApiPagination))]
+[JsonSerializable(typeof(SearchApiBook))]
+[JsonSerializable(typeof(DownloadApiResponse))]
+[JsonSerializable(typeof(DownloadApiFile))]
+[JsonSourceGenerationOptions(DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]
 internal partial class ZLibraryJsonContext : JsonSerializerContext
 {
 }

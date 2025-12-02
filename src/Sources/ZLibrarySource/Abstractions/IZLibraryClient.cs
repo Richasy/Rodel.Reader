@@ -8,26 +8,6 @@ namespace Richasy.RodelReader.Sources.ZLibrary;
 public interface IZLibraryClient : IDisposable
 {
     /// <summary>
-    /// 获取搜索模块.
-    /// </summary>
-    ISearchProvider Search { get; }
-
-    /// <summary>
-    /// 获取书籍详情模块.
-    /// </summary>
-    IBookDetailProvider Books { get; }
-
-    /// <summary>
-    /// 获取用户配置模块.
-    /// </summary>
-    IProfileProvider Profile { get; }
-
-    /// <summary>
-    /// 获取书单模块.
-    /// </summary>
-    IBooklistProvider Booklists { get; }
-
-    /// <summary>
     /// 获取客户端配置.
     /// </summary>
     ZLibraryClientOptions Options { get; }
@@ -55,4 +35,42 @@ public interface IZLibraryClient : IDisposable
     /// 登出.
     /// </summary>
     void Logout();
+
+    /// <summary>
+    /// 搜索书籍.
+    /// </summary>
+    /// <param name="query">搜索关键词.</param>
+    /// <param name="page">页码（从 1 开始）.</param>
+    /// <param name="options">搜索选项.</param>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>分页搜索结果.</returns>
+    Task<PagedResult<BookItem>> SearchAsync(
+        string query,
+        int page = 1,
+        BookSearchOptions? options = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取用户资料信息.
+    /// </summary>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>用户资料信息.</returns>
+    Task<UserProfile> GetProfileAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取书籍的真实下载链接.
+    /// </summary>
+    /// <param name="bookId">书籍 ID.</param>
+    /// <param name="bookHash">书籍哈希值.</param>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>下载信息，如果不允许下载则返回 null.</returns>
+    Task<DownloadInfo?> GetDownloadInfoAsync(string bookId, string bookHash, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取书籍的真实下载链接.
+    /// </summary>
+    /// <param name="book">书籍项.</param>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>下载信息，如果不允许下载则返回 null.</returns>
+    Task<DownloadInfo?> GetDownloadInfoAsync(BookItem book, CancellationToken cancellationToken = default);
 }

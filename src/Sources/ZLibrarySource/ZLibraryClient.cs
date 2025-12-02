@@ -9,13 +9,18 @@ namespace Richasy.RodelReader.Sources.ZLibrary;
 /// </summary>
 public sealed partial class ZLibraryClient : IZLibraryClient
 {
+    private const string SearchEndpoint = "/eapi/book/search";
+    private const string ProfileEndpoint = "/eapi/user/profile";
+    private const string DownloadLinkEndpoint = "/eapi/book/{0}/{1}/file";
+
+    private static readonly Regex InvalidFileNameCharsRegex = new(@"[\\/:*?""<>|]", RegexOptions.Compiled);
+
     private readonly ZLibDispatcher _dispatcher;
-    private readonly IHtmlParser _parser;
     private readonly ILogger<ZLibraryClient> _logger;
     private readonly HttpClient _httpClient;
+    private readonly string _mirror;
     private bool _disposed;
-    private string _mirror;
-
+    
     /// <summary>
     /// 初始化 <see cref="ZLibraryClient"/> 类的新实例.
     /// </summary>
@@ -65,31 +70,17 @@ public sealed partial class ZLibraryClient : IZLibraryClient
         ConfigureHttpClient(httpClient, options);
 
         // 创建分发器
-        _dispatcher = new ZLibDispatcher(httpClient, options.MaxConcurrentRequests, _logger);
+        _dispatcher = new ZLibDispatcher(httpClient, options.MaxConcurrentRequests, _logger, options.CustomHeaders, _mirror);
 
-        // 创建解析器
-        _parser = new ZLibHtmlParser(_logger);
-
-        // 创建各操作模块
-        Search = new SearchProvider(_dispatcher, _parser, () => _mirror, () => IsAuthenticated, _logger);
-        Books = new BookDetailProvider(_dispatcher, _parser, () => _mirror, () => IsAuthenticated, _logger);
-        Profile = new ProfileProvider(_dispatcher, _parser, () => _mirror, () => IsAuthenticated, _logger);
-        Booklists = new BooklistProvider(_dispatcher, _parser, () => _mirror, () => IsAuthenticated, _logger);
+        // 如果有初始 Cookies，设置它们
+        if (options.InitialCookies != null && options.InitialCookies.Count > 0)
+        {
+            _dispatcher.Cookies = new Dictionary<string, string>(options.InitialCookies);
+            _logger.LogDebug("Initial cookies set: {Count}", options.InitialCookies.Count);
+        }
 
         _logger.LogInformation("ZLibraryClient initialized successfully");
     }
-
-    /// <inheritdoc/>
-    public ISearchProvider Search { get; }
-
-    /// <inheritdoc/>
-    public IBookDetailProvider Books { get; }
-
-    /// <inheritdoc/>
-    public IProfileProvider Profile { get; }
-
-    /// <inheritdoc/>
-    public IBooklistProvider Booklists { get; }
 
     /// <inheritdoc/>
     public ZLibraryClientOptions Options { get; }
@@ -170,6 +161,144 @@ public sealed partial class ZLibraryClient : IZLibraryClient
     }
 
     /// <inheritdoc/>
+    public async Task<PagedResult<BookItem>> SearchAsync(
+        string query,
+        int page = 1,
+        BookSearchOptions? options = null,
+        CancellationToken cancellationToken = default)
+    {
+        Guard.IsAuthenticated(IsAuthenticated);
+
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            throw new EmptyQueryException();
+        }
+
+        var url = $"{_mirror}{SearchEndpoint}";
+        var formData = BuildSearchFormData(query, page, options);
+
+        _logger.LogDebug("Searching books: {Query}, page: {Page}", query, page);
+
+        var (json, _) = await _dispatcher.PostAsync(url, formData, cancellationToken).ConfigureAwait(false);
+        var response = JsonSerializer.Deserialize(json, ZLibraryJsonContext.Default.SearchApiResponse);
+
+        if (response?.Success != 1)
+        {
+            _logger.LogWarning("Search API returned unsuccessful response");
+            return new PagedResult<BookItem>
+            {
+                Items = [],
+                CurrentPage = page,
+                TotalPages = 0,
+                PageSize = options?.PageSize ?? 50,
+            };
+        }
+
+        var books = ConvertToBookItems(response.Books);
+        var pagination = response.Pagination;
+
+        return new PagedResult<BookItem>
+        {
+            Items = books,
+            CurrentPage = pagination?.Current ?? page,
+            TotalPages = pagination?.TotalPages ?? 1,
+            PageSize = pagination?.Limit ?? 50,
+        };
+    }
+
+    /// <inheritdoc/>
+    public async Task<UserProfile> GetProfileAsync(CancellationToken cancellationToken = default)
+    {
+        Guard.IsAuthenticated(IsAuthenticated);
+
+        var url = _mirror + ProfileEndpoint;
+
+        _logger.LogDebug("Getting user profile");
+
+        var json = await _dispatcher.GetAsync(url, cancellationToken).ConfigureAwait(false);
+        var response = JsonSerializer.Deserialize(json, ZLibraryJsonContext.Default.ProfileApiResponse);
+
+        if (response?.Success != 1 || response.User == null)
+        {
+            throw new ParseException("Failed to parse user profile response");
+        }
+
+        var user = response.User;
+        return new UserProfile
+        {
+            Id = user.Id,
+            Email = user.Email,
+            Name = user.Name,
+            KindleEmail = user.KindleEmail,
+            DownloadsToday = user.DownloadsToday,
+            DownloadsLimit = user.DownloadsLimit,
+            IsConfirmed = user.Confirmed == 1,
+            IsPremium = user.IsPremium == 1,
+        };
+    }
+
+    /// <inheritdoc/>
+    public Task<DownloadInfo?> GetDownloadInfoAsync(BookItem book, CancellationToken cancellationToken = default)
+    {
+        Guard.NotNull(book);
+
+        if (string.IsNullOrEmpty(book.Id) || string.IsNullOrEmpty(book.Hash))
+        {
+            throw new ArgumentException("Book must have valid Id and Hash properties.");
+        }
+
+        return GetDownloadInfoAsync(book.Id, book.Hash, cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    public async Task<DownloadInfo?> GetDownloadInfoAsync(string bookId, string bookHash, CancellationToken cancellationToken = default)
+    {
+        Guard.IsAuthenticated(IsAuthenticated);
+        Guard.NotNullOrWhiteSpace(bookId);
+        Guard.NotNullOrWhiteSpace(bookHash);
+
+        var url = _mirror + string.Format(DownloadLinkEndpoint, bookId, bookHash);
+
+        _logger.LogDebug("Getting download info for book: {BookId}, URL: {Url}", bookId, url);
+
+        var json = await _dispatcher.GetAsync(url, cancellationToken).ConfigureAwait(false);
+        
+        _logger.LogDebug("Download API response: {Json}", json);
+        
+        var response = JsonSerializer.Deserialize(json, ZLibraryJsonContext.Default.DownloadApiResponse);
+
+        if (response?.Success != 1 || response.File == null)
+        {
+            _logger.LogWarning("Download API returned unsuccessful response for book: {BookId}, Success: {Success}", bookId, response?.Success);
+            return null;
+        }
+
+        if (!response.File.AllowDownload)
+        {
+            _logger.LogWarning("Download not allowed for book: {BookId}", bookId);
+            return null;
+        }
+
+        if (string.IsNullOrEmpty(response.File.DownloadLink))
+        {
+            _logger.LogWarning("Download link is empty for book: {BookId}", bookId);
+            return null;
+        }
+
+        // 清理文件名中的非法字符
+        var fileName = response.File.Description ?? bookId;
+        fileName = InvalidFileNameCharsRegex.Replace(fileName, string.Empty);
+
+        return new DownloadInfo
+        {
+            DownloadLink = response.File.DownloadLink,
+            FileName = fileName,
+            Extension = response.File.Extension ?? string.Empty,
+            Author = response.File.Author,
+        };
+    }
+
+    /// <inheritdoc/>
     public void Dispose()
     {
         if (_disposed)
@@ -187,7 +316,7 @@ public sealed partial class ZLibraryClient : IZLibraryClient
     {
         var handler = new HttpClientHandler
         {
-            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli,
             UseCookies = false, // 我们手动管理 cookies
         };
 
@@ -201,10 +330,109 @@ public sealed partial class ZLibraryClient : IZLibraryClient
     {
         httpClient.DefaultRequestHeaders.Clear();
         httpClient.DefaultRequestHeaders.Add("User-Agent", options.UserAgent);
-        httpClient.DefaultRequestHeaders.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
-        httpClient.DefaultRequestHeaders.Add("Accept-Language", "en-US,en;q=0.5");
-        httpClient.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate");
+        httpClient.DefaultRequestHeaders.Add("Accept", "application/json, text/javascript, text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+        httpClient.DefaultRequestHeaders.Add("Accept-Language", "zh,zh-CN;q=0.9,en-US;q=0.8,en;q=0.7");
+        httpClient.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br, zstd");
         httpClient.DefaultRequestHeaders.Add("Connection", "keep-alive");
+    }
+
+    private static Dictionary<string, string> BuildSearchFormData(string query, int page, BookSearchOptions? options)
+    {
+        var formData = new Dictionary<string, string>
+        {
+            ["message"] = query,
+            ["page"] = page.ToString(),
+        };
+
+        if (options != null)
+        {
+            if (options.Exact)
+            {
+                formData["e"] = "1";
+            }
+
+            if (options.FromYear.HasValue)
+            {
+                formData["yearFrom"] = options.FromYear.Value.ToString();
+            }
+
+            if (options.ToYear.HasValue)
+            {
+                formData["yearTo"] = options.ToYear.Value.ToString();
+            }
+
+            if (options.Languages != null && options.Languages.Count > 0)
+            {
+                for (var i = 0; i < options.Languages.Count; i++)
+                {
+                    formData[$"languages[{i}]"] = options.Languages[i].ToString().ToLowerInvariant();
+                }
+            }
+
+            if (options.Extensions != null && options.Extensions.Count > 0)
+            {
+                for (var i = 0; i < options.Extensions.Count; i++)
+                {
+                    formData[$"extensions[{i}]"] = options.Extensions[i].ToString().ToLowerInvariant();
+                }
+            }
+
+            if (options.PageSize > 0)
+            {
+                formData["limit"] = options.PageSize.ToString();
+            }
+        }
+
+        return formData;
+    }
+
+    private List<BookItem> ConvertToBookItems(IList<SearchApiBook>? apiBooks)
+    {
+        if (apiBooks == null || apiBooks.Count == 0)
+        {
+            return [];
+        }
+
+        var books = new List<BookItem>(apiBooks.Count);
+        foreach (var apiBook in apiBooks)
+        {
+            var authors = !string.IsNullOrEmpty(apiBook.Author)
+                ? apiBook.Author.Split(';', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(a => a.Trim())
+                    .Where(a => !string.IsNullOrEmpty(a))
+                    .ToList()
+                : null;
+
+            var bookUrl = !string.IsNullOrEmpty(apiBook.Href)
+                ? $"{_mirror}{apiBook.Href}"
+                : null;
+
+            var downloadUrl = !string.IsNullOrEmpty(apiBook.Dl)
+                ? $"{_mirror}{apiBook.Dl}"
+                : null;
+
+            books.Add(new BookItem
+            {
+                Id = apiBook.Id.ToString(),
+                Name = apiBook.Title ?? "Unknown",
+                Isbn = apiBook.Identifier,
+                Url = bookUrl,
+                CoverUrl = apiBook.Cover,
+                Authors = authors,
+                Publisher = apiBook.Publisher,
+                Year = apiBook.Year > 0 ? apiBook.Year.ToString() : null,
+                Language = apiBook.Language,
+                Extension = apiBook.Extension,
+                FileSize = apiBook.FilesizeString,
+                Rating = apiBook.InterestScore,
+                Quality = apiBook.QualityScore,
+                DownloadUrl = downloadUrl,
+                Description = apiBook.Description,
+                Hash = apiBook.Hash,
+            });
+        }
+
+        return books;
     }
 
     [GeneratedRegex(@"^([^=]+)=([^;]+)")]

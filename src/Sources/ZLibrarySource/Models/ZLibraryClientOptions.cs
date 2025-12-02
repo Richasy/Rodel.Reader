@@ -35,7 +35,19 @@ public sealed class ZLibraryClientOptions
     /// <summary>
     /// 获取或设置自定义 User-Agent.
     /// </summary>
-    public string UserAgent { get; set; } = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+    public string UserAgent { get; set; } = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0";
+
+    /// <summary>
+    /// 获取或设置自定义请求头.
+    /// 这些请求头将被添加到所有 HTTP 请求中.
+    /// </summary>
+    public Dictionary<string, string>? CustomHeaders { get; set; }
+
+    /// <summary>
+    /// 获取或设置初始 Cookies.
+    /// 这些 Cookies 将在客户端初始化时设置.
+    /// </summary>
+    public Dictionary<string, string>? InitialCookies { get; set; }
 
     /// <summary>
     /// 获取有效的域名.

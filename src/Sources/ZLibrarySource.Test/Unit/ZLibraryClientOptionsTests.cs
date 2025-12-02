@@ -19,7 +19,7 @@ public class ZLibraryClientOptionsTests
         var domain = options.GetEffectiveDomain();
 
         // Assert
-        Assert.AreEqual("https://z-library.sk", domain);
+        Assert.AreEqual("https://zh.zlib.by", domain);
     }
 
     [TestMethod]
@@ -80,7 +80,7 @@ public class ZLibraryClientOptionsTests
         var loginUrl = options.GetLoginUrl();
 
         // Assert
-        Assert.AreEqual("https://z-library.sk/rpc.php", loginUrl);
+        Assert.AreEqual("https://zh.zlib.by/rpc.php", loginUrl);
     }
 
     [TestMethod]
