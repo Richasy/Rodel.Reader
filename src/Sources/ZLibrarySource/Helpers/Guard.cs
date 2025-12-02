@@ -1,0 +1,61 @@
+// Copyright (c) Richasy. All rights reserved.
+
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+
+namespace Richasy.RodelReader.Sources.ZLibrary.Helpers;
+
+/// <summary>
+/// 参数验证辅助类.
+/// </summary>
+internal static class Guard
+{
+    /// <summary>
+    /// 确保参数不为 null.
+    /// </summary>
+    /// <typeparam name="T">参数类型.</typeparam>
+    /// <param name="value">参数值.</param>
+    /// <param name="paramName">参数名称.</param>
+    /// <returns>参数值.</returns>
+    /// <exception cref="ArgumentNullException">当参数为 null 时抛出.</exception>
+    public static T NotNull<T>([NotNull] T? value, [CallerArgumentExpression(nameof(value))] string? paramName = null)
+        where T : class
+    {
+        if (value is null)
+        {
+            throw new ArgumentNullException(paramName);
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    /// 确保字符串不为 null 或空白.
+    /// </summary>
+    /// <param name="value">字符串值.</param>
+    /// <param name="paramName">参数名称.</param>
+    /// <returns>字符串值.</returns>
+    /// <exception cref="ArgumentException">当字符串为 null 或空白时抛出.</exception>
+    public static string NotNullOrWhiteSpace([NotNull] string? value, [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new ArgumentException("Value cannot be null or whitespace.", paramName);
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    /// 确保已认证.
+    /// </summary>
+    /// <param name="isAuthenticated">是否已认证.</param>
+    /// <exception cref="NotAuthenticatedException">当未认证时抛出.</exception>
+    public static void IsAuthenticated(bool isAuthenticated)
+    {
+        if (!isAuthenticated)
+        {
+            throw new NotAuthenticatedException();
+        }
+    }
+}
