@@ -5,6 +5,10 @@
     <Project Path="Services/WebDavService.Test/WebDavService.Test.csproj" Id="42f382ac-60f4-4219-93bf-e1fd46396b0e" />
     <Project Path="Services/WebDavService/WebDavService.csproj" Id="3bc7427b-f860-44b1-a418-0973f3223bda" />
   </Folder>
+  <Folder Name="/Sources/">
+    <Project Path="Sources/ApplePodcastSource.Test/ApplePodcastSource.Test.csproj" Id="6213bc7a-0e47-48ed-9a43-91d55409970d" />
+    <Project Path="Sources/ApplePodcastSource/ApplePodcastSource.csproj" Id="d51c0790-ded0-487f-91ed-e33dbbcbb878" />
+  </Folder>
   <Folder Name="/Utilities/">
     <Project Path="Utilities/EpubGenerator.Test/EpubGenerator.Test.csproj" Id="8901cd61-8a67-4757-8a6a-48fb9af6d8d2" />
     <Project Path="Utilities/EpubGenerator/EpubGenerator.csproj" Id="fc724acf-dc31-4037-9c88-01eb14ce8a7f" />
