@@ -1,0 +1,21 @@
+﻿<Project Sdk="MSTest.Sdk/4.0.1">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<LangVersion>latest</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<UseVSTest>true</UseVSTest>
+		<NoWarn>$(NoWarn);CS1591;CA1707;CA1861;MSTEST0004;MSTEST0032;MSTEST0037</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Moq" />
+		<PackageReference Include="RichardSzalay.MockHttp" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\OpdsService\OpdsService.csproj" />
+	</ItemGroup>
+
+</Project>
