@@ -1,0 +1,193 @@
+// Copyright (c) Richasy. All rights reserved.
+
+using Richasy.RodelReader.Sources.FanQie.Abstractions;
+
+namespace Richasy.RodelReader.Sources.FanQie;
+
+/// <summary>
+/// 番茄小说客户端.
+/// </summary>
+public sealed class FanQieClient : IFanQieClient
+{
+    private readonly Internal.FanQieDispatcher _dispatcher;
+    private readonly ILogger<FanQieClient>? _logger;
+    private bool _disposed;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FanQieClient"/> class.
+    /// </summary>
+    /// <param name="options">客户端配置（可选）.</param>
+    /// <param name="httpClient">HTTP 客户端（可选）.</param>
+    /// <param name="logger">日志记录器（可选）.</param>
+    public FanQieClient(
+        FanQieClientOptions? options = null,
+        HttpClient? httpClient = null,
+        ILogger<FanQieClient>? logger = null)
+    {
+        options ??= new FanQieClientOptions();
+        _logger = logger;
+        _dispatcher = new Internal.FanQieDispatcher(options, httpClient, logger);
+    }
+
+    /// <inheritdoc/>
+    public async Task<SearchResult<BookItem>> SearchBooksAsync(
+        string query,
+        int offset = 0,
+        CancellationToken cancellationToken = default)
+    {
+        Helpers.Guard.NotNullOrEmpty(query);
+        Helpers.Guard.NonNegative(offset);
+
+        _logger?.LogDebug("Searching books with query: {Query}, offset: {Offset}", query, offset);
+        return await _dispatcher.SearchBooksAsync(query, offset, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public async Task<BookDetail?> GetBookDetailAsync(
+        string bookId,
+        CancellationToken cancellationToken = default)
+    {
+        Helpers.Guard.NotNullOrEmpty(bookId);
+
+        _logger?.LogDebug("Getting book detail for: {BookId}", bookId);
+        return await _dispatcher.GetBookDetailAsync(bookId, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public async Task<IReadOnlyList<BookVolume>> GetBookTocAsync(
+        string bookId,
+        CancellationToken cancellationToken = default)
+    {
+        Helpers.Guard.NotNullOrEmpty(bookId);
+
+        _logger?.LogDebug("Getting book TOC for: {BookId}", bookId);
+        return await _dispatcher.GetBookTocAsync(bookId, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public async Task<ChapterContent?> GetChapterContentAsync(
+        string bookId,
+        string bookTitle,
+        ChapterItem chapter,
+        CancellationToken cancellationToken = default)
+    {
+        Helpers.Guard.NotNullOrEmpty(bookId);
+        Helpers.Guard.NotNullOrEmpty(bookTitle);
+        Helpers.Guard.NotNull(chapter);
+
+        var chapterInfoMap = new Dictionary<string, ChapterItem> { { chapter.ItemId, chapter } };
+        var results = await _dispatcher.GetBatchContentAsync(
+            [chapter.ItemId],
+            bookId,
+            bookTitle,
+            chapterInfoMap,
+            cancellationToken).ConfigureAwait(false);
+
+        return results.Count > 0 ? results[0] : null;
+    }
+
+    /// <inheritdoc/>
+    public async Task<IReadOnlyList<ChapterContent>> GetChapterContentsAsync(
+        string bookId,
+        string bookTitle,
+        IEnumerable<ChapterItem> chapters,
+        CancellationToken cancellationToken = default)
+    {
+        Helpers.Guard.NotNullOrEmpty(bookId);
+        Helpers.Guard.NotNullOrEmpty(bookTitle);
+        Helpers.Guard.NotNull(chapters);
+
+        var chapterList = chapters.ToList();
+        if (chapterList.Count == 0)
+        {
+            return [];
+        }
+
+        var chapterInfoMap = chapterList.ToDictionary(c => c.ItemId, c => c);
+        var itemIds = chapterList.Select(c => c.ItemId);
+
+        return await _dispatcher.GetBatchContentAsync(
+            itemIds,
+            bookId,
+            bookTitle,
+            chapterInfoMap,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public async Task<(BookDetail Detail, IReadOnlyList<ChapterContent> Chapters)> DownloadBookAsync(
+        string bookId,
+        IProgress<(int Current, int Total)>? progress = null,
+        CancellationToken cancellationToken = default)
+    {
+        Helpers.Guard.NotNullOrEmpty(bookId);
+
+        _logger?.LogInformation("Starting download for book: {BookId}", bookId);
+
+        // 1. 获取书籍详情
+        var detail = await GetBookDetailAsync(bookId, cancellationToken).ConfigureAwait(false)
+            ?? throw new Exceptions.FanQieApiException(404, $"Book not found: {bookId}");
+
+        // 2. 获取目录
+        var volumes = await GetBookTocAsync(bookId, cancellationToken).ConfigureAwait(false);
+
+        // 3. 筛选免费章节
+        var freeChapters = volumes
+            .SelectMany(v => v.Chapters)
+            .Where(c => !c.NeedPay && !c.IsLocked)
+            .ToList();
+
+        if (freeChapters.Count == 0)
+        {
+            _logger?.LogWarning("No free chapters found for book: {BookId}", bookId);
+            return (detail, []);
+        }
+
+        _logger?.LogInformation("Found {Count} free chapters to download.", freeChapters.Count);
+
+        // 4. 批量下载
+        var allContents = new List<ChapterContent>();
+        var chapterInfoMap = freeChapters.ToDictionary(c => c.ItemId, c => c);
+        var total = freeChapters.Count;
+        var batchSize = 25;
+
+        for (var i = 0; i < total; i += batchSize)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var batch = freeChapters.Skip(i).Take(batchSize).ToList();
+            var itemIds = batch.Select(c => c.ItemId);
+
+            var contents = await _dispatcher.GetBatchContentAsync(
+                itemIds,
+                bookId,
+                detail.Title,
+                chapterInfoMap,
+                cancellationToken).ConfigureAwait(false);
+
+            allContents.AddRange(contents);
+            progress?.Report((Math.Min(i + batchSize, total), total));
+
+            _logger?.LogDebug("Downloaded {Current}/{Total} chapters.", Math.Min(i + batchSize, total), total);
+        }
+
+        // 5. 按章节顺序排序
+        var orderedContents = allContents.OrderBy(c => c.Order).ToList();
+
+        _logger?.LogInformation("Download completed. Total chapters: {Count}", orderedContents.Count);
+
+        return (detail, orderedContents);
+    }
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _dispatcher.Dispose();
+        _disposed = true;
+    }
+}
