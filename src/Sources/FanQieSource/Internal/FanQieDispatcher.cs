@@ -801,8 +801,9 @@ internal sealed class FanQieDispatcher : IDisposable
                     Title = item.Title ?? string.Empty,
                     Order = order,
                     VolumeName = volumeName,
-                    IsLocked = item.IsChapterLock,
-                    NeedPay = item.NeedPay == 1,
+                    // 番茄小说是免费平台，不存在锁定/付费章节
+                    IsLocked = false,
+                    NeedPay = false,
                     FirstPassTime = firstPassTime,
                 });
             }

@@ -13,16 +13,28 @@ internal static partial class ContentParser
     /// 解析内容中的图片标签.
     /// </summary>
     /// <param name="content">原始内容.</param>
+    /// <param name="removeFirstLine">是否移除第一行（通常是章节标题）.</param>
     /// <returns>解析结果：提取的图片列表和移除图片标签后的纯文本.</returns>
-    public static (IReadOnlyList<ChapterImage>? Images, string CleanedText, string HtmlContent) ParseContentWithImages(string content)
+    public static (IReadOnlyList<ChapterImage>? Images, string CleanedText, string HtmlContent) ParseContentWithImages(string content, bool removeFirstLine = true)
     {
         if (string.IsNullOrWhiteSpace(content))
         {
             return (null, string.Empty, string.Empty);
         }
 
+        // 移除第一行（章节标题），因为标题会在 EPUB 生成时单独添加
+        var processedContent = content;
+        if (removeFirstLine)
+        {
+            var firstNewlineIndex = content.IndexOf('\n', StringComparison.Ordinal);
+            if (firstNewlineIndex > 0)
+            {
+                processedContent = content[(firstNewlineIndex + 1)..].TrimStart();
+            }
+        }
+
         var images = new List<ChapterImage>();
-        var cleanedText = content;
+        var cleanedText = processedContent;
 
         // 匹配 FanQie 特殊格式的 img 标签
         // 格式: <img src="\"url\"" img-width="\"602\"" img-height="\"339\"" alt="\"\"" media-idx="\"1\""/>
@@ -56,12 +68,12 @@ internal static partial class ContentParser
         }
 
         // 移除图片标签，得到纯文本
-        cleanedText = FanQieImageRegex().Replace(content, string.Empty);
+        cleanedText = FanQieImageRegex().Replace(processedContent, string.Empty);
         // 清理可能产生的多余空行
         cleanedText = MultipleNewlinesRegex().Replace(cleanedText, "\n\n").Trim();
 
         // 生成 HTML 内容（保留图片标签但转换为标准格式）
-        var htmlContent = content;
+        var htmlContent = processedContent;
         foreach (Match match in matches)
         {
             if (!match.Success)

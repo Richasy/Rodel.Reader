@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/Components/">
+    <Project Path="Components/FanQieDownloader.Test/FanQieDownloader.Test.csproj" />
+    <Project Path="Components/FanQieDownloader/FanQieDownloader.csproj" Id="a88b6db5-74ac-422c-a1a7-8c164f0c9170" />
+  </Folder>
   <Folder Name="/Services/">
     <Project Path="Services/OpdsService.Test/OpdsService.Test.csproj" Id="c519ece5-0bd3-41db-924c-2e36facfb0a8" />
     <Project Path="Services/OpdsService/OpdsService.csproj" Id="71b058d6-88ac-4f44-93af-51ed7dfd679e" />
