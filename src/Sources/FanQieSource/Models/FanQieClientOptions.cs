@@ -60,7 +60,7 @@ public sealed class FanQieClientOptions
     /// <summary>
     /// 批量下载每组章节数.
     /// </summary>
-    public int BatchSize { get; set; } = 25;
+    public int BatchSize { get; set; } = 10;
 
     /// <summary>
     /// 请求间隔（毫秒）.
@@ -71,4 +71,14 @@ public sealed class FanQieClientOptions
     /// 自定义请求头.
     /// </summary>
     public Dictionary<string, string>? CustomHeaders { get; set; }
+
+    /// <summary>
+    /// 后备 API 服务地址.
+    /// </summary>
+    public string FallbackApiBaseUrl { get; set; } = "https://fqnovel.richasy.net";
+
+    /// <summary>
+    /// 是否启用后备 API.
+    /// </summary>
+    public bool EnableFallback { get; set; } = true;
 }

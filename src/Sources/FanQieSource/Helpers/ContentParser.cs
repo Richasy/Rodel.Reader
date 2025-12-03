@@ -198,8 +198,10 @@ internal static partial class ContentParser
     [GeneratedRegex(@"\s")]
     private static partial Regex WhitespaceRegex();
 
-    // 匹配 FanQie 格式的图片标签:
-    // <img src="\"url\"" img-width="\"602\"" img-height="\"339\"" alt="\"\"" media-idx="\"1\""/>
-    [GeneratedRegex("""<img\s+src="\\?"(?<src>[^"]+?)\\?"(?:\s+img-width="\\?"(?<width>\d+)\\?")?(?:\s+img-height="\\?"(?<height>\d+)\\?")?(?:\s+alt="[^"]*")?(?:\s+media-idx="\\?"(?<idx>\d+)\\?")?\s*/?>""", RegexOptions.IgnoreCase | RegexOptions.Singleline)]
+    // 匹配 FanQie 格式的图片标签 (从 JSON 解析后的格式):
+    // 格式1: <img src=\"url\" img-width=\"602\" img-height=\"339\" alt=\"\" media-idx=\"1\"/> (主 API，带转义引号)
+    // 格式2: <img src="url" img-width="602" img-height="339" alt="" media-idx="1"/> (后备 API，标准 HTML)
+    // 使用 \\?" 同时匹配可选的反斜杠转义
+    [GeneratedRegex("""<img\s+src=\\?"(?<src>[^"\\]+)\\?"(?:\s+img-width=\\?"(?<width>\d+)\\?")?(?:\s+img-height=\\?"(?<height>\d+)\\?")?(?:\s+alt=\\?"[^"\\]*\\?")?(?:[^>]*\s+)?(?:media-idx=\\?"(?<idx>\d+)\\?")?\s*/?>""", RegexOptions.IgnoreCase | RegexOptions.Singleline)]
     private static partial Regex FanQieImageRegex();
 }

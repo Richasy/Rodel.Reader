@@ -223,8 +223,8 @@ public class ContentParserTests
     [TestMethod]
     public void ParseContentWithImages_WithFanQieImageTag_ExtractsImageUrl()
     {
-        // Arrange
-        var content = """文字内容<img src="\"http://example.com/image.jpg\"" img-width="\"602\"" img-height="\"339\"" alt="\"\"" media-idx="\"1\""/>更多文字""";
+        // Arrange - JSON 解析后的格式，双引号被转义为 \"
+        var content = "文字内容<img src=\\\"http://example.com/image.jpg\\\" img-width=\\\"602\\\" img-height=\\\"339\\\" alt=\\\"\\\" media-idx=\\\"1\\\"/>更多文字";
 
         // Act
         var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content);
@@ -242,8 +242,8 @@ public class ContentParserTests
     [TestMethod]
     public void ParseContentWithImages_WithMultipleImages_ExtractsAllImages()
     {
-        // Arrange
-        var content = """第一张<img src="\"http://example.com/1.jpg\"" media-idx="\"1\""/>中间<img src="\"http://example.com/2.jpg\"" media-idx="\"2\""/>最后""";
+        // Arrange - JSON 解析后的格式
+        var content = "第一张<img src=\\\"http://example.com/1.jpg\\\" media-idx=\\\"1\\\"/>中间<img src=\\\"http://example.com/2.jpg\\\" media-idx=\\\"2\\\"/>最后";
 
         // Act
         var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content);
@@ -260,8 +260,8 @@ public class ContentParserTests
     [TestMethod]
     public void ParseContentWithImages_WithEncodedUrl_DecodesUrl()
     {
-        // Arrange
-        var content = """<img src="\"http://example.com/image.jpg?a=1&amp;b=2\"" media-idx="\"1\""/>""";
+        // Arrange - JSON 解析后的格式
+        var content = "<img src=\\\"http://example.com/image.jpg?a=1&amp;b=2\\\" media-idx=\\\"1\\\"/>";
 
         // Act
         var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content);
@@ -275,8 +275,8 @@ public class ContentParserTests
     [TestMethod]
     public void ParseContentWithImages_HtmlContentContainsStandardImgTag()
     {
-        // Arrange
-        var content = """文字<img src="\"http://example.com/image.jpg\"" img-width="\"100\"" img-height="\"200\"" media-idx="\"1\""/>结束""";
+        // Arrange - JSON 解析后的格式
+        var content = "文字<img src=\\\"http://example.com/image.jpg\\\" img-width=\\\"100\\\" img-height=\\\"200\\\" media-idx=\\\"1\\\"/>结束";
 
         // Act
         var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content);
@@ -291,8 +291,8 @@ public class ContentParserTests
     [TestMethod]
     public void ParseContentWithImages_WithImageWithoutMediaIdx_OffsetIsNull()
     {
-        // Arrange
-        var content = """<img src="\"http://example.com/image.jpg\""/>""";
+        // Arrange - JSON 解析后的格式，只有 src 属性
+        var content = "<img src=\\\"http://example.com/image.jpg\\\"/>";
 
         // Act
         var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content);
@@ -307,8 +307,8 @@ public class ContentParserTests
     [TestMethod]
     public void ParseContentWithImages_WithRealWorldUrl_ExtractsCorrectly()
     {
-        // Arrange - 模拟真实的番茄小说图片 URL
-        var content = """<img src="\"http://p3-reading-sign.fqnovelpic.com/novel-pic-r/abc123~tplv-noop.jpeg?lk3s=8d963091&amp;x-expires=1859300599&amp;x-signature=Yc5gCHn3jkXkXFdcFmD7xY0WFi4%3D\"" img-width="\"602\"" img-height="\"339\"" alt="\"\"" media-idx="\"1\""/>""";
+        // Arrange - 模拟真实的番茄小说图片 URL (JSON 解析后的格式)
+        var content = "<img src=\\\"http://p3-reading-sign.fqnovelpic.com/novel-pic-r/abc123~tplv-noop.jpeg?lk3s=8d963091&amp;x-expires=1859300599&amp;x-signature=Yc5gCHn3jkXkXFdcFmD7xY0WFi4%3D\\\" img-width=\\\"602\\\" img-height=\\\"339\\\" alt=\\\"\\\" media-idx=\\\"1\\\"/>";
 
         // Act
         var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content);
@@ -319,5 +319,39 @@ public class ContentParserTests
         Assert.IsTrue(images[0].Url.StartsWith("http://p3-reading-sign.fqnovelpic.com", StringComparison.Ordinal));
         Assert.IsTrue(images[0].Url.Contains("x-expires=1859300599", StringComparison.Ordinal));
         Assert.IsTrue(images[0].Url.Contains("&x-signature=", StringComparison.Ordinal)); // &amp; 应该被解码为 &
+    }
+
+    [TestMethod]
+    public void ParseContentWithImages_WithStandardHtmlFormat_ExtractsImageUrl()
+    {
+        // Arrange - 标准 HTML 格式（后备 API 返回的格式）
+        var content = "文字内容<img src=\"http://example.com/image.jpg\" img-width=\"602\" img-height=\"339\" alt=\"\" media-idx=\"1\"/>更多文字";
+
+        // Act
+        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content);
+
+        // Assert
+        Assert.IsNotNull(images);
+        Assert.AreEqual(1, images.Count);
+        Assert.AreEqual("http://example.com/image.jpg", images[0].Url);
+        Assert.AreEqual(1, images[0].Offset);
+        Assert.IsFalse(cleanedText.Contains("<img", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [TestMethod]
+    public void ParseContentWithImages_WithFallbackApiFormat_ExtractsCorrectly()
+    {
+        // Arrange - 模拟后备 API 返回的真实格式
+        var content = """<p idx="76" p_idx="30000">注释文字</p><div data-fanqie-type="image"><p class="picture"><img src="http://p3-reading-sign.fqnovelpic.com/novel-pic-r/6b2820e0f11809dab6da8d6b6c0f71d8~tplv-noop.jpeg?lk3s=8d963091&amp;x-expires=1859337975&amp;x-signature=8VQfzWKDYhwhRkHNp2gyeEX7R%2Fg%3D" img-width="444" img-height="445" alt="" p_idx="20000" e_idx="0" e_order="77" media-idx="1"/></p></div>""";
+
+        // Act
+        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content);
+
+        // Assert
+        Assert.IsNotNull(images);
+        Assert.AreEqual(1, images.Count);
+        Assert.IsTrue(images[0].Url.StartsWith("http://p3-reading-sign.fqnovelpic.com", StringComparison.Ordinal));
+        Assert.AreEqual(1, images[0].Offset);
+        Assert.AreEqual(444, int.Parse(htmlContent.Contains("width=\"444\"", StringComparison.Ordinal) ? "444" : "0"));
     }
 }

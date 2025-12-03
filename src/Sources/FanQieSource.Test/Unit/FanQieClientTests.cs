@@ -198,4 +198,107 @@ public class FanQieClientTests
         client.Dispose();
         client.Dispose();
     }
+
+    #region Comment Tests
+
+    [TestMethod]
+    public async Task GetCommentCountAsync_WithNullBookId_ThrowsArgumentNullException()
+    {
+        // Arrange
+        using var client = new FanQieClient();
+
+        // Act & Assert
+        await Assert.ThrowsExactlyAsync<ArgumentNullException>(
+            async () => await client.GetCommentCountAsync(null!, "123"));
+    }
+
+    [TestMethod]
+    public async Task GetCommentCountAsync_WithEmptyBookId_ThrowsArgumentException()
+    {
+        // Arrange
+        using var client = new FanQieClient();
+
+        // Act & Assert
+        await Assert.ThrowsExactlyAsync<ArgumentException>(
+            async () => await client.GetCommentCountAsync(string.Empty, "123"));
+    }
+
+    [TestMethod]
+    public async Task GetCommentCountAsync_WithNullChapterId_ThrowsArgumentNullException()
+    {
+        // Arrange
+        using var client = new FanQieClient();
+
+        // Act & Assert
+        await Assert.ThrowsExactlyAsync<ArgumentNullException>(
+            async () => await client.GetCommentCountAsync("123", null!));
+    }
+
+    [TestMethod]
+    public async Task GetCommentCountAsync_WithEmptyChapterId_ThrowsArgumentException()
+    {
+        // Arrange
+        using var client = new FanQieClient();
+
+        // Act & Assert
+        await Assert.ThrowsExactlyAsync<ArgumentException>(
+            async () => await client.GetCommentCountAsync("123", string.Empty));
+    }
+
+    [TestMethod]
+    public async Task GetCommentsAsync_WithNullBookId_ThrowsArgumentNullException()
+    {
+        // Arrange
+        using var client = new FanQieClient();
+
+        // Act & Assert
+        await Assert.ThrowsExactlyAsync<ArgumentNullException>(
+            async () => await client.GetCommentsAsync(null!, "123", 0));
+    }
+
+    [TestMethod]
+    public async Task GetCommentsAsync_WithEmptyBookId_ThrowsArgumentException()
+    {
+        // Arrange
+        using var client = new FanQieClient();
+
+        // Act & Assert
+        await Assert.ThrowsExactlyAsync<ArgumentException>(
+            async () => await client.GetCommentsAsync(string.Empty, "123", 0));
+    }
+
+    [TestMethod]
+    public async Task GetCommentsAsync_WithNullChapterId_ThrowsArgumentNullException()
+    {
+        // Arrange
+        using var client = new FanQieClient();
+
+        // Act & Assert
+        await Assert.ThrowsExactlyAsync<ArgumentNullException>(
+            async () => await client.GetCommentsAsync("123", null!, 0));
+    }
+
+    [TestMethod]
+    public async Task GetCommentsAsync_WithEmptyChapterId_ThrowsArgumentException()
+    {
+        // Arrange
+        using var client = new FanQieClient();
+
+        // Act & Assert
+        await Assert.ThrowsExactlyAsync<ArgumentException>(
+            async () => await client.GetCommentsAsync("123", string.Empty, 0));
+    }
+
+    [TestMethod]
+    public async Task GetCommentsAsync_WithNegativeParagraphIndex_ThrowsArgumentOutOfRangeException()
+    {
+        // Arrange
+        using var client = new FanQieClient();
+
+        // Act & Assert
+        await Assert.ThrowsExactlyAsync<ArgumentOutOfRangeException>(
+            async () => await client.GetCommentsAsync("123", "456", -1));
+    }
+
+    #endregion
 }

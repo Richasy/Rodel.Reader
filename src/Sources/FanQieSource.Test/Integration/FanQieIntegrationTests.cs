@@ -39,7 +39,7 @@ public class FanQieIntegrationTests
     public async Task SearchBooks_WithValidQuery_ReturnsResults()
     {
         // Arrange
-        var query = "斗罗大陆";
+        var query = "冒姓琅琊";
 
         // Act
         var result = await _client!.SearchBooksAsync(query);
@@ -116,7 +116,7 @@ public class FanQieIntegrationTests
     public async Task GetBookDetail_WithValidId_ReturnsDetail()
     {
         // Arrange - 先搜索获取一个有效的书籍 ID
-        var searchResult = await _client!.SearchBooksAsync("斗罗大陆");
+        var searchResult = await _client!.SearchBooksAsync("冒姓琅琊");
         Assert.IsTrue(searchResult.Items.Count > 0, "需要先搜索到书籍");
 
         var bookId = searchResult.Items[0].BookId;
@@ -174,7 +174,7 @@ public class FanQieIntegrationTests
     public async Task GetBookToc_WithValidId_ReturnsVolumes()
     {
         // Arrange - 先搜索获取一个有效的书籍 ID
-        var searchResult = await _client!.SearchBooksAsync("斗罗大陆");
+        var searchResult = await _client!.SearchBooksAsync("冒姓琅琊");
         Assert.IsTrue(searchResult.Items.Count > 0, "需要先搜索到书籍");
 
         var bookId = searchResult.Items[0].BookId;
@@ -222,7 +222,7 @@ public class FanQieIntegrationTests
     public async Task GetChapterContent_WithValidChapter_ReturnsContent()
     {
         // Arrange - 获取书籍和目录
-        var searchResult = await _client!.SearchBooksAsync("斗罗大陆");
+        var searchResult = await _client!.SearchBooksAsync("冒姓琅琊");
         Assert.IsTrue(searchResult.Items.Count > 0);
 
         var book = searchResult.Items[0];
@@ -268,7 +268,7 @@ public class FanQieIntegrationTests
     public async Task GetChapterContents_BatchDownload_ReturnsMultipleChapters()
     {
         // Arrange
-        var searchResult = await _client!.SearchBooksAsync("斗罗大陆");
+        var searchResult = await _client!.SearchBooksAsync("冒姓琅琊");
         Assert.IsTrue(searchResult.Items.Count > 0);
 
         var book = searchResult.Items[0];
@@ -320,7 +320,7 @@ public class FanQieIntegrationTests
     public async Task DownloadBook_WithProgress_ReturnsBookData()
     {
         // Arrange
-        var searchResult = await _client!.SearchBooksAsync("斗罗大陆");
+        var searchResult = await _client!.SearchBooksAsync("冒姓琅琊");
         Assert.IsTrue(searchResult.Items.Count > 0);
 
         var bookId = searchResult.Items[0].BookId;
@@ -490,6 +490,264 @@ public class FanQieIntegrationTests
         Console.WriteLine($"  VolumeName: {content.VolumeName ?? "(无)"}");
         Console.WriteLine($"  PublishTime: {content.PublishTime?.ToString() ?? "(无)"}");
         Console.WriteLine($"  Images: {content.Images?.Count ?? 0}");
+    }
+
+    #endregion
+
+    #region Image Download Tests
+
+    [TestMethod]
+    public async Task DownloadImage_WithChapterContainingImage_ReturnsImageData()
+    {
+        // Arrange - 使用已知包含图片的章节
+        var bookId = "7414011485757639704";
+        var chapterId = "7508071600441262617";
+
+        // 先获取章节内容以获取图片 URL
+        var chapter = new ChapterItem { ItemId = chapterId, Title = "第260章 何必送目", Order = 260 };
+        var content = await _client!.GetChapterContentAsync(bookId, "关于南朝贵公子是我冒充的这回事", chapter);
+
+        Assert.IsNotNull(content, "章节内容不应为空");
+        Assert.IsNotNull(content.Images, "该章节应包含图片");
+        Assert.IsTrue(content.Images.Count > 0, "该章节应至少包含一张图片");
+
+        var imageUrl = content.Images[0].Url;
+        Console.WriteLine($"图片 URL: {imageUrl}");
+
+        // Act - 下载图片
+        var imageData = await _client!.DownloadImageAsync(imageUrl);
+
+        // Assert
+        Assert.IsNotNull(imageData);
+        Assert.IsTrue(imageData.Length > 0, "图片数据不应为空");
+        Console.WriteLine($"图片大小: {imageData.Length} bytes");
+
+        // 验证是否为有效的图片格式（JPEG 或 PNG）
+        var isJpeg = imageData.Length >= 2 && imageData[0] == 0xFF && imageData[1] == 0xD8;
+        var isPng = imageData.Length >= 8 && imageData[0] == 0x89 && imageData[1] == 0x50;
+        Assert.IsTrue(isJpeg || isPng, "图片应为有效的 JPEG 或 PNG 格式");
+        Console.WriteLine($"图片格式: {(isJpeg ? "JPEG" : "PNG")}");
+    }
+
+    [TestMethod]
+    public async Task DownloadImages_WithMultipleUrls_ReturnsAllImages()
+    {
+        // Arrange - 使用已知包含图片的章节
+        var bookId = "7414011485757639704";
+        var chapterId = "7508071600441262617";
+
+        var chapter = new ChapterItem { ItemId = chapterId, Title = "第260章 何必送目", Order = 260 };
+        var content = await _client!.GetChapterContentAsync(bookId, "关于南朝贵公子是我冒充的这回事", chapter);
+
+        Assert.IsNotNull(content?.Images, "该章节应包含图片");
+
+        var imageUrls = content.Images.Select(img => img.Url).ToList();
+        Console.WriteLine($"找到 {imageUrls.Count} 张图片");
+
+        // Act
+        var results = await _client!.DownloadImagesAsync(imageUrls);
+
+        // Assert
+        Assert.IsNotNull(results);
+        Assert.AreEqual(imageUrls.Count, results.Count, "应下载所有图片");
+
+        foreach (var (url, data) in results)
+        {
+            Assert.IsTrue(data.Length > 0, $"图片数据不应为空: {url}");
+            Console.WriteLine($"  {url.Substring(0, Math.Min(50, url.Length))}... ({data.Length} bytes)");
+        }
+    }
+
+    #endregion
+
+    #region Comment Tests
+
+    [TestMethod]
+    public async Task GetCommentCount_WithValidBookAndChapter_ReturnsCommentCounts()
+    {
+        // Arrange - 先搜索获取书籍和章节
+        var searchResult = await _client!.SearchBooksAsync("冒姓琅琊");
+        Assert.IsTrue(searchResult.Items.Count > 0, "需要先搜索到书籍");
+
+        var bookId = searchResult.Items[0].BookId;
+        await Task.Delay(1000);
+
+        var volumes = await _client!.GetBookTocAsync(bookId);
+        Assert.IsTrue(volumes.Count > 0 && volumes[0].Chapters.Count > 0, "需要有章节");
+
+        var chapterId = volumes[0].Chapters[0].ItemId;
+        await Task.Delay(1000);
+
+        // Act
+        var commentCounts = await _client!.GetCommentCountAsync(bookId, chapterId);
+
+        // Assert
+        Assert.IsNotNull(commentCounts, "评论数量结果不应为空");
+        Console.WriteLine($"该章节共有 {commentCounts.Count} 个段落有评论");
+
+        foreach (var (paragraphIndex, count) in commentCounts.Take(5))
+        {
+            Console.WriteLine($"  段落 {paragraphIndex}: {count} 条评论");
+        }
+    }
+
+    [TestMethod]
+    public async Task GetCommentCount_WithInvalidChapter_ReturnsEmptyOrNull()
+    {
+        // Arrange
+        var bookId = "99999999999";
+        var chapterId = "99999999999";
+
+        // Act
+        var commentCounts = await _client!.GetCommentCountAsync(bookId, chapterId);
+
+        // Assert - 可能返回 null 或空字典
+        Console.WriteLine($"无效章节返回: {(commentCounts == null ? "null" : $"{commentCounts.Count} 个段落")}");
+    }
+
+    [TestMethod]
+    public async Task GetComments_WithValidParagraph_ReturnsComments()
+    {
+        // Arrange - 先获取有评论的段落
+        var searchResult = await _client!.SearchBooksAsync("冒姓琅琊");
+        Assert.IsTrue(searchResult.Items.Count > 0, "需要先搜索到书籍");
+
+        var bookId = searchResult.Items[0].BookId;
+        await Task.Delay(1000);
+
+        var volumes = await _client!.GetBookTocAsync(bookId);
+        Assert.IsTrue(volumes.Count > 0 && volumes[0].Chapters.Count > 0, "需要有章节");
+
+        var chapterId = volumes[0].Chapters[0].ItemId;
+        await Task.Delay(1000);
+
+        // 获取评论数量，找到有评论的段落
+        var commentCounts = await _client!.GetCommentCountAsync(bookId, chapterId);
+        Assert.IsNotNull(commentCounts, "评论数量结果不应为空");
+
+        var paragraphWithComments = commentCounts.FirstOrDefault(kvp => kvp.Value > 0);
+        if (paragraphWithComments.Key == null)
+        {
+            Console.WriteLine("该章节没有任何段落有评论，跳过测试");
+            return;
+        }
+
+        var paragraphIndex = int.Parse(paragraphWithComments.Key);
+        await Task.Delay(1000);
+
+        // Act
+        var result = await _client!.GetCommentsAsync(bookId, chapterId, paragraphIndex);
+
+        // Assert
+        Assert.IsNotNull(result, "评论列表结果不应为空");
+        Assert.AreEqual(paragraphIndex, result.ParagraphIndex);
+
+        Console.WriteLine($"段落 {paragraphIndex} 的评论:");
+        Console.WriteLine($"  共 {result.Comments.Count} 条评论");
+        Console.WriteLine($"  是否有更多: {result.HasMore}");
+        Console.WriteLine($"  下一页偏移: {result.NextOffset}");
+
+        if (!string.IsNullOrEmpty(result.ParagraphContent))
+        {
+            var content = result.ParagraphContent.Length > 50
+                ? result.ParagraphContent[..50] + "..."
+                : result.ParagraphContent;
+            Console.WriteLine($"  段落内容: {content}");
+        }
+
+        foreach (var comment in result.Comments.Take(3))
+        {
+            Console.WriteLine($"  - [{comment.UserName}] {comment.Content}");
+            Console.WriteLine($"    点赞: {comment.LikeCount}, 回复: {comment.ReplyCount}");
+            Console.WriteLine($"    发布时间: {comment.PublishTime}");
+            if (comment.IsAuthor)
+            {
+                Console.WriteLine($"    [作者]");
+            }
+        }
+    }
+
+    [TestMethod]
+    public async Task GetComments_WithPagination_ReturnsNextPage()
+    {
+        // Arrange - 先获取有评论的段落
+        var searchResult = await _client!.SearchBooksAsync("冒姓琅琊");
+        Assert.IsTrue(searchResult.Items.Count > 0, "需要先搜索到书籍");
+
+        var bookId = searchResult.Items[0].BookId;
+        await Task.Delay(1000);
+
+        var volumes = await _client!.GetBookTocAsync(bookId);
+        Assert.IsTrue(volumes.Count > 0 && volumes[0].Chapters.Count > 0, "需要有章节");
+
+        var chapterId = volumes[0].Chapters[0].ItemId;
+        await Task.Delay(1000);
+
+        // 获取评论数量，找到有较多评论的段落
+        var commentCounts = await _client!.GetCommentCountAsync(bookId, chapterId);
+        Assert.IsNotNull(commentCounts, "评论数量结果不应为空");
+
+        var paragraphWithManyComments = commentCounts.FirstOrDefault(kvp => kvp.Value > 20);
+        if (paragraphWithManyComments.Key == null)
+        {
+            Console.WriteLine("该章节没有评论数超过 20 的段落，跳过分页测试");
+            return;
+        }
+
+        var paragraphIndex = int.Parse(paragraphWithManyComments.Key);
+        await Task.Delay(1000);
+
+        // Act - 获取第一页
+        var firstPage = await _client!.GetCommentsAsync(bookId, chapterId, paragraphIndex);
+        Assert.IsNotNull(firstPage, "第一页结果不应为空");
+
+        if (!firstPage.HasMore)
+        {
+            Console.WriteLine("第一页就是最后一页，跳过分页测试");
+            return;
+        }
+
+        await Task.Delay(1000);
+
+        // Act - 获取第二页
+        var secondPage = await _client!.GetCommentsAsync(bookId, chapterId, paragraphIndex, firstPage.NextOffset);
+
+        // Assert
+        Assert.IsNotNull(secondPage, "第二页结果不应为空");
+        Assert.AreEqual(paragraphIndex, secondPage.ParagraphIndex);
+
+        Console.WriteLine($"第一页: {firstPage.Comments.Count} 条评论, 有更多: {firstPage.HasMore}");
+        Console.WriteLine($"第二页: {secondPage.Comments.Count} 条评论, 有更多: {secondPage.HasMore}");
+
+        // 验证两页的评论不同
+        if (firstPage.Comments.Count > 0 && secondPage.Comments.Count > 0)
+        {
+            var firstPageIds = firstPage.Comments.Select(c => c.Id).ToHashSet();
+            var secondPageIds = secondPage.Comments.Select(c => c.Id).ToHashSet();
+            Assert.IsFalse(firstPageIds.SetEquals(secondPageIds), "两页的评论应该不同");
+        }
+    }
+
+    [TestMethod]
+    public async Task GetComments_WithInvalidParagraph_ReturnsEmptyOrNull()
+    {
+        // Arrange
+        var bookId = "99999999999";
+        var chapterId = "99999999999";
+        var paragraphIndex = 0;
+
+        // Act
+        var result = await _client!.GetCommentsAsync(bookId, chapterId, paragraphIndex);
+
+        // Assert - 可能返回 null 或空列表
+        if (result != null)
+        {
+            Console.WriteLine($"无效参数返回: {result.Comments.Count} 条评论");
+        }
+        else
+        {
+            Console.WriteLine("无效参数返回 null");
+        }
     }
 
     #endregion

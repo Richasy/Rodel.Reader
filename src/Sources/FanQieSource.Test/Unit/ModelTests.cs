@@ -278,8 +278,10 @@ public class ModelTests
         Assert.AreEqual(FanQieClientOptions.DefaultUserAgent, options.UserAgent);
         Assert.AreEqual(FanQieClientOptions.DefaultAid, options.Aid);
         Assert.AreEqual(3, options.MaxConcurrentRequests);
-        Assert.AreEqual(25, options.BatchSize);
+        Assert.AreEqual(10, options.BatchSize);
         Assert.AreEqual(500, options.RequestDelayMs);
+        Assert.IsTrue(options.EnableFallback);
+        Assert.AreEqual("https://fqnovel.richasy.net", options.FallbackApiBaseUrl);
     }
 
     [TestMethod]
@@ -326,6 +328,198 @@ public class ModelTests
         Assert.AreEqual(0, (int)BookGender.Unknown);
         Assert.AreEqual(1, (int)BookGender.Male);
         Assert.AreEqual(2, (int)BookGender.Female);
+    }
+
+    #endregion
+
+    #region Comment Tests
+
+    [TestMethod]
+    public void Comment_RequiredProperties_AreSet()
+    {
+        // Arrange & Act
+        var comment = new Comment
+        {
+            Id = "comment_123",
+            Content = "这是一条测试评论",
+        };
+
+        // Assert
+        Assert.AreEqual("comment_123", comment.Id);
+        Assert.AreEqual("这是一条测试评论", comment.Content);
+    }
+
+    [TestMethod]
+    public void Comment_OptionalProperties_CanBeNull()
+    {
+        // Arrange & Act
+        var comment = new Comment
+        {
+            Id = "comment_123",
+            Content = "测试评论",
+        };
+
+        // Assert
+        Assert.IsNull(comment.UserId);
+        Assert.IsNull(comment.UserName);
+        Assert.IsNull(comment.Avatar);
+        Assert.IsNull(comment.Pictures);
+    }
+
+    [TestMethod]
+    public void Comment_AllProperties_CanBeSet()
+    {
+        // Arrange
+        var pictures = new List<Uri>
+        {
+            new("https://example.com/pic1.jpg"),
+            new("https://example.com/pic2.jpg"),
+        };
+        var publishTime = DateTime.Now;
+
+        // Act
+        var comment = new Comment
+        {
+            Id = "comment_123",
+            Content = "完整测试评论",
+            UserId = "user_001",
+            UserName = "测试用户",
+            Avatar = new Uri("https://example.com/avatar.jpg"),
+            IsAuthor = true,
+            PublishTime = publishTime,
+            LikeCount = 100,
+            ReplyCount = 10,
+            Pictures = pictures,
+        };
+
+        // Assert
+        Assert.AreEqual("comment_123", comment.Id);
+        Assert.AreEqual("完整测试评论", comment.Content);
+        Assert.AreEqual("user_001", comment.UserId);
+        Assert.AreEqual("测试用户", comment.UserName);
+        Assert.IsNotNull(comment.Avatar);
+        Assert.AreEqual("https://example.com/avatar.jpg", comment.Avatar.ToString());
+        Assert.IsTrue(comment.IsAuthor);
+        Assert.AreEqual(publishTime, comment.PublishTime);
+        Assert.AreEqual(100, comment.LikeCount);
+        Assert.AreEqual(10, comment.ReplyCount);
+        Assert.IsNotNull(comment.Pictures);
+        Assert.AreEqual(2, comment.Pictures.Count);
+    }
+
+    [TestMethod]
+    public void Comment_IsAuthor_DefaultsToFalse()
+    {
+        // Arrange & Act
+        var comment = new Comment
+        {
+            Id = "comment_123",
+            Content = "测试评论",
+        };
+
+        // Assert
+        Assert.IsFalse(comment.IsAuthor);
+    }
+
+    [TestMethod]
+    public void Comment_Counts_DefaultToZero()
+    {
+        // Arrange & Act
+        var comment = new Comment
+        {
+            Id = "comment_123",
+            Content = "测试评论",
+        };
+
+        // Assert
+        Assert.AreEqual(0, comment.LikeCount);
+        Assert.AreEqual(0, comment.ReplyCount);
+    }
+
+    #endregion
+
+    #region CommentListResult Tests
+
+    [TestMethod]
+    public void CommentListResult_RequiredProperties_AreSet()
+    {
+        // Arrange & Act
+        var result = new CommentListResult
+        {
+            Comments = new List<Comment>(),
+        };
+
+        // Assert
+        Assert.IsNotNull(result.Comments);
+        Assert.AreEqual(0, result.Comments.Count);
+    }
+
+    [TestMethod]
+    public void CommentListResult_AllProperties_CanBeSet()
+    {
+        // Arrange
+        var comments = new List<Comment>
+        {
+            new() { Id = "1", Content = "评论1" },
+            new() { Id = "2", Content = "评论2" },
+        };
+
+        // Act
+        var result = new CommentListResult
+        {
+            Comments = comments,
+            ParagraphIndex = 5,
+            HasMore = true,
+            NextOffset = "100",
+            ParagraphContent = "这是段落原文内容",
+        };
+
+        // Assert
+        Assert.AreEqual(2, result.Comments.Count);
+        Assert.AreEqual(5, result.ParagraphIndex);
+        Assert.IsTrue(result.HasMore);
+        Assert.AreEqual("100", result.NextOffset);
+        Assert.AreEqual("这是段落原文内容", result.ParagraphContent);
+    }
+
+    [TestMethod]
+    public void CommentListResult_OptionalProperties_CanBeNull()
+    {
+        // Arrange & Act
+        var result = new CommentListResult
+        {
+            Comments = new List<Comment>(),
+        };
+
+        // Assert
+        Assert.IsNull(result.NextOffset);
+        Assert.IsNull(result.ParagraphContent);
+    }
+
+    [TestMethod]
+    public void CommentListResult_HasMore_DefaultsToFalse()
+    {
+        // Arrange & Act
+        var result = new CommentListResult
+        {
+            Comments = new List<Comment>(),
+        };
+
+        // Assert
+        Assert.IsFalse(result.HasMore);
+    }
+
+    [TestMethod]
+    public void CommentListResult_ParagraphIndex_DefaultsToZero()
+    {
+        // Arrange & Act
+        var result = new CommentListResult
+        {
+            Comments = new List<Comment>(),
+        };
+
+        // Assert
+        Assert.AreEqual(0, result.ParagraphIndex);
     }
 
     #endregion

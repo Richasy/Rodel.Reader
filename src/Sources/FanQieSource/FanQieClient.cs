@@ -180,6 +180,67 @@ public sealed class FanQieClient : IFanQieClient
     }
 
     /// <inheritdoc/>
+    public async Task<byte[]> DownloadImageAsync(
+        string imageUrl,
+        CancellationToken cancellationToken = default)
+    {
+        Helpers.Guard.NotNullOrEmpty(imageUrl);
+
+        _logger?.LogDebug("Downloading image: {Url}", imageUrl);
+        return await _dispatcher.DownloadImageAsync(imageUrl, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public async Task<IReadOnlyDictionary<string, byte[]>> DownloadImagesAsync(
+        IEnumerable<string> imageUrls,
+        CancellationToken cancellationToken = default)
+    {
+        Helpers.Guard.NotNull(imageUrls);
+
+        var urlList = imageUrls.ToList();
+        if (urlList.Count == 0)
+        {
+            return new Dictionary<string, byte[]>();
+        }
+
+        _logger?.LogDebug("Downloading {Count} images", urlList.Count);
+        return await _dispatcher.DownloadImagesAsync(urlList, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public async Task<IReadOnlyDictionary<string, int>?> GetCommentCountAsync(
+        string bookId,
+        string chapterId,
+        string? cookie = null,
+        CancellationToken cancellationToken = default)
+    {
+        Helpers.Guard.NotNullOrEmpty(bookId);
+        Helpers.Guard.NotNullOrEmpty(chapterId);
+
+        _logger?.LogDebug("Getting comment count for book: {BookId}, chapter: {ChapterId}", bookId, chapterId);
+        return await _dispatcher.GetCommentCountAsync(bookId, chapterId, cookie, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public async Task<CommentListResult?> GetCommentsAsync(
+        string bookId,
+        string chapterId,
+        int paragraphIndex,
+        string? offset = null,
+        string? cookie = null,
+        CancellationToken cancellationToken = default)
+    {
+        Helpers.Guard.NotNullOrEmpty(bookId);
+        Helpers.Guard.NotNullOrEmpty(chapterId);
+        Helpers.Guard.NonNegative(paragraphIndex);
+
+        _logger?.LogDebug(
+            "Getting comments for book: {BookId}, chapter: {ChapterId}, paragraph: {ParagraphIndex}",
+            bookId, chapterId, paragraphIndex);
+        return await _dispatcher.GetCommentsAsync(bookId, chapterId, paragraphIndex, offset, cookie, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
     public void Dispose()
     {
         if (_disposed)
