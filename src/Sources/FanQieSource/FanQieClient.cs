@@ -211,14 +211,13 @@ public sealed class FanQieClient : IFanQieClient
     public async Task<IReadOnlyDictionary<string, int>?> GetCommentCountAsync(
         string bookId,
         string chapterId,
-        string? cookie = null,
         CancellationToken cancellationToken = default)
     {
         Helpers.Guard.NotNullOrEmpty(bookId);
         Helpers.Guard.NotNullOrEmpty(chapterId);
 
         _logger?.LogDebug("Getting comment count for book: {BookId}, chapter: {ChapterId}", bookId, chapterId);
-        return await _dispatcher.GetCommentCountAsync(bookId, chapterId, cookie, cancellationToken).ConfigureAwait(false);
+        return await _dispatcher.GetCommentCountAsync(bookId, chapterId, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>
@@ -227,7 +226,6 @@ public sealed class FanQieClient : IFanQieClient
         string chapterId,
         int paragraphIndex,
         string? offset = null,
-        string? cookie = null,
         CancellationToken cancellationToken = default)
     {
         Helpers.Guard.NotNullOrEmpty(bookId);
@@ -237,7 +235,7 @@ public sealed class FanQieClient : IFanQieClient
         _logger?.LogDebug(
             "Getting comments for book: {BookId}, chapter: {ChapterId}, paragraph: {ParagraphIndex}",
             bookId, chapterId, paragraphIndex);
-        return await _dispatcher.GetCommentsAsync(bookId, chapterId, paragraphIndex, offset, cookie, cancellationToken).ConfigureAwait(false);
+        return await _dispatcher.GetCommentsAsync(bookId, chapterId, paragraphIndex, offset, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc/>

@@ -104,13 +104,11 @@ public interface IFanQieClient : IDisposable
     /// </summary>
     /// <param name="bookId">书籍 ID.</param>
     /// <param name="chapterId">章节 ID.</param>
-    /// <param name="cookie">可选的 Cookie 认证字符串.</param>
     /// <param name="cancellationToken">取消令牌.</param>
     /// <returns>段落索引与评论数量的映射，键为段落索引（字符串），值为评论数量.</returns>
     Task<IReadOnlyDictionary<string, int>?> GetCommentCountAsync(
         string bookId,
         string chapterId,
-        string? cookie = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -120,7 +118,6 @@ public interface IFanQieClient : IDisposable
     /// <param name="chapterId">章节 ID.</param>
     /// <param name="paragraphIndex">段落索引.</param>
     /// <param name="offset">分页偏移量.</param>
-    /// <param name="cookie">可选的 Cookie 认证字符串.</param>
     /// <param name="cancellationToken">取消令牌.</param>
     /// <returns>评论列表结果.</returns>
     Task<CommentListResult?> GetCommentsAsync(
@@ -128,6 +125,5 @@ public interface IFanQieClient : IDisposable
         string chapterId,
         int paragraphIndex,
         string? offset = null,
-        string? cookie = null,
         CancellationToken cancellationToken = default);
 }

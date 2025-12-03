@@ -249,20 +249,18 @@ internal sealed class FanQieDispatcher : IDisposable
     /// </summary>
     /// <param name="bookId">书籍 ID.</param>
     /// <param name="chapterId">章节 ID.</param>
-    /// <param name="cookie">可选的 Cookie.</param>
     /// <param name="cancellationToken">取消令牌.</param>
     /// <returns>段落索引与评论数量的映射.</returns>
     public async Task<IReadOnlyDictionary<string, int>?> GetCommentCountAsync(
         string bookId,
         string chapterId,
-        string? cookie = null,
         CancellationToken cancellationToken = default)
     {
         var url = ApiEndpoints.GetCommentCountUrl(bookId, chapterId, _options.Aid);
         _logger?.LogDebug("Getting comment count: {Url}", url);
 
-        var response = await GetWithOptionalCookieAsync<Models.Internal.DataResponse<Models.Internal.CommentCountData>>(
-            url, cookie, cancellationToken).ConfigureAwait(false);
+        var response = await GetAsync<Models.Internal.DataResponse<Models.Internal.CommentCountData>>(
+            url, cancellationToken).ConfigureAwait(false);
 
         if (response.Code != 0)
         {
@@ -286,7 +284,6 @@ internal sealed class FanQieDispatcher : IDisposable
     /// <param name="chapterId">章节 ID.</param>
     /// <param name="paragraphIndex">段落索引.</param>
     /// <param name="offset">分页偏移量.</param>
-    /// <param name="cookie">可选的 Cookie.</param>
     /// <param name="cancellationToken">取消令牌.</param>
     /// <returns>评论列表结果.</returns>
     public async Task<CommentListResult?> GetCommentsAsync(
@@ -294,14 +291,13 @@ internal sealed class FanQieDispatcher : IDisposable
         string chapterId,
         int paragraphIndex,
         string? offset = null,
-        string? cookie = null,
         CancellationToken cancellationToken = default)
     {
         var url = ApiEndpoints.GetCommentListUrl(bookId, chapterId, paragraphIndex, _options.Aid, offset);
         _logger?.LogDebug("Getting comments: {Url}", url);
 
-        var response = await GetWithOptionalCookieAsync<Models.Internal.DataResponse<Models.Internal.CommentListData>>(
-            url, cookie, cancellationToken).ConfigureAwait(false);
+        var response = await GetAsync<Models.Internal.DataResponse<Models.Internal.CommentListData>>(
+            url, cancellationToken).ConfigureAwait(false);
 
         if (response.Code != 0)
         {
@@ -551,33 +547,6 @@ internal sealed class FanQieDispatcher : IDisposable
                 throw new Exceptions.FanQieApiException(-1, "Empty response received from API.");
             }
 
-            var typeInfo = GetTypeInfo<T>();
-            return System.Text.Json.JsonSerializer.Deserialize(json, typeInfo)
-                ?? throw new Exceptions.FanQieParseException($"Failed to parse response as {typeof(T).Name}.");
-        }
-        finally
-        {
-            _ = _semaphore.Release();
-        }
-    }
-
-    private async Task<T> GetWithOptionalCookieAsync<T>(string url, string? cookie, CancellationToken cancellationToken)
-    {
-        await _semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
-        try
-        {
-            _logger?.LogDebug("GET {Url}", url);
-
-            using var request = new HttpRequestMessage(HttpMethod.Get, url);
-            if (!string.IsNullOrEmpty(cookie))
-            {
-                request.Headers.Add("Cookie", cookie);
-            }
-
-            var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
-
-            var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
             var typeInfo = GetTypeInfo<T>();
             return System.Text.Json.JsonSerializer.Deserialize(json, typeInfo)
                 ?? throw new Exceptions.FanQieParseException($"Failed to parse response as {typeof(T).Name}.");
