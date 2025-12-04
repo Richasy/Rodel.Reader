@@ -17,6 +17,8 @@
     <Project Path="Sources/ApplePodcastSource/ApplePodcastSource.csproj" Id="d51c0790-ded0-487f-91ed-e33dbbcbb878" />
     <Project Path="Sources/FanQieSource.Test/FanQieSource.Test.csproj" />
     <Project Path="Sources/FanQieSource/FanQieSource.csproj" Id="581945f9-d4b3-4e5a-9633-99e32db2d5f0" />
+    <Project Path="Sources/LegadoSource.Test/LegadoSource.Test.csproj" />
+    <Project Path="Sources/LegadoSource/LegadoSource.csproj" Id="2eee6023-a306-4626-b16e-0262196f71ed" />
     <Project Path="Sources/ZLibrarySource.Test/ZLibrarySource.Test.csproj" Id="d4cd8bf4-5a61-4fb2-bd7a-41ca5506a493" />
     <Project Path="Sources/ZLibrarySource/ZLibrarySource.csproj" Id="51cf4ec8-75be-409f-a928-9b0bbab97554" />
   </Folder>
