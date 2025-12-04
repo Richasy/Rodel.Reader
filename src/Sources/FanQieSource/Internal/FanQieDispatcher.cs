@@ -11,9 +11,6 @@ internal sealed class FanQieDispatcher : IDisposable
     private readonly FanQieClientOptions _options;
     private readonly ILogger? _logger;
     private readonly SemaphoreSlim _semaphore;
-    private string? _cryptKey;
-    private string? _installId;
-    private string? _deviceId;
     private bool _disposed;
 
     /// <summary>
@@ -64,10 +61,10 @@ internal sealed class FanQieDispatcher : IDisposable
                 SearchId = response.Data?.SearchId,
             };
         }
-        catch (Exception ex) when (_options.EnableFallback && ex is not OperationCanceledException)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            _logger?.LogWarning(ex, "Primary search API failed, trying fallback API...");
-            return await SearchBooksWithFallbackAsync(query, offset, cancellationToken).ConfigureAwait(false);
+            _logger?.LogWarning(ex, "Official search API failed, trying third-party API...");
+            return await SearchBooksWithThirdPartyApiAsync(query, offset, cancellationToken).ConfigureAwait(false);
         }
     }
 
@@ -98,10 +95,10 @@ internal sealed class FanQieDispatcher : IDisposable
 
             return MapToBookDetail(response.Data[0]);
         }
-        catch (Exception ex) when (_options.EnableFallback && ex is not OperationCanceledException)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            _logger?.LogWarning(ex, "Primary book detail API failed, trying fallback API...");
-            return await GetBookDetailWithFallbackAsync(bookId, cancellationToken).ConfigureAwait(false);
+            _logger?.LogWarning(ex, "Official book detail API failed, trying third-party API...");
+            return await GetBookDetailWithThirdPartyApiAsync(bookId, cancellationToken).ConfigureAwait(false);
         }
     }
 
@@ -127,10 +124,10 @@ internal sealed class FanQieDispatcher : IDisposable
 
             return ParseToc(response.Data);
         }
-        catch (Exception ex) when (_options.EnableFallback && ex is not OperationCanceledException)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            _logger?.LogWarning(ex, "Primary book TOC API failed, trying fallback API...");
-            return await GetBookTocWithFallbackAsync(bookId, cancellationToken).ConfigureAwait(false);
+            _logger?.LogWarning(ex, "Official book TOC API failed, trying third-party API...");
+            return await GetBookTocWithThirdPartyApiAsync(bookId, cancellationToken).ConfigureAwait(false);
         }
     }
 
@@ -150,7 +147,7 @@ internal sealed class FanQieDispatcher : IDisposable
         Dictionary<string, ChapterItem> chapterInfoMap,
         CancellationToken cancellationToken = default)
     {
-        // 使用外部 API，不需要密钥初始化
+        // 章节内容获取优先级：SelfHost API（如有）→ 内置 API
 
         var idList = itemIds.ToList();
         var results = new List<ChapterContent>();
@@ -159,7 +156,7 @@ internal sealed class FanQieDispatcher : IDisposable
         for (var i = 0; i < idList.Count; i += _options.BatchSize)
         {
             var batch = idList.Skip(i).Take(_options.BatchSize).ToList();
-            var batchContent = await FetchBatchAsync(batch, bookId, bookTitle, chapterInfoMap, cancellationToken).ConfigureAwait(false);
+            var batchContent = await FetchBatchContentAsync(batch, bookId, bookTitle, chapterInfoMap, cancellationToken).ConfigureAwait(false);
             results.AddRange(batchContent);
 
             // 请求间隔
@@ -344,217 +341,139 @@ internal sealed class FanQieDispatcher : IDisposable
         _disposed = true;
     }
 
-    private async Task<IReadOnlyList<ChapterContent>> FetchBatchAsync(
+    /// <summary>
+    /// 获取第三方 API 基础 URL.
+    /// </summary>
+    /// <param name="preferSelfHost">是否优先使用自部署 API.</param>
+    /// <returns>API 基础 URL.</returns>
+    private string GetThirdPartyApiBaseUrl(bool preferSelfHost = true)
+    {
+        if (preferSelfHost && !string.IsNullOrEmpty(_options.SelfHostApiBaseUrl))
+        {
+            return _options.SelfHostApiBaseUrl;
+        }
+
+        return FanQieClientOptions.BuiltInApiBaseUrl;
+    }
+
+    /// <summary>
+    /// 获取章节内容（支持 SelfHost → 内置 API 回退）.
+    /// </summary>
+    private async Task<IReadOnlyList<ChapterContent>> FetchBatchContentAsync(
         List<string> itemIds,
         string bookId,
         string bookTitle,
         Dictionary<string, ChapterItem> chapterInfoMap,
         CancellationToken cancellationToken)
     {
-        try
+        // 如果有自部署 API，先尝试使用
+        if (!string.IsNullOrEmpty(_options.SelfHostApiBaseUrl))
         {
-            // 使用外部 API 获取批量内容
-            var url = $"{ApiEndpoints.ExternalContent}?tab=批量&item_ids={string.Join(",", itemIds)}&book_id={bookId}";
-            _logger?.LogDebug("Fetching batch content from external API: {Url}", url);
-
-            var response = await GetAsync<Models.Internal.ExternalBatchContentApiResponse>(url, cancellationToken).ConfigureAwait(false);
-
-            if (response.Code != 200)
+            try
             {
-                throw new Exceptions.FanQieApiException(response.Code, response.Message ?? "Get batch content failed.");
+                return await FetchBatchContentFromApiAsync(
+                    _options.SelfHostApiBaseUrl,
+                    itemIds,
+                    bookId,
+                    bookTitle,
+                    chapterInfoMap,
+                    cancellationToken).ConfigureAwait(false);
             }
-
-            var results = new List<ChapterContent>();
-
-            if (response.Data?.Chapters is null || response.Data.Chapters.Count == 0)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                return results;
+                _logger?.LogWarning(ex, "SelfHost API failed for batch content, falling back to built-in API...");
             }
-
-            // 按照请求顺序处理章节
-            for (var i = 0; i < itemIds.Count && i < response.Data.Chapters.Count; i++)
-            {
-                var itemId = itemIds[i];
-                var chapter = response.Data.Chapters[i];
-
-                if (chapter.Code != 0 || string.IsNullOrEmpty(chapter.Content))
-                {
-                    continue;
-                }
-
-                // 解析章节信息
-                chapterInfoMap.TryGetValue(itemId, out var chapterInfo);
-
-                // 解析内容中的图片并提取纯文本
-                var (images, textContent, htmlContent) = Helpers.ContentParser.ParseContentWithImages(chapter.Content, itemId);
-
-                results.Add(new ChapterContent
-                {
-                    ItemId = itemId,
-                    BookId = bookId,
-                    BookTitle = bookTitle,
-                    Title = chapter.Title ?? chapterInfo?.Title ?? string.Empty,
-                    TextContent = textContent,
-                    HtmlContent = htmlContent,
-                    WordCount = Helpers.ContentParser.CountWords(textContent),
-                    Order = chapterInfo?.Order ?? 0,
-                    VolumeName = chapterInfo?.VolumeName,
-                    PublishTime = chapterInfo?.FirstPassTime,
-                    Images = images,
-                });
-            }
-
-            return results;
         }
-        catch (Exception ex) when (_options.EnableFallback && ex is not OperationCanceledException)
-        {
-            _logger?.LogWarning(ex, "Primary batch content API failed, trying fallback API...");
-            return await FetchBatchWithFallbackAsync(itemIds, bookId, bookTitle, chapterInfoMap, cancellationToken).ConfigureAwait(false);
-        }
+
+        // 使用内置 API
+        return await FetchBatchContentFromApiAsync(
+            FanQieClientOptions.BuiltInApiBaseUrl,
+            itemIds,
+            bookId,
+            bookTitle,
+            chapterInfoMap,
+            cancellationToken).ConfigureAwait(false);
     }
 
-    private async Task<ChapterContent?> FetchSingleChapterAsync(
-        string itemId,
+    /// <summary>
+    /// 从指定 API 获取批量章节内容.
+    /// </summary>
+    private async Task<IReadOnlyList<ChapterContent>> FetchBatchContentFromApiAsync(
+        string apiBaseUrl,
+        List<string> itemIds,
         string bookId,
         string bookTitle,
-        ChapterItem? chapterInfo,
+        Dictionary<string, ChapterItem> chapterInfoMap,
         CancellationToken cancellationToken)
     {
-        // 使用外部 API 获取单个章节内容
-        var url = $"{ApiEndpoints.ExternalContent}?tab=小说&item_id={itemId}";
-        _logger?.LogDebug("Fetching single chapter from external API: {Url}", url);
+        var url = ApiEndpoints.GetFallbackBatchContentUrl(apiBaseUrl);
+        _logger?.LogDebug("Fetching batch content from API: {Url}", url);
 
-        var response = await GetAsync<Models.Internal.ExternalContentApiResponse>(url, cancellationToken).ConfigureAwait(false);
-
-        if (response.Code != 200)
+        var requestBody = new Models.Internal.FallbackBatchContentRequest
         {
-            throw new Exceptions.FanQieApiException(response.Code, response.Message ?? "Get chapter content failed.");
-        }
-
-        if (response.Data?.Content is null)
-        {
-            return null;
-        }
-
-        // 解析内容中的图片并提取纯文本
-        var (images, textContent, htmlContent) = Helpers.ContentParser.ParseContentWithImages(response.Data.Content, itemId);
-
-        return new ChapterContent
-        {
-            ItemId = itemId,
             BookId = bookId,
-            BookTitle = bookTitle,
-            Title = chapterInfo?.Title ?? string.Empty,
-            TextContent = textContent,
-            HtmlContent = htmlContent,
-            WordCount = Helpers.ContentParser.CountWords(textContent),
-            Order = chapterInfo?.Order ?? 0,
-            VolumeName = chapterInfo?.VolumeName,
-            PublishTime = chapterInfo?.FirstPassTime,
-            Images = images,
+            ChapterIds = itemIds,
         };
-    }
 
-    private async Task InitializeCryptKeyAsync(CancellationToken cancellationToken)
-    {
-        _logger?.LogDebug("Initializing crypt key via external device register API...");
+        var response = await PostAsync<Models.Internal.FallbackBatchContentRequest, Models.Internal.FallbackBatchContentApiResponse>(
+            url,
+            requestBody,
+            cancellationToken).ConfigureAwait(false);
 
-        await _semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
-        try
+        if (response.Code != 0)
         {
-            // 调用外部设备注册 API
-            var url = $"{ApiEndpoints.ExternalDeviceRegister}?platform=android";
-            _logger?.LogDebug("Calling external device register API: {Url}", url);
+            throw new Exceptions.FanQieApiException(response.Code, response.Message ?? "Get batch content failed.");
+        }
 
-            var response = await _httpClient.GetAsync(new Uri(url), cancellationToken).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
+        var results = new List<ChapterContent>();
 
-            var responseJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-            _logger?.LogDebug("Device register response: {Response}", responseJson);
+        if (response.Data?.Chapters is null || response.Data.Chapters.Count == 0)
+        {
+            return results;
+        }
 
-            var registerResponse = System.Text.Json.JsonSerializer.Deserialize(responseJson, FanQieJsonContext.Default.DeviceRegisterApiResponse)
-                ?? throw new Exceptions.FanQieParseException("Failed to parse device register response.");
-
-            if (registerResponse.Code != 200 || registerResponse.Data is null)
+        foreach (var itemId in itemIds)
+        {
+            if (!response.Data.Chapters.TryGetValue(itemId, out var chapter) || chapter is null)
             {
-                throw new Exceptions.FanQieApiException(registerResponse.Code, registerResponse.Message ?? "Failed to register device.");
+                continue;
             }
 
-            // 保存设备信息
-            _deviceId = registerResponse.Data.DeviceId;
-            _installId = registerResponse.Data.InstallId;
-            _cryptKey = registerResponse.Data.SecretKey;
+            chapterInfoMap.TryGetValue(itemId, out var chapterInfo);
 
-            _logger?.LogDebug(
-                "Device registered successfully. DeviceId: {DeviceId}, InstallId: {InstallId}",
-                _deviceId,
-                _installId);
-        }
-        finally
-        {
-            _ = _semaphore.Release();
-        }
-    }
+            // 优先使用纯文本内容，如果有 HTML 内容则解析
+            string textContent;
+            string htmlContent;
+            IReadOnlyList<ChapterImage>? images = null;
 
-    private async Task<T> GetWithCookieAsync<T>(string url, CancellationToken cancellationToken)
-    {
-        await _semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
-        try
-        {
-            _logger?.LogDebug("GET (with cookie) {Url}", url);
-
-            using var request = new HttpRequestMessage(HttpMethod.Get, url);
-
-            // 优先使用动态获取的 installId，否则使用配置的
-            var installId = _installId ?? _options.InstallId;
-            if (!string.IsNullOrEmpty(installId))
+            if (!string.IsNullOrEmpty(chapter.RawContent))
             {
-                request.Headers.Add("Cookie", $"install_id={installId}");
-            }
-
-            // 添加 Accept-Encoding 以接收压缩响应
-            request.Headers.Add("Accept-Encoding", "gzip");
-
-            var response = await _httpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
-
-            // 获取原始字节数据
-            var bytes = await response.Content.ReadAsByteArrayAsync(cancellationToken).ConfigureAwait(false);
-            _logger?.LogDebug("Response bytes length: {Length}, first bytes: {FirstBytes}",
-                bytes.Length,
-                bytes.Length >= 10 ? BitConverter.ToString(bytes, 0, 10) : BitConverter.ToString(bytes));
-
-            // 检查是否是 GZIP 压缩数据并解压
-            string json;
-            if (bytes.Length >= 2 && bytes[0] == 0x1f && bytes[1] == 0x8b)
-            {
-                _logger?.LogDebug("Detected GZIP compression, decompressing...");
-                using var compressedStream = new MemoryStream(bytes);
-                using var gzipStream = new GZipStream(compressedStream, CompressionMode.Decompress);
-                using var resultStream = new MemoryStream();
-                await gzipStream.CopyToAsync(resultStream, cancellationToken).ConfigureAwait(false);
-                json = Encoding.UTF8.GetString(resultStream.ToArray());
+                // 解析 HTML 内容
+                (images, textContent, htmlContent) = Helpers.ContentParser.ParseFallbackHtmlContent(chapter.RawContent, itemId);
             }
             else
             {
-                json = Encoding.UTF8.GetString(bytes);
+                textContent = chapter.TxtContent ?? string.Empty;
+                htmlContent = $"<p>{System.Net.WebUtility.HtmlEncode(textContent).Replace("\n", "</p><p>", StringComparison.Ordinal)}</p>";
             }
 
-            _logger?.LogDebug("Response JSON (first 500 chars): {Json}", json.Length > 500 ? json[..500] : json);
-
-            if (string.IsNullOrWhiteSpace(json))
+            results.Add(new ChapterContent
             {
-                throw new Exceptions.FanQieApiException(-1, "Empty response received from API.");
-            }
+                ItemId = itemId,
+                BookId = bookId,
+                BookTitle = bookTitle,
+                Title = chapter.ChapterName ?? chapterInfo?.Title ?? string.Empty,
+                TextContent = textContent,
+                HtmlContent = htmlContent,
+                WordCount = chapter.WordCount > 0 ? chapter.WordCount : Helpers.ContentParser.CountWords(textContent),
+                Order = chapterInfo?.Order ?? 0,
+                VolumeName = chapterInfo?.VolumeName,
+                PublishTime = chapterInfo?.FirstPassTime,
+                Images = images,
+            });
+        }
 
-            var typeInfo = GetTypeInfo<T>();
-            return System.Text.Json.JsonSerializer.Deserialize(json, typeInfo)
-                ?? throw new Exceptions.FanQieParseException($"Failed to parse response as {typeof(T).Name}.");
-        }
-        finally
-        {
-            _ = _semaphore.Release();
-        }
+        return results;
     }
 
     private async Task<T> GetAsync<T>(string url, CancellationToken cancellationToken)
@@ -602,21 +521,6 @@ internal sealed class FanQieDispatcher : IDisposable
         if (typeof(T) == typeof(Models.Internal.CryptKeyApiResponse))
         {
             return (System.Text.Json.Serialization.Metadata.JsonTypeInfo<T>)(object)FanQieJsonContext.Default.CryptKeyApiResponse;
-        }
-
-        if (typeof(T) == typeof(Models.Internal.DeviceRegisterApiResponse))
-        {
-            return (System.Text.Json.Serialization.Metadata.JsonTypeInfo<T>)(object)FanQieJsonContext.Default.DeviceRegisterApiResponse;
-        }
-
-        if (typeof(T) == typeof(Models.Internal.ExternalContentApiResponse))
-        {
-            return (System.Text.Json.Serialization.Metadata.JsonTypeInfo<T>)(object)FanQieJsonContext.Default.ExternalContentApiResponse;
-        }
-
-        if (typeof(T) == typeof(Models.Internal.ExternalBatchContentApiResponse))
-        {
-            return (System.Text.Json.Serialization.Metadata.JsonTypeInfo<T>)(object)FanQieJsonContext.Default.ExternalBatchContentApiResponse;
         }
 
         if (typeof(T) == typeof(Models.Internal.FallbackSearchApiResponse))
@@ -819,21 +723,50 @@ internal sealed class FanQieDispatcher : IDisposable
         return volumes;
     }
 
-    #region 后备 API 实现
+    #region 第三方 API 实现
 
-    private async Task<SearchResult<BookItem>> SearchBooksWithFallbackAsync(
+    /// <summary>
+    /// 使用第三方 API 搜索（支持 SelfHost → 内置 API 回退）.
+    /// </summary>
+    private async Task<SearchResult<BookItem>> SearchBooksWithThirdPartyApiAsync(
         string query,
         int offset,
         CancellationToken cancellationToken)
     {
-        var url = ApiEndpoints.GetFallbackSearchUrl(_options.FallbackApiBaseUrl, query, offset);
-        _logger?.LogDebug("Fallback search API: {Url}", url);
+        // 如果有自部署 API，先尝试使用
+        if (!string.IsNullOrEmpty(_options.SelfHostApiBaseUrl))
+        {
+            try
+            {
+                return await SearchBooksFromApiAsync(_options.SelfHostApiBaseUrl, query, offset, cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                _logger?.LogWarning(ex, "SelfHost API failed for search, falling back to built-in API...");
+            }
+        }
+
+        // 使用内置 API
+        return await SearchBooksFromApiAsync(FanQieClientOptions.BuiltInApiBaseUrl, query, offset, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// 从指定 API 搜索书籍.
+    /// </summary>
+    private async Task<SearchResult<BookItem>> SearchBooksFromApiAsync(
+        string apiBaseUrl,
+        string query,
+        int offset,
+        CancellationToken cancellationToken)
+    {
+        var url = ApiEndpoints.GetFallbackSearchUrl(apiBaseUrl, query, offset);
+        _logger?.LogDebug("Third-party search API: {Url}", url);
 
         var response = await GetAsync<Models.Internal.FallbackSearchApiResponse>(url, cancellationToken).ConfigureAwait(false);
 
         if (response.Code != 0)
         {
-            throw new Exceptions.FanQieApiException(response.Code, response.Message ?? "Fallback search failed.");
+            throw new Exceptions.FanQieApiException(response.Code, response.Message ?? "Search failed.");
         }
 
         var items = response.Data?.Books?.Select(MapFallbackToBookItem).ToList() ?? [];
@@ -847,18 +780,46 @@ internal sealed class FanQieDispatcher : IDisposable
         };
     }
 
-    private async Task<BookDetail?> GetBookDetailWithFallbackAsync(
+    /// <summary>
+    /// 使用第三方 API 获取书籍详情（支持 SelfHost → 内置 API 回退）.
+    /// </summary>
+    private async Task<BookDetail?> GetBookDetailWithThirdPartyApiAsync(
         string bookId,
         CancellationToken cancellationToken)
     {
-        var url = ApiEndpoints.GetFallbackBookDetailUrl(_options.FallbackApiBaseUrl, bookId);
-        _logger?.LogDebug("Fallback book detail API: {Url}", url);
+        // 如果有自部署 API，先尝试使用
+        if (!string.IsNullOrEmpty(_options.SelfHostApiBaseUrl))
+        {
+            try
+            {
+                return await GetBookDetailFromApiAsync(_options.SelfHostApiBaseUrl, bookId, cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                _logger?.LogWarning(ex, "SelfHost API failed for book detail, falling back to built-in API...");
+            }
+        }
+
+        // 使用内置 API
+        return await GetBookDetailFromApiAsync(FanQieClientOptions.BuiltInApiBaseUrl, bookId, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// 从指定 API 获取书籍详情.
+    /// </summary>
+    private async Task<BookDetail?> GetBookDetailFromApiAsync(
+        string apiBaseUrl,
+        string bookId,
+        CancellationToken cancellationToken)
+    {
+        var url = ApiEndpoints.GetFallbackBookDetailUrl(apiBaseUrl, bookId);
+        _logger?.LogDebug("Third-party book detail API: {Url}", url);
 
         var response = await GetAsync<Models.Internal.FallbackBookDetailApiResponse>(url, cancellationToken).ConfigureAwait(false);
 
         if (response.Code != 0)
         {
-            throw new Exceptions.FanQieApiException(response.Code, response.Message ?? "Fallback get book detail failed.");
+            throw new Exceptions.FanQieApiException(response.Code, response.Message ?? "Get book detail failed.");
         }
 
         if (response.Data is null)
@@ -869,98 +830,49 @@ internal sealed class FanQieDispatcher : IDisposable
         return MapFallbackToBookDetail(response.Data);
     }
 
-    private async Task<IReadOnlyList<BookVolume>> GetBookTocWithFallbackAsync(
+    /// <summary>
+    /// 使用第三方 API 获取书籍目录（支持 SelfHost → 内置 API 回退）.
+    /// </summary>
+    private async Task<IReadOnlyList<BookVolume>> GetBookTocWithThirdPartyApiAsync(
         string bookId,
         CancellationToken cancellationToken)
     {
-        var url = ApiEndpoints.GetFallbackBookTocUrl(_options.FallbackApiBaseUrl, bookId);
-        _logger?.LogDebug("Fallback book TOC API: {Url}", url);
+        // 如果有自部署 API，先尝试使用
+        if (!string.IsNullOrEmpty(_options.SelfHostApiBaseUrl))
+        {
+            try
+            {
+                return await GetBookTocFromApiAsync(_options.SelfHostApiBaseUrl, bookId, cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                _logger?.LogWarning(ex, "SelfHost API failed for book TOC, falling back to built-in API...");
+            }
+        }
+
+        // 使用内置 API
+        return await GetBookTocFromApiAsync(FanQieClientOptions.BuiltInApiBaseUrl, bookId, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// 从指定 API 获取书籍目录.
+    /// </summary>
+    private async Task<IReadOnlyList<BookVolume>> GetBookTocFromApiAsync(
+        string apiBaseUrl,
+        string bookId,
+        CancellationToken cancellationToken)
+    {
+        var url = ApiEndpoints.GetFallbackBookTocUrl(apiBaseUrl, bookId);
+        _logger?.LogDebug("Third-party book TOC API: {Url}", url);
 
         var response = await GetAsync<Models.Internal.FallbackBookTocApiResponse>(url, cancellationToken).ConfigureAwait(false);
 
         if (response.Code != 0)
         {
-            throw new Exceptions.FanQieApiException(response.Code, response.Message ?? "Fallback get book TOC failed.");
+            throw new Exceptions.FanQieApiException(response.Code, response.Message ?? "Get book TOC failed.");
         }
 
         return ParseFallbackToc(response.Data);
-    }
-
-    private async Task<IReadOnlyList<ChapterContent>> FetchBatchWithFallbackAsync(
-        List<string> itemIds,
-        string bookId,
-        string bookTitle,
-        Dictionary<string, ChapterItem> chapterInfoMap,
-        CancellationToken cancellationToken)
-    {
-        var url = ApiEndpoints.GetFallbackBatchContentUrl(_options.FallbackApiBaseUrl);
-        _logger?.LogDebug("Fallback batch content API: {Url}", url);
-
-        var requestBody = new Models.Internal.FallbackBatchContentRequest
-        {
-            BookId = bookId,
-            ChapterIds = itemIds,
-        };
-
-        var response = await PostAsync<Models.Internal.FallbackBatchContentRequest, Models.Internal.FallbackBatchContentApiResponse>(
-            url,
-            requestBody,
-            cancellationToken).ConfigureAwait(false);
-
-        if (response.Code != 0)
-        {
-            throw new Exceptions.FanQieApiException(response.Code, response.Message ?? "Fallback get batch content failed.");
-        }
-
-        var results = new List<ChapterContent>();
-
-        if (response.Data?.Chapters is null || response.Data.Chapters.Count == 0)
-        {
-            return results;
-        }
-
-        foreach (var itemId in itemIds)
-        {
-            if (!response.Data.Chapters.TryGetValue(itemId, out var chapter) || chapter is null)
-            {
-                continue;
-            }
-
-            chapterInfoMap.TryGetValue(itemId, out var chapterInfo);
-
-            // 优先使用纯文本内容，如果有 HTML 内容则解析
-            string textContent;
-            string htmlContent;
-            IReadOnlyList<ChapterImage>? images = null;
-
-            if (!string.IsNullOrEmpty(chapter.RawContent))
-            {
-                // 解析 HTML 内容
-                (images, textContent, htmlContent) = Helpers.ContentParser.ParseFallbackHtmlContent(chapter.RawContent, itemId);
-            }
-            else
-            {
-                textContent = chapter.TxtContent ?? string.Empty;
-                htmlContent = $"<p>{System.Net.WebUtility.HtmlEncode(textContent).Replace("\n", "</p><p>", StringComparison.Ordinal)}</p>";
-            }
-
-            results.Add(new ChapterContent
-            {
-                ItemId = itemId,
-                BookId = bookId,
-                BookTitle = bookTitle,
-                Title = chapter.ChapterName ?? chapterInfo?.Title ?? string.Empty,
-                TextContent = textContent,
-                HtmlContent = htmlContent,
-                WordCount = chapter.WordCount > 0 ? chapter.WordCount : Helpers.ContentParser.CountWords(textContent),
-                Order = chapterInfo?.Order ?? 0,
-                VolumeName = chapterInfo?.VolumeName,
-                PublishTime = chapterInfo?.FirstPassTime,
-                Images = images,
-            });
-        }
-
-        return results;
     }
 
     private async Task<TResponse> PostAsync<TRequest, TResponse>(
@@ -973,12 +885,12 @@ internal sealed class FanQieDispatcher : IDisposable
         {
             _logger?.LogDebug("POST {Url}", url);
 
-            // 使用默认选项序列化，以确保 JsonPropertyName 特性生效（后备 API 期望 camelCase）
+            // 使用默认选项序列化，以确保 JsonPropertyName 特性生效（第三方 API 期望 camelCase）
             var json = System.Text.Json.JsonSerializer.Serialize(request);
             using var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync(new Uri(url), content, cancellationToken).ConfigureAwait(false);
-            
+
             var responseJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
             response.EnsureSuccessStatusCode();

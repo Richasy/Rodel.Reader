@@ -45,7 +45,7 @@ public class FanQieDownloaderIntegrationTests
             Timeout = TimeSpan.FromSeconds(120),
             MaxConcurrentRequests = 3,
             RequestDelayMs = 300,
-            FallbackApiBaseUrl = "http://127.0.0.1:9999"
+            SelfHostApiBaseUrl = "http://127.0.0.1:9999"
         };
 
         _client = new FanQieClient(options);

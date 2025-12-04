@@ -73,12 +73,23 @@ public sealed class FanQieClientOptions
     public Dictionary<string, string>? CustomHeaders { get; set; }
 
     /// <summary>
-    /// 后备 API 服务地址.
+    /// 内置 API 服务地址.
     /// </summary>
-    public string FallbackApiBaseUrl { get; set; } = "https://fqnovel.richasy.net";
+    /// <remarks>
+    /// 默认的第三方 API 服务，用于在官方 API 失败或获取章节内容时使用。
+    /// </remarks>
+    public const string BuiltInApiBaseUrl = "https://fqnovel.richasy.net";
 
     /// <summary>
-    /// 是否启用后备 API.
+    /// 用户自部署的 API 服务地址.
     /// </summary>
-    public bool EnableFallback { get; set; } = true;
+    /// <remarks>
+    /// <para>可选的自部署服务地址，该服务是可自部署的 Docker 容器。</para>
+    /// <para>请求优先级：</para>
+    /// <list type="bullet">
+    /// <item>对于官方 API 支持的服务（搜索、详情、目录）：官方 API → 自部署 API → 内置 API</item>
+    /// <item>对于仅第三方支持的服务（章节内容）：自部署 API → 内置 API</item>
+    /// </list>
+    /// </remarks>
+    public string? SelfHostApiBaseUrl { get; set; }
 }

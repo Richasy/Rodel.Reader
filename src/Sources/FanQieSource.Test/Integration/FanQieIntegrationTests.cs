@@ -22,7 +22,7 @@ public class FanQieIntegrationTests
             MaxConcurrentRequests = 2,
             RequestDelayMs = 1000, // 增加延迟避免被限流
             InstallId = TestInstallId,
-            FallbackApiBaseUrl = "http://127.0.0.1:9999"
+            SelfHostApiBaseUrl = "http://127.0.0.1:9999"
         };
 
         _client = new FanQieClient(options);

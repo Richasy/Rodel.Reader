@@ -33,16 +33,6 @@ internal static class ApiEndpoints
     public const string RegisterKey = "https://api5-normal-sinfonlineb.fqnovel.com/reading/crypt/registerkey";
 
     /// <summary>
-    /// 外部设备注册 API URL（第三方服务）.
-    /// </summary>
-    public const string ExternalDeviceRegister = "https://fq.shusan.cn/api/device/register";
-
-    /// <summary>
-    /// 外部内容获取 API URL（第三方服务）.
-    /// </summary>
-    public const string ExternalContent = "https://fq.shusan.cn/api/content";
-
-    /// <summary>
     /// 获取搜索 URL.
     /// </summary>
     /// <param name="query">搜索关键词.</param>
