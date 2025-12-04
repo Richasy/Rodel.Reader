@@ -73,12 +73,12 @@ public sealed class FanQieClientOptions
     public Dictionary<string, string>? CustomHeaders { get; set; }
 
     /// <summary>
-    /// 后备 API 服务地址.
+    /// 外部 API 服务地址（从远程配置获取）.
     /// </summary>
-    public string FallbackApiBaseUrl { get; set; } = "https://fqnovel.richasy.net";
-
-    /// <summary>
-    /// 是否启用后备 API.
-    /// </summary>
-    public bool EnableFallback { get; set; } = true;
+    /// <remarks>
+    /// <para>该地址从远程配置动态获取，用于批量章节内容请求。</para>
+    /// <para>对于非批量请求（搜索、详情、目录、单章节），官方 API 失败时会回退到此 API。</para>
+    /// <para>对于批量章节请求，仅使用此 API。</para>
+    /// </remarks>
+    public string? ExternalApiBaseUrl { get; set; }
 }

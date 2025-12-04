@@ -68,6 +68,22 @@ public interface IFanQieClient : IDisposable
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// 使用范围表示法批量获取章节内容.
+    /// </summary>
+    /// <param name="bookId">书籍 ID.</param>
+    /// <param name="bookTitle">书籍标题.</param>
+    /// <param name="chapterRange">章节范围，格式为 "start-end"，如 "1-10" 表示第1到第10章.</param>
+    /// <param name="chapterInfoMap">章节信息映射表（itemId -> ChapterItem）.</param>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>章节内容列表.</returns>
+    Task<IReadOnlyList<ChapterContent>> GetChapterContentsByRangeAsync(
+        string bookId,
+        string bookTitle,
+        string chapterRange,
+        Dictionary<string, ChapterItem> chapterInfoMap,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// 下载整本书的所有章节内容（仅免费章节）.
     /// </summary>
     /// <param name="bookId">书籍 ID.</param>

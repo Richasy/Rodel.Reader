@@ -97,43 +97,21 @@ internal sealed class ChapterGenerator : IChapterGenerator
             return html;
         }
 
-        // 对于已经是 HTML 的内容，按偏移量插入图片
-        // 这里使用简单策略：在偏移位置后的下一个闭合标签后插入
-        var sortedImages = images.OrderByDescending(img => img.Offset).ToList();
-
         var result = html;
-        foreach (var image in sortedImages)
-        {
-            var imageHtml = GenerateImageHtml(image);
 
-            if (image.Offset >= result.Length)
+        // 使用 ID 匹配模式替换占位符
+        foreach (var image in images)
+        {
+            // 查找占位符 <!-- FANQIE_IMAGE:imageId -->
+            var placeholder = $"<!-- FANQIE_IMAGE:{image.Id} -->";
+            if (result.Contains(placeholder, StringComparison.Ordinal))
             {
-                // 偏移量超出内容，追加到末尾
-                result = result + "\n" + imageHtml;
-            }
-            else
-            {
-                // 在偏移位置后寻找合适的插入点（下一个 > 或换行）
-                var insertPos = FindInsertPosition(result, image.Offset);
-                result = result.Insert(insertPos, "\n" + imageHtml);
+                var imageHtml = GenerateImageHtml(image);
+                result = result.Replace(placeholder, imageHtml, StringComparison.Ordinal);
             }
         }
 
         return result;
-    }
-
-    private static int FindInsertPosition(string html, int offset)
-    {
-        // 从偏移位置开始，找到下一个闭合标签 > 或换行符
-        for (var i = offset; i < html.Length; i++)
-        {
-            if (html[i] == '>' || html[i] == '\n')
-            {
-                return i + 1;
-            }
-        }
-
-        return html.Length;
     }
 
     private static string GenerateImageHtml(ChapterImageInfo image)

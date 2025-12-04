@@ -23,26 +23,6 @@ internal static class ApiEndpoints
     public const string BookToc = "https://fanqienovel.com/api/reader/directory/detail";
 
     /// <summary>
-    /// 批量内容 API 基础 URL.
-    /// </summary>
-    public const string BatchContentBase = "https://api5-normal-sinfonlineb.fqnovel.com/reading/reader/batch_full/v";
-
-    /// <summary>
-    /// 注册密钥 API URL.
-    /// </summary>
-    public const string RegisterKey = "https://api5-normal-sinfonlineb.fqnovel.com/reading/crypt/registerkey";
-
-    /// <summary>
-    /// 外部设备注册 API URL（第三方服务）.
-    /// </summary>
-    public const string ExternalDeviceRegister = "https://fq.shusan.cn/api/device/register";
-
-    /// <summary>
-    /// 外部内容获取 API URL（第三方服务）.
-    /// </summary>
-    public const string ExternalContent = "https://fq.shusan.cn/api/content";
-
-    /// <summary>
     /// 获取搜索 URL.
     /// </summary>
     /// <param name="query">搜索关键词.</param>
@@ -76,64 +56,83 @@ internal static class ApiEndpoints
         return $"{BookToc}?bookId={bookId}";
     }
 
-    /// <summary>
-    /// 获取批量内容 URL.
-    /// </summary>
-    /// <param name="itemIds">章节 ID 列表（逗号分隔）.</param>
-    /// <param name="aid">应用 ID.</param>
-    /// <param name="updateVersionCode">更新版本码.</param>
-    /// <returns>批量内容 URL.</returns>
-    public static string GetBatchContentUrl(string itemIds, string aid, string updateVersionCode)
-    {
-        return $"{BatchContentBase}?item_ids={itemIds}&req_type=1&aid={aid}&update_version_code={updateVersionCode}";
-    }
-
-    #region 后备 API
+    #region 外部 API (qkfqapi.vv9v.cn)
 
     /// <summary>
-    /// 获取后备搜索 URL.
+    /// 外部 API 配置 URL.
     /// </summary>
-    /// <param name="baseUrl">后备 API 基础 URL.</param>
+    public const string ExternalConfigUrl = "https://qbin.me/r/fpoash/";
+
+    /// <summary>
+    /// 获取外部搜索 URL.
+    /// </summary>
+    /// <param name="baseUrl">外部 API 基础 URL.</param>
     /// <param name="query">搜索关键词.</param>
     /// <param name="offset">偏移量.</param>
-    /// <param name="count">每页数量.</param>
-    /// <returns>后备搜索 URL.</returns>
-    public static string GetFallbackSearchUrl(string baseUrl, string query, int offset, int count = 20)
+    /// <returns>外部搜索 URL.</returns>
+    public static string GetExternalSearchUrl(string baseUrl, string query, int offset)
     {
         var encodedQuery = Uri.EscapeDataString(query);
-        return $"{baseUrl}/api/fqsearch/books?query={encodedQuery}&offset={offset}&count={count}";
+        return $"{baseUrl}/api/search?key={encodedQuery}&tab_type=3&offset={offset}";
     }
 
     /// <summary>
-    /// 获取后备书籍详情 URL.
+    /// 获取外部书籍详情 URL.
     /// </summary>
-    /// <param name="baseUrl">后备 API 基础 URL.</param>
+    /// <param name="baseUrl">外部 API 基础 URL.</param>
     /// <param name="bookId">书籍 ID.</param>
-    /// <returns>后备书籍详情 URL.</returns>
-    public static string GetFallbackBookDetailUrl(string baseUrl, string bookId)
+    /// <returns>外部书籍详情 URL.</returns>
+    public static string GetExternalBookDetailUrl(string baseUrl, string bookId)
     {
-        return $"{baseUrl}/api/fqnovel/book/{bookId}";
+        return $"{baseUrl}/api/detail?book_id={bookId}";
     }
 
     /// <summary>
-    /// 获取后备书籍目录 URL.
+    /// 获取外部书籍目录 URL.
     /// </summary>
-    /// <param name="baseUrl">后备 API 基础 URL.</param>
+    /// <param name="baseUrl">外部 API 基础 URL.</param>
     /// <param name="bookId">书籍 ID.</param>
-    /// <returns>后备书籍目录 URL.</returns>
-    public static string GetFallbackBookTocUrl(string baseUrl, string bookId)
+    /// <returns>外部书籍目录 URL.</returns>
+    public static string GetExternalBookTocUrl(string baseUrl, string bookId)
     {
-        return $"{baseUrl}/api/fqsearch/directory/{bookId}";
+        return $"{baseUrl}/api/book?book_id={bookId}";
     }
 
     /// <summary>
-    /// 获取后备批量章节内容 URL.
+    /// 获取外部章节内容 URL（单章节）.
     /// </summary>
-    /// <param name="baseUrl">后备 API 基础 URL.</param>
-    /// <returns>后备批量章节内容 URL.</returns>
-    public static string GetFallbackBatchContentUrl(string baseUrl)
+    /// <param name="baseUrl">外部 API 基础 URL.</param>
+    /// <param name="itemId">章节 ID.</param>
+    /// <returns>外部章节内容 URL.</returns>
+    public static string GetExternalChapterContentUrl(string baseUrl, string itemId)
     {
-        return $"{baseUrl}/api/fqnovel/chapters/batch";
+        var encodedTab = Uri.EscapeDataString("小说");
+        return $"{baseUrl}/api/content?tab={encodedTab}&item_id={itemId}";
+    }
+
+    /// <summary>
+    /// 获取外部批量章节内容 URL.
+    /// </summary>
+    /// <param name="baseUrl">外部 API 基础 URL.</param>
+    /// <param name="bookId">书籍 ID.</param>
+    /// <param name="itemIds">章节 ID 列表，用逗号分隔.</param>
+    /// <returns>外部批量章节内容 URL.</returns>
+    public static string GetExternalBatchContentUrl(string baseUrl, string bookId, string itemIds)
+    {
+        var encodedTab = Uri.EscapeDataString("批量");
+        return $"{baseUrl}/api/content?tab={encodedTab}&book_id={bookId}&item_ids={itemIds}";
+    }
+
+    /// <summary>
+    /// 获取外部整书下载 URL.
+    /// </summary>
+    /// <param name="baseUrl">外部 API 基础 URL.</param>
+    /// <param name="bookId">书籍 ID.</param>
+    /// <returns>外部整书下载 URL.</returns>
+    public static string GetExternalFullBookUrl(string baseUrl, string bookId)
+    {
+        var encodedTab = Uri.EscapeDataString("下载");
+        return $"{baseUrl}/api/content?book_id={bookId}&tab={encodedTab}";
     }
 
     #endregion
