@@ -18,15 +18,15 @@ namespace Richasy.RodelReader.Sources.FanQie.Internal;
 [JsonSerializable(typeof(Models.Internal.CryptKeyApiResponse))]
 [JsonSerializable(typeof(Models.Internal.RegisterKeyRequest))]
 [JsonSerializable(typeof(List<Models.Internal.CategoryV2Item>))]
-[JsonSerializable(typeof(Models.Internal.FallbackSearchApiResponse))]
-[JsonSerializable(typeof(Models.Internal.FallbackBookDetailApiResponse))]
-[JsonSerializable(typeof(Models.Internal.FallbackBookTocApiResponse))]
-[JsonSerializable(typeof(Models.Internal.FallbackBatchContentApiResponse))]
-[JsonSerializable(typeof(Models.Internal.FallbackBatchContentRequest))]
-[JsonSerializable(typeof(Models.Internal.DeviceRegisterApiResponse))]
-[JsonSerializable(typeof(Models.Internal.DeviceReleaseResponse))]
 [JsonSerializable(typeof(Models.Internal.DataResponse<Models.Internal.CommentCountData>))]
 [JsonSerializable(typeof(Models.Internal.DataResponse<Models.Internal.CommentListData>))]
+[JsonSerializable(typeof(Models.Internal.ExternalRemoteConfig))]
+[JsonSerializable(typeof(Models.Internal.ExternalSearchApiResponse))]
+[JsonSerializable(typeof(Models.Internal.ExternalBookDetailApiResponse))]
+[JsonSerializable(typeof(Models.Internal.ExternalBookTocApiResponse))]
+[JsonSerializable(typeof(Models.Internal.ExternalChapterContentApiResponse))]
+[JsonSerializable(typeof(Models.Internal.ExternalBatchContentApiResponse))]
+[JsonSerializable(typeof(Models.Internal.ExternalFullBookApiResponse))]
 internal sealed partial class FanQieJsonContext : JsonSerializerContext
 {
 }

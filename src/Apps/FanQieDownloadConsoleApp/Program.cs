@@ -17,11 +17,7 @@ Console.InputEncoding = System.Text.Encoding.UTF8;
 ConsoleUI.ShowWelcome();
 
 // 创建依赖
-var opt = new FanQieClientOptions
-{
-    SelfHostApiBaseUrl = "https://127.0.0.1:9999",
-};
-using var fanQieClient = new FanQieClient(opt);
+using var fanQieClient = new FanQieClient();
 var epubBuilder = new EpubBuilder();
 var downloadService = new FanQieDownloadService(fanQieClient, epubBuilder);
 

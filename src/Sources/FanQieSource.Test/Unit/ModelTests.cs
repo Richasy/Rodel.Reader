@@ -280,8 +280,7 @@ public class ModelTests
         Assert.AreEqual(3, options.MaxConcurrentRequests);
         Assert.AreEqual(10, options.BatchSize);
         Assert.AreEqual(500, options.RequestDelayMs);
-        Assert.IsNull(options.SelfHostApiBaseUrl);
-        Assert.AreEqual("https://fqnovel.richasy.net", FanQieClientOptions.BuiltInApiBaseUrl);
+        Assert.IsNull(options.ExternalApiBaseUrl);
     }
 
     [TestMethod]
