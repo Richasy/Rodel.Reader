@@ -75,9 +75,12 @@ public sealed class FanQieClient : IFanQieClient
         Helpers.Guard.NotNullOrEmpty(bookTitle);
         Helpers.Guard.NotNull(chapter);
 
+        // 单章节使用范围请求，范围为 "order-order"
+        var chapterRange = $"{chapter.Order}-{chapter.Order}";
         var chapterInfoMap = new Dictionary<string, ChapterItem> { { chapter.ItemId, chapter } };
-        var results = await _dispatcher.GetBatchContentAsync(
-            [chapter.ItemId],
+
+        var results = await _dispatcher.GetBatchContentByRangeAsync(
+            chapterRange,
             bookId,
             bookTitle,
             chapterInfoMap,
@@ -104,10 +107,35 @@ public sealed class FanQieClient : IFanQieClient
         }
 
         var chapterInfoMap = chapterList.ToDictionary(c => c.ItemId, c => c);
-        var itemIds = chapterList.Select(c => c.ItemId);
 
+        // 使用范围请求
+#pragma warning disable CS0618 // Type or member is obsolete
         return await _dispatcher.GetBatchContentAsync(
-            itemIds,
+            chapterList.Select(c => c.ItemId),
+            bookId,
+            bookTitle,
+            chapterInfoMap,
+            cancellationToken).ConfigureAwait(false);
+#pragma warning restore CS0618
+    }
+
+    /// <inheritdoc/>
+    public async Task<IReadOnlyList<ChapterContent>> GetChapterContentsByRangeAsync(
+        string bookId,
+        string bookTitle,
+        string chapterRange,
+        Dictionary<string, ChapterItem> chapterInfoMap,
+        CancellationToken cancellationToken = default)
+    {
+        Helpers.Guard.NotNullOrEmpty(bookId);
+        Helpers.Guard.NotNullOrEmpty(bookTitle);
+        Helpers.Guard.NotNullOrEmpty(chapterRange);
+        Helpers.Guard.NotNull(chapterInfoMap);
+
+        _logger?.LogDebug("Getting chapter contents by range: {Range}", chapterRange);
+
+        return await _dispatcher.GetBatchContentByRangeAsync(
+            chapterRange,
             bookId,
             bookTitle,
             chapterInfoMap,
@@ -144,7 +172,7 @@ public sealed class FanQieClient : IFanQieClient
 
         _logger?.LogInformation("Found {Count} chapters to download.", allChapters.Count);
 
-        // 4. 批量下载
+        // 4. 使用范围请求批量下载
         var allContents = new List<ChapterContent>();
         var chapterInfoMap = allChapters.ToDictionary(c => c.ItemId, c => c);
         var total = allChapters.Count;
@@ -154,11 +182,13 @@ public sealed class FanQieClient : IFanQieClient
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var batch = allChapters.Skip(i).Take(batchSize).ToList();
-            var itemIds = batch.Select(c => c.ItemId);
+            var startOrder = allChapters[i].Order;
+            var endIndex = Math.Min(i + batchSize - 1, total - 1);
+            var endOrder = allChapters[endIndex].Order;
+            var chapterRange = $"{startOrder}-{endOrder}";
 
-            var contents = await _dispatcher.GetBatchContentAsync(
-                itemIds,
+            var contents = await _dispatcher.GetBatchContentByRangeAsync(
+                chapterRange,
                 bookId,
                 detail.Title,
                 chapterInfoMap,

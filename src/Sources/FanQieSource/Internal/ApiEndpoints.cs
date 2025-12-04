@@ -23,16 +23,6 @@ internal static class ApiEndpoints
     public const string BookToc = "https://fanqienovel.com/api/reader/directory/detail";
 
     /// <summary>
-    /// 批量内容 API 基础 URL.
-    /// </summary>
-    public const string BatchContentBase = "https://api5-normal-sinfonlineb.fqnovel.com/reading/reader/batch_full/v";
-
-    /// <summary>
-    /// 注册密钥 API URL.
-    /// </summary>
-    public const string RegisterKey = "https://api5-normal-sinfonlineb.fqnovel.com/reading/crypt/registerkey";
-
-    /// <summary>
     /// 获取搜索 URL.
     /// </summary>
     /// <param name="query">搜索关键词.</param>
@@ -64,18 +54,6 @@ internal static class ApiEndpoints
     public static string GetBookTocUrl(string bookId)
     {
         return $"{BookToc}?bookId={bookId}";
-    }
-
-    /// <summary>
-    /// 获取批量内容 URL.
-    /// </summary>
-    /// <param name="itemIds">章节 ID 列表（逗号分隔）.</param>
-    /// <param name="aid">应用 ID.</param>
-    /// <param name="updateVersionCode">更新版本码.</param>
-    /// <returns>批量内容 URL.</returns>
-    public static string GetBatchContentUrl(string itemIds, string aid, string updateVersionCode)
-    {
-        return $"{BatchContentBase}?item_ids={itemIds}&req_type=1&aid={aid}&update_version_code={updateVersionCode}";
     }
 
     #region 后备 API
@@ -124,6 +102,26 @@ internal static class ApiEndpoints
     public static string GetFallbackBatchContentUrl(string baseUrl)
     {
         return $"{baseUrl}/api/fqnovel/chapters/batch";
+    }
+
+    /// <summary>
+    /// 获取设备注册 URL.
+    /// </summary>
+    /// <param name="baseUrl">API 基础 URL.</param>
+    /// <returns>设备注册 URL.</returns>
+    public static string GetDeviceRegisterUrl(string baseUrl)
+    {
+        return $"{baseUrl}/api/fqnovel/device/register";
+    }
+
+    /// <summary>
+    /// 获取设备释放 URL.
+    /// </summary>
+    /// <param name="baseUrl">API 基础 URL.</param>
+    /// <returns>设备释放 URL.</returns>
+    public static string GetDeviceReleaseUrl(string baseUrl)
+    {
+        return $"{baseUrl}/api/fqnovel/device/release";
     }
 
     #endregion

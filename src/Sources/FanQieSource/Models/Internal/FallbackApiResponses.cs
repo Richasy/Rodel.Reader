@@ -249,7 +249,7 @@ internal sealed class FallbackBatchContentData
     public FallbackBatchBookInfo? BookInfo { get; set; }
 
     /// <summary>
-    /// 章节内容字典，键为章节ID.
+    /// 章节内容字典，键为章节序号(order)，如 "1", "2", "3".
     /// </summary>
     [JsonPropertyName("chapters")]
     public Dictionary<string, FallbackChapterContent>? Chapters { get; set; }
@@ -307,15 +307,18 @@ internal sealed class FallbackChapterContent
 }
 
 /// <summary>
-/// 后备批量章节请求体.
+/// 后备批量章节请求体（使用范围表示法）.
 /// </summary>
 internal sealed class FallbackBatchContentRequest
 {
     [JsonPropertyName("bookId")]
     public string? BookId { get; set; }
 
-    [JsonPropertyName("chapterIds")]
-    public IEnumerable<string>? ChapterIds { get; set; }
+    /// <summary>
+    /// 章节范围，格式为 "start-end"，如 "1-10" 表示第1到第10章.
+    /// </summary>
+    [JsonPropertyName("chapterRange")]
+    public string? ChapterRange { get; set; }
 }
 
 #endregion

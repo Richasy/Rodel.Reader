@@ -100,11 +100,24 @@ internal static partial class ChapterContentMarker
             return ChapterStatus.Pending;
         }
 
-        // 尝试从 HTML 注释提取（新格式）
+        // 优先从 HTML 注释提取（新格式，最可靠）
         var commentMatch = CommentStatusRegex().Match(htmlContent);
         if (commentMatch.Success)
         {
             return commentMatch.Groups[1].Value.ToLowerInvariant() switch
+            {
+                "downloaded" => ChapterStatus.Downloaded,
+                "failed" => ChapterStatus.Failed,
+                "locked" => ChapterStatus.Locked,
+                _ => ChapterStatus.Pending,
+            };
+        }
+
+        // 从 data-fanqie-status 属性提取（也很可靠）
+        var attrMatch = DataStatusRegex().Match(htmlContent);
+        if (attrMatch.Success)
+        {
+            return attrMatch.Groups[1].Value.ToLowerInvariant() switch
             {
                 "downloaded" => ChapterStatus.Downloaded,
                 "failed" => ChapterStatus.Failed,
@@ -126,27 +139,21 @@ internal static partial class ChapterContentMarker
             };
         }
 
-        // 尝试从 data-fanqie-status 属性提取
-        var attrMatch = DataStatusRegex().Match(htmlContent);
-        if (attrMatch.Success)
-        {
-            return attrMatch.Groups[1].Value.ToLowerInvariant() switch
-            {
-                "downloaded" => ChapterStatus.Downloaded,
-                "failed" => ChapterStatus.Failed,
-                "locked" => ChapterStatus.Locked,
-                _ => ChapterStatus.Pending,
-            };
-        }
-
         // 如果包含 chapter-unavailable 类，则为失败
         if (htmlContent.Contains("chapter-unavailable", StringComparison.OrdinalIgnoreCase))
         {
             return ChapterStatus.Failed;
         }
 
-        // 如果有段落内容标记，则为已下载
-        if (ParagraphChapterIdRegex().IsMatch(htmlContent))
+        // 如果包含 chapter-locked 类，则为锁定
+        if (htmlContent.Contains("chapter-locked", StringComparison.OrdinalIgnoreCase))
+        {
+            return ChapterStatus.Locked;
+        }
+
+        // 如果有段落内容标记（data-fanqie-index），说明是正常内容
+        // 注意：这个判断要在检查失败/锁定类之后
+        if (ParagraphIndexRegex().IsMatch(htmlContent))
         {
             return ChapterStatus.Downloaded;
         }
@@ -177,4 +184,7 @@ internal static partial class ChapterContentMarker
 
     [GeneratedRegex(@"data-fanqie-status=""(\w+)""", RegexOptions.IgnoreCase)]
     private static partial Regex DataStatusRegex();
+
+    [GeneratedRegex(@"data-fanqie-index=""\d+""", RegexOptions.IgnoreCase)]
+    private static partial Regex ParagraphIndexRegex();
 }

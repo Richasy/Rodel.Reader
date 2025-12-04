@@ -23,6 +23,8 @@ namespace Richasy.RodelReader.Sources.FanQie.Internal;
 [JsonSerializable(typeof(Models.Internal.FallbackBookTocApiResponse))]
 [JsonSerializable(typeof(Models.Internal.FallbackBatchContentApiResponse))]
 [JsonSerializable(typeof(Models.Internal.FallbackBatchContentRequest))]
+[JsonSerializable(typeof(Models.Internal.DeviceRegisterApiResponse))]
+[JsonSerializable(typeof(Models.Internal.DeviceReleaseResponse))]
 [JsonSerializable(typeof(Models.Internal.DataResponse<Models.Internal.CommentCountData>))]
 [JsonSerializable(typeof(Models.Internal.DataResponse<Models.Internal.CommentListData>))]
 internal sealed partial class FanQieJsonContext : JsonSerializerContext

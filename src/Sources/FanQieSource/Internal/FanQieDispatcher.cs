@@ -7,11 +7,18 @@ namespace Richasy.RodelReader.Sources.FanQie.Internal;
 /// </summary>
 internal sealed class FanQieDispatcher : IDisposable
 {
+    private const string DeviceTokenHeader = "X-FanQie-Device";
+
     private readonly HttpClient _httpClient;
     private readonly FanQieClientOptions _options;
     private readonly ILogger? _logger;
     private readonly SemaphoreSlim _semaphore;
+    private readonly SemaphoreSlim _deviceLock = new(1, 1);
     private bool _disposed;
+
+    // 非章节 API 的设备令牌（客户端生命周期内缓存）
+    private string? _builtInDeviceToken;
+    private string? _selfHostDeviceToken;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FanQieDispatcher"/> class.
@@ -132,6 +139,53 @@ internal sealed class FanQieDispatcher : IDisposable
     }
 
     /// <summary>
+    /// 批量获取章节内容（使用范围表示法）.
+    /// </summary>
+    /// <param name="chapterRange">章节范围，格式为 "start-end"，如 "1-10".</param>
+    /// <param name="bookId">书籍 ID.</param>
+    /// <param name="bookTitle">书籍标题.</param>
+    /// <param name="chapterInfoMap">章节信息映射表（itemId -> ChapterItem）.</param>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>章节内容列表.</returns>
+    public async Task<IReadOnlyList<ChapterContent>> GetBatchContentByRangeAsync(
+        string chapterRange,
+        string bookId,
+        string bookTitle,
+        Dictionary<string, ChapterItem> chapterInfoMap,
+        CancellationToken cancellationToken = default)
+    {
+        // 章节内容获取优先级：SelfHost API（如有）→ 内置 API
+
+        // 如果有自部署 API，先尝试使用
+        if (!string.IsNullOrEmpty(_options.SelfHostApiBaseUrl))
+        {
+            try
+            {
+                return await FetchBatchContentByRangeFromApiAsync(
+                    _options.SelfHostApiBaseUrl,
+                    chapterRange,
+                    bookId,
+                    bookTitle,
+                    chapterInfoMap,
+                    cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                _logger?.LogWarning(ex, "SelfHost API failed for batch content (range: {Range}), falling back to built-in API...", chapterRange);
+            }
+        }
+
+        // 使用内置 API
+        return await FetchBatchContentByRangeFromApiAsync(
+            FanQieClientOptions.BuiltInApiBaseUrl,
+            chapterRange,
+            bookId,
+            bookTitle,
+            chapterInfoMap,
+            cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
     /// 批量获取章节内容.
     /// </summary>
     /// <param name="itemIds">章节 ID 列表.</param>
@@ -140,6 +194,7 @@ internal sealed class FanQieDispatcher : IDisposable
     /// <param name="chapterInfoMap">章节信息映射表（itemId -> ChapterItem）.</param>
     /// <param name="cancellationToken">取消令牌.</param>
     /// <returns>章节内容列表.</returns>
+    [Obsolete("Use GetBatchContentByRangeAsync instead for better rate limiting.")]
     public async Task<IReadOnlyList<ChapterContent>> GetBatchContentAsync(
         IEnumerable<string> itemIds,
         string bookId,
@@ -147,26 +202,85 @@ internal sealed class FanQieDispatcher : IDisposable
         Dictionary<string, ChapterItem> chapterInfoMap,
         CancellationToken cancellationToken = default)
     {
-        // 章节内容获取优先级：SelfHost API（如有）→ 内置 API
-
+        // 将 itemIds 转换为范围请求
         var idList = itemIds.ToList();
+        if (idList.Count == 0)
+        {
+            return [];
+        }
+
+        // 根据 chapterInfoMap 获取 order，按 order 分组为连续范围
+        var orderedChapters = idList
+            .Where(id => chapterInfoMap.ContainsKey(id))
+            .Select(id => chapterInfoMap[id])
+            .OrderBy(c => c.Order)
+            .ToList();
+
+        if (orderedChapters.Count == 0)
+        {
+            return [];
+        }
+
+        var ranges = CalculateRanges(orderedChapters.Select(c => c.Order).ToList());
         var results = new List<ChapterContent>();
 
-        // 分批处理
-        for (var i = 0; i < idList.Count; i += _options.BatchSize)
+        foreach (var range in ranges)
         {
-            var batch = idList.Skip(i).Take(_options.BatchSize).ToList();
-            var batchContent = await FetchBatchContentAsync(batch, bookId, bookTitle, chapterInfoMap, cancellationToken).ConfigureAwait(false);
-            results.AddRange(batchContent);
+            var rangeContent = await GetBatchContentByRangeAsync(
+                range,
+                bookId,
+                bookTitle,
+                chapterInfoMap,
+                cancellationToken).ConfigureAwait(false);
+
+            results.AddRange(rangeContent);
 
             // 请求间隔
-            if (i + _options.BatchSize < idList.Count && _options.RequestDelayMs > 0)
+            if (_options.RequestDelayMs > 0)
             {
                 await Task.Delay(_options.RequestDelayMs, cancellationToken).ConfigureAwait(false);
             }
         }
 
         return results;
+    }
+
+    /// <summary>
+    /// 计算连续范围.
+    /// </summary>
+    /// <param name="orders">章节序号列表（已排序）.</param>
+    /// <returns>范围列表，如 ["1-5", "8-10"].</returns>
+    private static List<string> CalculateRanges(List<int> orders)
+    {
+        if (orders.Count == 0)
+        {
+            return [];
+        }
+
+        var ranges = new List<string>();
+        var start = orders[0];
+        var end = orders[0];
+
+        for (var i = 1; i < orders.Count; i++)
+        {
+            if (orders[i] == end + 1)
+            {
+                // 连续
+                end = orders[i];
+            }
+            else
+            {
+                // 断开，保存当前范围
+                ranges.Add($"{start}-{end}");
+                start = orders[i];
+                end = orders[i];
+            }
+        }
+
+        // 保存最后一个范围
+        ranges.Add($"{start}-{end}");
+
+        return ranges;
     }
 
     /// <summary>
@@ -336,9 +450,43 @@ internal sealed class FanQieDispatcher : IDisposable
             return;
         }
 
+        // 尝试释放设备令牌（使用 Fire-and-forget 模式，不阻塞 Dispose）
+        _ = ReleaseDeviceTokensAsync();
+
         _semaphore.Dispose();
+        _deviceLock.Dispose();
         _httpClient.Dispose();
         _disposed = true;
+    }
+
+    /// <summary>
+    /// 释放所有已注册的设备令牌.
+    /// </summary>
+    private async Task ReleaseDeviceTokensAsync()
+    {
+        try
+        {
+            var tasks = new List<Task>();
+
+            if (!string.IsNullOrEmpty(_builtInDeviceToken))
+            {
+                tasks.Add(ReleaseDeviceAsync(FanQieClientOptions.BuiltInApiBaseUrl, _builtInDeviceToken));
+            }
+
+            if (!string.IsNullOrEmpty(_selfHostDeviceToken) && !string.IsNullOrEmpty(_options.SelfHostApiBaseUrl))
+            {
+                tasks.Add(ReleaseDeviceAsync(_options.SelfHostApiBaseUrl, _selfHostDeviceToken));
+            }
+
+            if (tasks.Count > 0)
+            {
+                await Task.WhenAll(tasks).ConfigureAwait(false);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogWarning(ex, "Failed to release device tokens during dispose.");
+        }
     }
 
     /// <summary>
@@ -357,123 +505,246 @@ internal sealed class FanQieDispatcher : IDisposable
     }
 
     /// <summary>
-    /// 获取章节内容（支持 SelfHost → 内置 API 回退）.
+    /// 注册设备，获取设备令牌.
     /// </summary>
-    private async Task<IReadOnlyList<ChapterContent>> FetchBatchContentAsync(
-        List<string> itemIds,
-        string bookId,
-        string bookTitle,
-        Dictionary<string, ChapterItem> chapterInfoMap,
-        CancellationToken cancellationToken)
+    /// <param name="apiBaseUrl">API 基础 URL.</param>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>设备令牌，如果注册失败则返回 null.</returns>
+    private async Task<string?> RegisterDeviceAsync(string apiBaseUrl, CancellationToken cancellationToken)
     {
-        // 如果有自部署 API，先尝试使用
-        if (!string.IsNullOrEmpty(_options.SelfHostApiBaseUrl))
+        try
         {
+            var url = ApiEndpoints.GetDeviceRegisterUrl(apiBaseUrl);
+            _logger?.LogDebug("Registering device: {Url}", url);
+
+            await _semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
             try
             {
-                return await FetchBatchContentFromApiAsync(
-                    _options.SelfHostApiBaseUrl,
-                    itemIds,
-                    bookId,
-                    bookTitle,
-                    chapterInfoMap,
-                    cancellationToken).ConfigureAwait(false);
+                using var content = new StringContent("{}", Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync(new Uri(url), content, cancellationToken).ConfigureAwait(false);
+                response.EnsureSuccessStatusCode();
+
+                var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                var result = System.Text.Json.JsonSerializer.Deserialize(json, FanQieJsonContext.Default.DeviceRegisterApiResponse);
+
+                if (result?.Code == 0 && !string.IsNullOrEmpty(result.Data?.Token))
+                {
+                    _logger?.LogDebug("Device registered successfully. Token: {Token}", result.Data.Token);
+                    return result.Data.Token;
+                }
+
+                _logger?.LogWarning("Device registration failed: Code={Code}, Message={Message}", result?.Code, result?.Message);
+                return null;
             }
-            catch (Exception ex) when (ex is not OperationCanceledException)
+            finally
             {
-                _logger?.LogWarning(ex, "SelfHost API failed for batch content, falling back to built-in API...");
+                _ = _semaphore.Release();
             }
         }
-
-        // 使用内置 API
-        return await FetchBatchContentFromApiAsync(
-            FanQieClientOptions.BuiltInApiBaseUrl,
-            itemIds,
-            bookId,
-            bookTitle,
-            chapterInfoMap,
-            cancellationToken).ConfigureAwait(false);
+        catch (Exception ex)
+        {
+            _logger?.LogWarning(ex, "Failed to register device at {Url}", apiBaseUrl);
+            return null;
+        }
     }
 
     /// <summary>
-    /// 从指定 API 获取批量章节内容.
+    /// 释放设备令牌.
     /// </summary>
-    private async Task<IReadOnlyList<ChapterContent>> FetchBatchContentFromApiAsync(
+    /// <param name="apiBaseUrl">API 基础 URL.</param>
+    /// <param name="deviceToken">设备令牌.</param>
+    private async Task ReleaseDeviceAsync(string apiBaseUrl, string deviceToken)
+    {
+        try
+        {
+            var url = ApiEndpoints.GetDeviceReleaseUrl(apiBaseUrl);
+            _logger?.LogDebug("Releasing device: {Url}, Token: {Token}", url, deviceToken);
+
+            await _semaphore.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                using var request = new HttpRequestMessage(HttpMethod.Post, new Uri(url));
+                request.Headers.Add(DeviceTokenHeader, deviceToken);
+                request.Content = new StringContent("{}", Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.SendAsync(request, CancellationToken.None).ConfigureAwait(false);
+                response.EnsureSuccessStatusCode();
+
+                var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                var result = System.Text.Json.JsonSerializer.Deserialize(json, FanQieJsonContext.Default.DeviceReleaseResponse);
+
+                if (result?.Code == 0)
+                {
+                    _logger?.LogDebug("Device released successfully.");
+                }
+                else
+                {
+                    _logger?.LogWarning("Device release failed: Code={Code}, Message={Message}", result?.Code, result?.Message);
+                }
+            }
+            finally
+            {
+                _ = _semaphore.Release();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogWarning(ex, "Failed to release device at {Url}", apiBaseUrl);
+        }
+    }
+
+    /// <summary>
+    /// 获取或注册非章节 API 使用的设备令牌（客户端生命周期内缓存）.
+    /// </summary>
+    /// <param name="apiBaseUrl">API 基础 URL.</param>
+    /// <param name="cancellationToken">取消令牌.</param>
+    /// <returns>设备令牌，可能为 null.</returns>
+    private async Task<string?> GetOrRegisterCachedDeviceTokenAsync(string apiBaseUrl, CancellationToken cancellationToken)
+    {
+        var isBuiltIn = apiBaseUrl == FanQieClientOptions.BuiltInApiBaseUrl;
+        var currentToken = isBuiltIn ? _builtInDeviceToken : _selfHostDeviceToken;
+
+        if (!string.IsNullOrEmpty(currentToken))
+        {
+            return currentToken;
+        }
+
+        await _deviceLock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            // 双重检查
+            currentToken = isBuiltIn ? _builtInDeviceToken : _selfHostDeviceToken;
+            if (!string.IsNullOrEmpty(currentToken))
+            {
+                return currentToken;
+            }
+
+            var token = await RegisterDeviceAsync(apiBaseUrl, cancellationToken).ConfigureAwait(false);
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                if (isBuiltIn)
+                {
+                    _builtInDeviceToken = token;
+                }
+                else
+                {
+                    _selfHostDeviceToken = token;
+                }
+            }
+
+            return token;
+        }
+        finally
+        {
+            _ = _deviceLock.Release();
+        }
+    }
+
+    /// <summary>
+    /// 从指定 API 使用范围请求获取批量章节内容.
+    /// 注意：章节 API 每次调用都需要注册设备并在完成后释放.
+    /// </summary>
+    private async Task<IReadOnlyList<ChapterContent>> FetchBatchContentByRangeFromApiAsync(
         string apiBaseUrl,
-        List<string> itemIds,
+        string chapterRange,
         string bookId,
         string bookTitle,
         Dictionary<string, ChapterItem> chapterInfoMap,
         CancellationToken cancellationToken)
     {
-        var url = ApiEndpoints.GetFallbackBatchContentUrl(apiBaseUrl);
-        _logger?.LogDebug("Fetching batch content from API: {Url}", url);
+        // 章节 API 每次调用都注册设备
+        var deviceToken = await RegisterDeviceAsync(apiBaseUrl, cancellationToken).ConfigureAwait(false);
 
-        var requestBody = new Models.Internal.FallbackBatchContentRequest
+        try
         {
-            BookId = bookId,
-            ChapterIds = itemIds,
-        };
+            var url = ApiEndpoints.GetFallbackBatchContentUrl(apiBaseUrl);
+            _logger?.LogDebug("Fetching batch content by range from API: {Url}, Range: {Range}", url, chapterRange);
 
-        var response = await PostAsync<Models.Internal.FallbackBatchContentRequest, Models.Internal.FallbackBatchContentApiResponse>(
-            url,
-            requestBody,
-            cancellationToken).ConfigureAwait(false);
+            var requestBody = new Models.Internal.FallbackBatchContentRequest
+            {
+                BookId = bookId,
+                ChapterRange = chapterRange,
+            };
 
-        if (response.Code != 0)
-        {
-            throw new Exceptions.FanQieApiException(response.Code, response.Message ?? "Get batch content failed.");
-        }
+            var response = await PostWithDeviceTokenAsync<Models.Internal.FallbackBatchContentRequest, Models.Internal.FallbackBatchContentApiResponse>(
+                url,
+                requestBody,
+                deviceToken,
+                cancellationToken).ConfigureAwait(false);
 
-        var results = new List<ChapterContent>();
+            if (response.Code != 0)
+            {
+                throw new Exceptions.FanQieApiException(response.Code, response.Message ?? "Get batch content failed.");
+            }
 
-        if (response.Data?.Chapters is null || response.Data.Chapters.Count == 0)
-        {
+            var results = new List<ChapterContent>();
+
+            if (response.Data?.Chapters is null || response.Data.Chapters.Count == 0)
+            {
+                return results;
+            }
+
+            // 建立 order -> ChapterItem 的映射
+            var orderToChapterMap = chapterInfoMap.Values.ToDictionary(c => c.Order.ToString(), c => c);
+
+            // 按章节顺序处理返回的内容（服务端返回的 key 是章节序号）
+            foreach (var kvp in response.Data.Chapters)
+            {
+                var orderKey = kvp.Key;  // 这是章节序号，如 "1", "2", "3"
+                var chapter = kvp.Value;
+
+                if (chapter is null)
+                {
+                    continue;
+                }
+
+                // 通过序号查找对应的章节信息
+                orderToChapterMap.TryGetValue(orderKey, out var chapterInfo);
+                var itemId = chapterInfo?.ItemId ?? orderKey;
+
+                // 优先使用纯文本内容，如果有 HTML 内容则解析
+                string textContent;
+                string htmlContent;
+                IReadOnlyList<ChapterImage>? images = null;
+
+                if (!string.IsNullOrEmpty(chapter.RawContent))
+                {
+                    // 解析 HTML 内容
+                    (images, textContent, htmlContent) = Helpers.ContentParser.ParseFallbackHtmlContent(chapter.RawContent, itemId);
+                }
+                else
+                {
+                    textContent = chapter.TxtContent ?? string.Empty;
+                    htmlContent = $"<p>{System.Net.WebUtility.HtmlEncode(textContent).Replace("\n", "</p><p>", StringComparison.Ordinal)}</p>";
+                }
+
+                results.Add(new ChapterContent
+                {
+                    ItemId = itemId,
+                    BookId = bookId,
+                    BookTitle = bookTitle,
+                    Title = chapter.ChapterName ?? chapterInfo?.Title ?? string.Empty,
+                    TextContent = textContent,
+                    HtmlContent = htmlContent,
+                    WordCount = chapter.WordCount > 0 ? chapter.WordCount : Helpers.ContentParser.CountWords(textContent),
+                    Order = chapterInfo?.Order ?? (int.TryParse(orderKey, out var o) ? o : 0),
+                    VolumeName = chapterInfo?.VolumeName,
+                    PublishTime = chapterInfo?.FirstPassTime,
+                    Images = images,
+                });
+            }
+
             return results;
         }
-
-        foreach (var itemId in itemIds)
+        finally
         {
-            if (!response.Data.Chapters.TryGetValue(itemId, out var chapter) || chapter is null)
+            // 章节 API 调用完成后释放设备
+            if (!string.IsNullOrEmpty(deviceToken))
             {
-                continue;
+                await ReleaseDeviceAsync(apiBaseUrl, deviceToken).ConfigureAwait(false);
             }
-
-            chapterInfoMap.TryGetValue(itemId, out var chapterInfo);
-
-            // 优先使用纯文本内容，如果有 HTML 内容则解析
-            string textContent;
-            string htmlContent;
-            IReadOnlyList<ChapterImage>? images = null;
-
-            if (!string.IsNullOrEmpty(chapter.RawContent))
-            {
-                // 解析 HTML 内容
-                (images, textContent, htmlContent) = Helpers.ContentParser.ParseFallbackHtmlContent(chapter.RawContent, itemId);
-            }
-            else
-            {
-                textContent = chapter.TxtContent ?? string.Empty;
-                htmlContent = $"<p>{System.Net.WebUtility.HtmlEncode(textContent).Replace("\n", "</p><p>", StringComparison.Ordinal)}</p>";
-            }
-
-            results.Add(new ChapterContent
-            {
-                ItemId = itemId,
-                BookId = bookId,
-                BookTitle = bookTitle,
-                Title = chapter.ChapterName ?? chapterInfo?.Title ?? string.Empty,
-                TextContent = textContent,
-                HtmlContent = htmlContent,
-                WordCount = chapter.WordCount > 0 ? chapter.WordCount : Helpers.ContentParser.CountWords(textContent),
-                Order = chapterInfo?.Order ?? 0,
-                VolumeName = chapterInfo?.VolumeName,
-                PublishTime = chapterInfo?.FirstPassTime,
-                Images = images,
-            });
         }
-
-        return results;
     }
 
     private async Task<T> GetAsync<T>(string url, CancellationToken cancellationToken)
@@ -890,6 +1161,53 @@ internal sealed class FanQieDispatcher : IDisposable
             using var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync(new Uri(url), content, cancellationToken).ConfigureAwait(false);
+
+            var responseJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+
+            response.EnsureSuccessStatusCode();
+
+            if (string.IsNullOrWhiteSpace(responseJson))
+            {
+                throw new Exceptions.FanQieParseException($"Empty response from {url}. Status: {response.StatusCode}");
+            }
+
+            var typeInfo = GetTypeInfo<TResponse>();
+            return System.Text.Json.JsonSerializer.Deserialize(responseJson, typeInfo)
+                ?? throw new Exceptions.FanQieParseException($"Failed to parse response as {typeof(TResponse).Name}.");
+        }
+        finally
+        {
+            _ = _semaphore.Release();
+        }
+    }
+
+    /// <summary>
+    /// 发送带设备令牌的 POST 请求.
+    /// </summary>
+    private async Task<TResponse> PostWithDeviceTokenAsync<TRequest, TResponse>(
+        string url,
+        TRequest request,
+        string? deviceToken,
+        CancellationToken cancellationToken)
+    {
+        await _semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            _logger?.LogDebug("POST {Url} (with device token: {HasToken})", url, !string.IsNullOrEmpty(deviceToken));
+
+            // 使用默认选项序列化，以确保 JsonPropertyName 特性生效（第三方 API 期望 camelCase）
+            var json = System.Text.Json.JsonSerializer.Serialize(request);
+
+            using var httpRequest = new HttpRequestMessage(HttpMethod.Post, new Uri(url));
+            httpRequest.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            // 添加设备令牌头
+            if (!string.IsNullOrEmpty(deviceToken))
+            {
+                httpRequest.Headers.Add(DeviceTokenHeader, deviceToken);
+            }
+
+            var response = await _httpClient.SendAsync(httpRequest, cancellationToken).ConfigureAwait(false);
 
             var responseJson = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 

@@ -71,6 +71,24 @@ public class ChapterContentMarkerTests
     }
 
     [TestMethod]
+    public void ExtractChapterId_FromHtmlComment()
+    {
+        // Arrange - 这是 PlaceholderGenerator.WrapChapterContent 生成的格式
+        var html = """
+            <!-- fanqie:chapter-id=7046844484302144036 -->
+            <!-- fanqie:chapter-order=255 -->
+            <!-- fanqie:status=downloaded -->
+            <p data-fanqie-index="0" data-fanqie-chapter-id="7046844484302144036">内容</p>
+            """;
+
+        // Act
+        var chapterId = ChapterContentMarker.ExtractChapterId(html);
+
+        // Assert
+        Assert.AreEqual("7046844484302144036", chapterId);
+    }
+
+    [TestMethod]
     public void ExtractChapterId_FromMetaTag()
     {
         // Arrange
@@ -121,8 +139,8 @@ public class ChapterContentMarkerTests
     [TestMethod]
     public void ExtractStatus_ReturnsDownloaded_WhenHasParagraphMarker()
     {
-        // Arrange
-        var html = "<p data-fanqie-chapter-id=\"123\">内容</p>";
+        // Arrange - 真正下载的内容会同时有 data-fanqie-index 和 data-fanqie-chapter-id
+        var html = "<p data-fanqie-index=\"0\" data-fanqie-chapter-id=\"123\">内容</p>";
 
         // Act
         var status = ChapterContentMarker.ExtractStatus(html);

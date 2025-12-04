@@ -89,6 +89,9 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
 
             var allChaptersRaw = volumes.SelectMany(v => v.Chapters).OrderBy(c => c.Order).ToList();
 
+            // 基于完整目录计算哈希，这样章节范围变化不会导致缓存失效
+            var tocHash = TocHashCalculator.Calculate(allChaptersRaw.Select(c => c.ItemId));
+
             // 应用章节范围过滤
             var allChapters = allChaptersRaw
                 .Where(c => (!options.StartChapterOrder.HasValue || c.Order >= options.StartChapterOrder.Value) &&
@@ -104,7 +107,6 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
                     allChapters.Count);
             }
 
-            var tocHash = TocHashCalculator.Calculate(allChapters.Select(c => c.ItemId));
             stats.TotalChapters = allChapters.Count;
 
             bookInfo = FanQieBookInfo.FromBookDetail(bookDetail) with
@@ -117,10 +119,11 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            // 3. 检查缓存
+            // 3. 检查缓存（缓存用于断点续传，不影响已完成的 EPUB）
             progress?.Report(SyncProgress.CheckingCache());
             cacheManager = new CacheManager(options.TempDirectory, bookId);
 
+            // 缓存仅在同一次同步会话中有效，目录变化时清理
             var cacheState = await cacheManager.GetStateAsync().ConfigureAwait(false);
             var usableCache = cacheState?.IsValid(tocHash) == true;
 
@@ -136,17 +139,20 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
             }
 
             // 4. 确定需要下载的章节
-            var existingChapterIds = new HashSet<string>();
-            var failedChapterIds = new HashSet<string>();
+            // 优先级：1. 从现有 EPUB 判断章节状态  2. 从缓存获取断点续传信息
+            var successfulChapterIds = new HashSet<string>();  // 已成功下载的章节
+            var failedChapterIds = new HashSet<string>();      // 失败的章节（需要重试）
 
-            // 从现有 EPUB 获取已下载章节
+            // 从现有 EPUB 获取章节状态（这是最可靠的来源）
             if (existingInfo != null)
             {
+                // 成功下载的章节
                 foreach (var id in existingInfo.DownloadedChapterIds)
                 {
-                    existingChapterIds.Add(id);
+                    successfulChapterIds.Add(id);
                 }
 
+                // 失败的章节（如果启用重试）
                 if (options.RetryFailedChapters)
                 {
                     foreach (var id in existingInfo.FailedChapterIds)
@@ -156,27 +162,39 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
                 }
             }
 
-            // 从缓存获取已下载章节
+            // 从缓存获取断点续传信息（补充，不覆盖 EPUB 的判断）
             if (usableCache && cacheState != null)
             {
                 stats.RestoredFromCache = cacheState.CachedChapterIds.Count;
                 foreach (var id in cacheState.CachedChapterIds)
                 {
-                    existingChapterIds.Add(id);
+                    // 只添加不在 EPUB 中的章节（断点续传的新下载）
+                    if (!successfulChapterIds.Contains(id) && !failedChapterIds.Contains(id))
+                    {
+                        successfulChapterIds.Add(id);
+                    }
                 }
             }
 
-            // 计算需要下载的章节
+            // 计算需要下载的章节：
+            // - 新章节（不在成功列表中）
+            // - 失败章节（在失败列表中，需要重试）
+            // - 强制重下载时包含所有章节
             var chaptersToDownload = allChapters
                 .Where(c => !c.IsLocked && !c.NeedPay)
                 .Where(c => options.ForceRedownload ||
-                            !existingChapterIds.Contains(c.ItemId) ||
+                            !successfulChapterIds.Contains(c.ItemId) ||
                             failedChapterIds.Contains(c.ItemId))
                 .ToList();
 
             var lockedChapters = allChapters.Where(c => c.IsLocked || c.NeedPay).ToList();
             stats.LockedChapters = lockedChapters.Count;
-            stats.Reused = existingChapterIds.Count - (usableCache ? cacheState!.CachedChapterIds.Count : 0);
+
+            // 计算复用数：在当前范围内已成功下载且不需要重新下载的章节
+            var reusedFromEpub = allChapters
+                .Where(c => !c.IsLocked && !c.NeedPay)
+                .Count(c => successfulChapterIds.Contains(c.ItemId) && !failedChapterIds.Contains(c.ItemId));
+            stats.Reused = reusedFromEpub;
 
             _logger?.LogInformation(
                 "需要下载: {ToDownload} 章节, 复用: {Reused} 章节, 锁定: {Locked} 章节",
@@ -310,16 +328,25 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
         bool continueOnError,
         CancellationToken cancellationToken)
     {
+        if (chapters.Count == 0)
+        {
+            return;
+        }
+
         var completed = 0;
         var failed = 0;
         var skipped = 0;
         var total = chapters.Count;
 
-        // 批量下载（FanQieClient 内部会分批处理）
-        foreach (var chapter in chapters)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
+        // 构建章节信息映射
+        var chapterInfoMap = chapters.ToDictionary(c => c.ItemId, c => c);
 
+        // 计算需要下载的范围（跳过已缓存的章节）
+        var orderedChapters = chapters.OrderBy(c => c.Order).ToList();
+        var chaptersToDownload = new List<ChapterItem>();
+
+        foreach (var chapter in orderedChapters)
+        {
             // 检查缓存
             var cached = await cacheManager.LoadChapterAsync(chapter.ItemId).ConfigureAwait(false);
             if (cached?.Status == ChapterStatus.Downloaded)
@@ -329,21 +356,51 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
                 continue;
             }
 
+            chaptersToDownload.Add(chapter);
+        }
+
+        if (chaptersToDownload.Count == 0)
+        {
+            return;
+        }
+
+        // 计算连续范围
+        var ranges = CalculateDownloadRanges(chaptersToDownload);
+        _logger?.LogInformation("需要下载 {Count} 个范围: {Ranges}", ranges.Count, string.Join(", ", ranges.Select(r => r.Range)));
+
+        // 按范围批量下载
+        foreach (var rangeInfo in ranges)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
             try
             {
-                var content = await _client.GetChapterContentAsync(bookId, bookTitle, chapter, cancellationToken).ConfigureAwait(false);
+                _logger?.LogDebug("下载范围: {Range}", rangeInfo.Range);
 
-                if (content != null)
+                var contents = await _client.GetChapterContentsByRangeAsync(
+                    bookId,
+                    bookTitle,
+                    rangeInfo.Range,
+                    chapterInfoMap,
+                    cancellationToken).ConfigureAwait(false);
+
+                // 处理下载结果
+                foreach (var content in contents)
                 {
+                    if (!chapterInfoMap.TryGetValue(content.ItemId, out var chapterInfo))
+                    {
+                        continue;
+                    }
+
                     // 添加段落标记
-                    var markedHtml = ChapterContentMarker.AddMarkers(content.HtmlContent, chapter.ItemId);
+                    var markedHtml = ChapterContentMarker.AddMarkers(content.HtmlContent, content.ItemId);
 
                     var cachedChapter = new CachedChapter
                     {
-                        ChapterId = chapter.ItemId,
-                        Title = chapter.Title,
-                        Order = chapter.Order,
-                        VolumeName = chapter.VolumeName,
+                        ChapterId = content.ItemId,
+                        Title = content.Title,
+                        Order = content.Order,
+                        VolumeName = content.VolumeName,
                         Status = ChapterStatus.Downloaded,
                         HtmlContent = markedHtml,
                         WordCount = content.WordCount,
@@ -359,35 +416,125 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
                     await cacheManager.SaveChapterAsync(cachedChapter).ConfigureAwait(false);
                     completed++;
                     stats.NewlyDownloaded++;
+                    ReportDownloadProgress(progress, completed, total, failed, skipped, content.Title);
                 }
-                else
+
+                // 检查是否有章节未返回（下载失败）
+                var downloadedIds = contents.Select(c => c.ItemId).ToHashSet();
+                foreach (var chapter in rangeInfo.Chapters)
                 {
-                    throw new InvalidOperationException("获取章节内容失败");
+                    if (!downloadedIds.Contains(chapter.ItemId))
+                    {
+                        _logger?.LogWarning("章节未返回: {ChapterId} {Title}", chapter.ItemId, chapter.Title);
+
+                        if (continueOnError)
+                        {
+                            var failedChapter = new CachedChapter
+                            {
+                                ChapterId = chapter.ItemId,
+                                Title = chapter.Title,
+                                Order = chapter.Order,
+                                VolumeName = chapter.VolumeName,
+                                Status = ChapterStatus.Failed,
+                                FailureReason = "服务器未返回此章节",
+                                DownloadTime = DateTimeOffset.Now,
+                            };
+
+                            await cacheManager.SaveChapterAsync(failedChapter).ConfigureAwait(false);
+                            failed++;
+                            stats.Failed++;
+                            stats.FailedChapterIds.Add(chapter.ItemId);
+                            ReportDownloadProgress(progress, completed, total, failed, skipped, chapter.Title);
+                        }
+                    }
                 }
             }
             catch (Exception ex) when (continueOnError)
             {
-                _logger?.LogWarning(ex, "下载章节失败: {ChapterId} {Title}", chapter.ItemId, chapter.Title);
+                _logger?.LogWarning(ex, "下载范围失败: {Range}", rangeInfo.Range);
 
-                var failedChapter = new CachedChapter
+                // 将范围内所有章节标记为失败
+                foreach (var chapter in rangeInfo.Chapters)
                 {
-                    ChapterId = chapter.ItemId,
-                    Title = chapter.Title,
-                    Order = chapter.Order,
-                    VolumeName = chapter.VolumeName,
-                    Status = ChapterStatus.Failed,
-                    FailureReason = ex.Message,
-                    DownloadTime = DateTimeOffset.Now,
-                };
+                    var failedChapter = new CachedChapter
+                    {
+                        ChapterId = chapter.ItemId,
+                        Title = chapter.Title,
+                        Order = chapter.Order,
+                        VolumeName = chapter.VolumeName,
+                        Status = ChapterStatus.Failed,
+                        FailureReason = ex.Message,
+                        DownloadTime = DateTimeOffset.Now,
+                    };
 
-                await cacheManager.SaveChapterAsync(failedChapter).ConfigureAwait(false);
-                failed++;
-                stats.Failed++;
-                stats.FailedChapterIds.Add(chapter.ItemId);
+                    await cacheManager.SaveChapterAsync(failedChapter).ConfigureAwait(false);
+                    failed++;
+                    stats.Failed++;
+                    stats.FailedChapterIds.Add(chapter.ItemId);
+                    ReportDownloadProgress(progress, completed, total, failed, skipped, chapter.Title);
+                }
             }
-
-            ReportDownloadProgress(progress, completed, total, failed, skipped, chapter.Title);
         }
+    }
+
+    /// <summary>
+    /// 计算需要下载的连续范围.
+    /// </summary>
+    /// <param name="chapters">需要下载的章节列表（已按 Order 排序）.</param>
+    /// <returns>范围列表.</returns>
+    private static List<DownloadRangeInfo> CalculateDownloadRanges(List<ChapterItem> chapters)
+    {
+        if (chapters.Count == 0)
+        {
+            return [];
+        }
+
+        var ranges = new List<DownloadRangeInfo>();
+        var currentRangeChapters = new List<ChapterItem> { chapters[0] };
+        var startOrder = chapters[0].Order;
+        var endOrder = chapters[0].Order;
+
+        for (var i = 1; i < chapters.Count; i++)
+        {
+            if (chapters[i].Order == endOrder + 1)
+            {
+                // 连续
+                endOrder = chapters[i].Order;
+                currentRangeChapters.Add(chapters[i]);
+            }
+            else
+            {
+                // 断开，保存当前范围
+                ranges.Add(new DownloadRangeInfo
+                {
+                    Range = $"{startOrder}-{endOrder}",
+                    Chapters = currentRangeChapters,
+                });
+
+                // 开始新范围
+                startOrder = chapters[i].Order;
+                endOrder = chapters[i].Order;
+                currentRangeChapters = [chapters[i]];
+            }
+        }
+
+        // 保存最后一个范围
+        ranges.Add(new DownloadRangeInfo
+        {
+            Range = $"{startOrder}-{endOrder}",
+            Chapters = currentRangeChapters,
+        });
+
+        return ranges;
+    }
+
+    /// <summary>
+    /// 下载范围信息.
+    /// </summary>
+    private sealed class DownloadRangeInfo
+    {
+        public required string Range { get; init; }
+        public required List<ChapterItem> Chapters { get; init; }
     }
 
     private async Task DownloadImagesAsync(
@@ -527,11 +674,26 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
             // 从现有 EPUB 复用
             else if (existingBook != null && existingIds.Contains(chapter.ItemId))
             {
-                var existingHtml = await FanQieEpubAnalyzer.ReadChapterContentAsync(existingBook, chapter.ItemId).ConfigureAwait(false);
-                if (!string.IsNullOrEmpty(existingHtml))
+                var existingChapter = await FanQieEpubAnalyzer.ReadChapterContentAsync(existingBook, chapter.ItemId).ConfigureAwait(false);
+                if (existingChapter != null && !string.IsNullOrEmpty(existingChapter.BodyContent))
                 {
-                    htmlContent = existingHtml;
-                    // TODO: 复用现有 EPUB 中的图片
+                    // 使用 body 内部内容，不需要再次包装（内容已包含元数据标记）
+                    htmlContent = existingChapter.BodyContent;
+
+                    // 复用现有 EPUB 中的图片
+                    if (existingChapter.Images != null)
+                    {
+                        foreach (var img in existingChapter.Images)
+                        {
+                            images.Add(new ChapterImageInfo
+                            {
+                                Id = img.Id,
+                                Offset = 0,
+                                ImageData = img.Data,
+                                MediaType = img.MediaType,
+                            });
+                        }
+                    }
                 }
                 else
                 {
