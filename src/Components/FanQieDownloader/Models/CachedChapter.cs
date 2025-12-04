@@ -74,7 +74,7 @@ public sealed class CachedChapter
 public sealed class CachedImageRef
 {
     /// <summary>
-    /// 图片 ID.
+    /// 图片 ID（用于占位符匹配）.
     /// </summary>
     [JsonPropertyName("id")]
     public required string ImageId { get; init; }
@@ -84,12 +84,6 @@ public sealed class CachedImageRef
     /// </summary>
     [JsonPropertyName("url")]
     public required string Url { get; init; }
-
-    /// <summary>
-    /// 在文本中的偏移位置.
-    /// </summary>
-    [JsonPropertyName("offset")]
-    public int Offset { get; init; }
 
     /// <summary>
     /// 媒体类型.

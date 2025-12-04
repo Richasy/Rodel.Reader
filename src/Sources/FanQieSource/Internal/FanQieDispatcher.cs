@@ -386,7 +386,7 @@ internal sealed class FanQieDispatcher : IDisposable
                 chapterInfoMap.TryGetValue(itemId, out var chapterInfo);
 
                 // 解析内容中的图片并提取纯文本
-                var (images, textContent, htmlContent) = Helpers.ContentParser.ParseContentWithImages(chapter.Content);
+                var (images, textContent, htmlContent) = Helpers.ContentParser.ParseContentWithImages(chapter.Content, itemId);
 
                 results.Add(new ChapterContent
                 {
@@ -437,7 +437,7 @@ internal sealed class FanQieDispatcher : IDisposable
         }
 
         // 解析内容中的图片并提取纯文本
-        var (images, textContent, htmlContent) = Helpers.ContentParser.ParseContentWithImages(response.Data.Content);
+        var (images, textContent, htmlContent) = Helpers.ContentParser.ParseContentWithImages(response.Data.Content, itemId);
 
         return new ChapterContent
         {
@@ -936,7 +936,7 @@ internal sealed class FanQieDispatcher : IDisposable
             if (!string.IsNullOrEmpty(chapter.RawContent))
             {
                 // 解析 HTML 内容
-                (images, textContent, htmlContent) = Helpers.ContentParser.ParseContentWithImages(chapter.RawContent);
+                (images, textContent, htmlContent) = Helpers.ContentParser.ParseFallbackHtmlContent(chapter.RawContent, itemId);
             }
             else
             {

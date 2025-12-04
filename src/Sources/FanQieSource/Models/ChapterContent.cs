@@ -69,12 +69,12 @@ public sealed record ChapterContent
 public sealed record ChapterImage
 {
     /// <summary>
+    /// 图片唯一标识符（用于占位符匹配）.
+    /// </summary>
+    public required string Id { get; init; }
+
+    /// <summary>
     /// 图片 URL.
     /// </summary>
     public required string Url { get; init; }
-
-    /// <summary>
-    /// 在文本中的位置（字符偏移）.
-    /// </summary>
-    public int? Offset { get; init; }
 }

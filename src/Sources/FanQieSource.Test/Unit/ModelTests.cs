@@ -183,8 +183,8 @@ public class ModelTests
         // Arrange
         var images = new List<ChapterImage>
         {
-            new() { Url = "https://example.com/img1.jpg", Offset = 100 },
-            new() { Url = "https://example.com/img2.jpg", Offset = 500 },
+            new() { Id = "img_001_0", Url = "https://example.com/img1.jpg" },
+            new() { Id = "img_001_1", Url = "https://example.com/img2.jpg" },
         };
 
         // Act
@@ -202,7 +202,7 @@ public class ModelTests
         // Assert
         Assert.AreEqual(2, content.Images?.Count);
         Assert.AreEqual("https://example.com/img1.jpg", content.Images?[0].Url);
-        Assert.AreEqual(100, content.Images?[0].Offset);
+        Assert.AreEqual("img_001_0", content.Images?[0].Id);
     }
 
     #endregion

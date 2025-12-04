@@ -348,11 +348,10 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
                         HtmlContent = markedHtml,
                         WordCount = content.WordCount,
                         DownloadTime = DateTimeOffset.Now,
-                        Images = content.Images?.Select((img, i) => new CachedImageRef
+                        Images = content.Images?.Select(img => new CachedImageRef
                         {
-                            ImageId = $"img_{chapter.ItemId}_{i}",
+                            ImageId = img.Id,
                             Url = img.Url,
-                            Offset = img.Offset ?? 0,
                             MediaType = GuessImageMediaType(img.Url),
                         }).ToList(),
                     };
@@ -497,7 +496,7 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
                         chapter.Order,
                         cached.HtmlContent);
 
-                    // 加载图片
+                    // 加载图片数据（EpubGenerator 会根据 ID 匹配占位符替换）
                     if (cached.Images?.Count > 0)
                     {
                         foreach (var imgRef in cached.Images)
@@ -508,7 +507,7 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
                                 images.Add(new ChapterImageInfo
                                 {
                                     Id = imgRef.ImageId,
-                                    Offset = imgRef.Offset,
+                                    Offset = 0,
                                     ImageData = imgData,
                                     MediaType = imgRef.MediaType,
                                 });

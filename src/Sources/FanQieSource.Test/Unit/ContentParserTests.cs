@@ -180,8 +180,8 @@ public class ContentParserTests
         // Arrange
         var content = "这是一段普通文字内容。\n第二段内容。";
 
-        // Act
-        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content);
+        // Act - 设置 removeFirstLine = false 以保留完整内容
+        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content, "test_chapter", removeFirstLine: false);
 
         // Assert
         Assert.IsNull(images);
@@ -197,7 +197,7 @@ public class ContentParserTests
         var content = string.Empty;
 
         // Act
-        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content);
+        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content, "test_chapter");
 
         // Assert
         Assert.IsNull(images);
@@ -212,7 +212,7 @@ public class ContentParserTests
         string? content = null;
 
         // Act
-        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content!);
+        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content!, "test_chapter");
 
         // Assert
         Assert.IsNull(images);
@@ -227,13 +227,13 @@ public class ContentParserTests
         var content = "文字内容<img src=\\\"http://example.com/image.jpg\\\" img-width=\\\"602\\\" img-height=\\\"339\\\" alt=\\\"\\\" media-idx=\\\"1\\\"/>更多文字";
 
         // Act
-        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content);
+        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content, "test_chapter");
 
         // Assert
         Assert.IsNotNull(images);
         Assert.AreEqual(1, images.Count);
         Assert.AreEqual("http://example.com/image.jpg", images[0].Url);
-        Assert.AreEqual(1, images[0].Offset);
+        Assert.AreEqual("img_test_chapter_0", images[0].Id);
         Assert.IsFalse(cleanedText.Contains("<img", StringComparison.OrdinalIgnoreCase));
         Assert.IsTrue(cleanedText.Contains("文字内容", StringComparison.Ordinal));
         Assert.IsTrue(cleanedText.Contains("更多文字", StringComparison.Ordinal));
@@ -246,15 +246,15 @@ public class ContentParserTests
         var content = "第一张<img src=\\\"http://example.com/1.jpg\\\" media-idx=\\\"1\\\"/>中间<img src=\\\"http://example.com/2.jpg\\\" media-idx=\\\"2\\\"/>最后";
 
         // Act
-        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content);
+        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content, "test_chapter");
 
         // Assert
         Assert.IsNotNull(images);
         Assert.AreEqual(2, images.Count);
         Assert.AreEqual("http://example.com/1.jpg", images[0].Url);
-        Assert.AreEqual(1, images[0].Offset);
+        Assert.AreEqual("img_test_chapter_0", images[0].Id);
         Assert.AreEqual("http://example.com/2.jpg", images[1].Url);
-        Assert.AreEqual(2, images[1].Offset);
+        Assert.AreEqual("img_test_chapter_1", images[1].Id);
     }
 
     [TestMethod]
@@ -264,7 +264,7 @@ public class ContentParserTests
         var content = "<img src=\\\"http://example.com/image.jpg?a=1&amp;b=2\\\" media-idx=\\\"1\\\"/>";
 
         // Act
-        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content);
+        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content, "test_chapter");
 
         // Assert
         Assert.IsNotNull(images);
@@ -273,35 +273,33 @@ public class ContentParserTests
     }
 
     [TestMethod]
-    public void ParseContentWithImages_HtmlContentContainsStandardImgTag()
+    public void ParseContentWithImages_HtmlContentContainsPlaceholder()
     {
         // Arrange - JSON 解析后的格式
         var content = "文字<img src=\\\"http://example.com/image.jpg\\\" img-width=\\\"100\\\" img-height=\\\"200\\\" media-idx=\\\"1\\\"/>结束";
 
         // Act
-        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content);
+        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content, "test_chapter");
 
         // Assert
-        Assert.IsTrue(htmlContent.Contains("<img src=\"http://example.com/image.jpg\"", StringComparison.Ordinal));
-        Assert.IsTrue(htmlContent.Contains("width=\"100\"", StringComparison.Ordinal));
-        Assert.IsTrue(htmlContent.Contains("height=\"200\"", StringComparison.Ordinal));
+        Assert.IsTrue(htmlContent.Contains("<!-- FANQIE_IMAGE:img_test_chapter_0 -->", StringComparison.Ordinal));
         Assert.IsFalse(htmlContent.Contains("\\\"", StringComparison.Ordinal)); // 不应该有转义引号
     }
 
     [TestMethod]
-    public void ParseContentWithImages_WithImageWithoutMediaIdx_OffsetIsNull()
+    public void ParseContentWithImages_WithImageWithoutMediaIdx_HasValidId()
     {
         // Arrange - JSON 解析后的格式，只有 src 属性
         var content = "<img src=\\\"http://example.com/image.jpg\\\"/>";
 
         // Act
-        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content);
+        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content, "test_chapter");
 
         // Assert
         Assert.IsNotNull(images);
         Assert.AreEqual(1, images.Count);
         Assert.AreEqual("http://example.com/image.jpg", images[0].Url);
-        Assert.IsNull(images[0].Offset);
+        Assert.AreEqual("img_test_chapter_0", images[0].Id);
     }
 
     [TestMethod]
@@ -311,7 +309,7 @@ public class ContentParserTests
         var content = "<img src=\\\"http://p3-reading-sign.fqnovelpic.com/novel-pic-r/abc123~tplv-noop.jpeg?lk3s=8d963091&amp;x-expires=1859300599&amp;x-signature=Yc5gCHn3jkXkXFdcFmD7xY0WFi4%3D\\\" img-width=\\\"602\\\" img-height=\\\"339\\\" alt=\\\"\\\" media-idx=\\\"1\\\"/>";
 
         // Act
-        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content);
+        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content, "test_chapter");
 
         // Assert
         Assert.IsNotNull(images);
@@ -328,13 +326,13 @@ public class ContentParserTests
         var content = "文字内容<img src=\"http://example.com/image.jpg\" img-width=\"602\" img-height=\"339\" alt=\"\" media-idx=\"1\"/>更多文字";
 
         // Act
-        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content);
+        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content, "test_chapter");
 
         // Assert
         Assert.IsNotNull(images);
         Assert.AreEqual(1, images.Count);
         Assert.AreEqual("http://example.com/image.jpg", images[0].Url);
-        Assert.AreEqual(1, images[0].Offset);
+        Assert.AreEqual("img_test_chapter_0", images[0].Id);
         Assert.IsFalse(cleanedText.Contains("<img", StringComparison.OrdinalIgnoreCase));
     }
 
@@ -345,13 +343,12 @@ public class ContentParserTests
         var content = """<p idx="76" p_idx="30000">注释文字</p><div data-fanqie-type="image"><p class="picture"><img src="http://p3-reading-sign.fqnovelpic.com/novel-pic-r/6b2820e0f11809dab6da8d6b6c0f71d8~tplv-noop.jpeg?lk3s=8d963091&amp;x-expires=1859337975&amp;x-signature=8VQfzWKDYhwhRkHNp2gyeEX7R%2Fg%3D" img-width="444" img-height="445" alt="" p_idx="20000" e_idx="0" e_order="77" media-idx="1"/></p></div>""";
 
         // Act
-        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content);
+        var (images, cleanedText, htmlContent) = ContentParser.ParseContentWithImages(content, "test_chapter");
 
         // Assert
         Assert.IsNotNull(images);
         Assert.AreEqual(1, images.Count);
         Assert.IsTrue(images[0].Url.StartsWith("http://p3-reading-sign.fqnovelpic.com", StringComparison.Ordinal));
-        Assert.AreEqual(1, images[0].Offset);
-        Assert.AreEqual(444, int.Parse(htmlContent.Contains("width=\"444\"", StringComparison.Ordinal) ? "444" : "0"));
+        Assert.AreEqual("img_test_chapter_0", images[0].Id);
     }
 }
