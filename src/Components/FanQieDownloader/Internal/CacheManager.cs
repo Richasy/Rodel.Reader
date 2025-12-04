@@ -14,6 +14,7 @@ internal sealed class CacheManager
     private readonly string _tempDirectory;
     private readonly string _bookId;
     private readonly string _cacheRoot;
+    private readonly SemaphoreSlim _manifestLock = new(1, 1);
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -68,7 +69,15 @@ internal sealed class CacheManager
             UpdatedAt = DateTimeOffset.Now,
         };
 
-        await SaveManifestAsync(manifest).ConfigureAwait(false);
+        await _manifestLock.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            await SaveManifestInternalAsync(manifest).ConfigureAwait(false);
+        }
+        finally
+        {
+            _manifestLock.Release();
+        }
     }
 
     /// <summary>
@@ -81,6 +90,38 @@ internal sealed class CacheManager
     /// 读取缓存清单.
     /// </summary>
     public async Task<CacheManifest?> LoadManifestAsync()
+    {
+        await _manifestLock.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            return await LoadManifestInternalAsync().ConfigureAwait(false);
+        }
+        finally
+        {
+            _manifestLock.Release();
+        }
+    }
+
+    /// <summary>
+    /// 保存缓存清单.
+    /// </summary>
+    public async Task SaveManifestAsync(CacheManifest manifest)
+    {
+        await _manifestLock.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            await SaveManifestInternalAsync(manifest).ConfigureAwait(false);
+        }
+        finally
+        {
+            _manifestLock.Release();
+        }
+    }
+
+    /// <summary>
+    /// 读取缓存清单（内部方法，调用方需要持有锁）.
+    /// </summary>
+    private async Task<CacheManifest?> LoadManifestInternalAsync()
     {
         var manifestPath = Path.Combine(_cacheRoot, ManifestFileName);
         if (!File.Exists(manifestPath))
@@ -100,9 +141,9 @@ internal sealed class CacheManager
     }
 
     /// <summary>
-    /// 保存缓存清单.
+    /// 保存缓存清单（内部方法，调用方需要持有锁）.
     /// </summary>
-    public async Task SaveManifestAsync(CacheManifest manifest)
+    private async Task SaveManifestInternalAsync(CacheManifest manifest)
     {
         var manifestPath = Path.Combine(_cacheRoot, ManifestFileName);
         var json = JsonSerializer.Serialize(manifest, JsonOptions);
@@ -118,29 +159,37 @@ internal sealed class CacheManager
         var json = JsonSerializer.Serialize(chapter, JsonOptions);
         await File.WriteAllTextAsync(chapterPath, json).ConfigureAwait(false);
 
-        // 更新清单
-        var manifest = await LoadManifestAsync().ConfigureAwait(false);
-        if (manifest != null)
+        // 更新清单（需要加锁保护）
+        await _manifestLock.WaitAsync().ConfigureAwait(false);
+        try
         {
-            if (chapter.Status == ChapterStatus.Downloaded)
+            var manifest = await LoadManifestInternalAsync().ConfigureAwait(false);
+            if (manifest != null)
             {
-                if (!manifest.CachedChapterIds.Contains(chapter.ChapterId))
+                if (chapter.Status == ChapterStatus.Downloaded)
                 {
-                    manifest.CachedChapterIds.Add(chapter.ChapterId);
+                    if (!manifest.CachedChapterIds.Contains(chapter.ChapterId))
+                    {
+                        manifest.CachedChapterIds.Add(chapter.ChapterId);
+                    }
+
+                    manifest.FailedChapterIds.Remove(chapter.ChapterId);
+                }
+                else if (chapter.Status == ChapterStatus.Failed)
+                {
+                    if (!manifest.FailedChapterIds.Contains(chapter.ChapterId))
+                    {
+                        manifest.FailedChapterIds.Add(chapter.ChapterId);
+                    }
                 }
 
-                manifest.FailedChapterIds.Remove(chapter.ChapterId);
+                manifest.UpdatedAt = DateTimeOffset.Now;
+                await SaveManifestInternalAsync(manifest).ConfigureAwait(false);
             }
-            else if (chapter.Status == ChapterStatus.Failed)
-            {
-                if (!manifest.FailedChapterIds.Contains(chapter.ChapterId))
-                {
-                    manifest.FailedChapterIds.Add(chapter.ChapterId);
-                }
-            }
-
-            manifest.UpdatedAt = DateTimeOffset.Now;
-            await SaveManifestAsync(manifest).ConfigureAwait(false);
+        }
+        finally
+        {
+            _manifestLock.Release();
         }
     }
 
@@ -265,21 +314,29 @@ internal sealed class CacheManager
     /// </summary>
     public async Task<CacheState?> GetStateAsync()
     {
-        var manifest = await LoadManifestAsync().ConfigureAwait(false);
-        if (manifest == null)
+        await _manifestLock.WaitAsync().ConfigureAwait(false);
+        try
         {
-            return null;
-        }
+            var manifest = await LoadManifestInternalAsync().ConfigureAwait(false);
+            if (manifest == null)
+            {
+                return null;
+            }
 
-        return new CacheState
+            return new CacheState
+            {
+                BookId = manifest.BookId,
+                Title = manifest.Title,
+                TocHash = manifest.TocHash,
+                CachedChapterIds = manifest.CachedChapterIds,
+                FailedChapterIds = manifest.FailedChapterIds,
+                CreatedAt = manifest.CreatedAt,
+                UpdatedAt = manifest.UpdatedAt,
+            };
+        }
+        finally
         {
-            BookId = manifest.BookId,
-            Title = manifest.Title,
-            TocHash = manifest.TocHash,
-            CachedChapterIds = manifest.CachedChapterIds,
-            FailedChapterIds = manifest.FailedChapterIds,
-            CreatedAt = manifest.CreatedAt,
-            UpdatedAt = manifest.UpdatedAt,
-        };
+            _manifestLock.Release();
+        }
     }
 }

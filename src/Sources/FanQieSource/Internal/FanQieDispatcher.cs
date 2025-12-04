@@ -685,13 +685,31 @@ internal sealed class FanQieDispatcher : IDisposable
                 return results;
             }
 
+            // 解析请求的范围起始值
+            var rangeStart = 0;
+            var rangeParts = chapterRange.Split('-');
+            if (rangeParts.Length >= 1 && int.TryParse(rangeParts[0], out var start))
+            {
+                rangeStart = start;
+            }
+
             // 建立 order -> ChapterItem 的映射
             var orderToChapterMap = chapterInfoMap.Values.ToDictionary(c => c.Order.ToString(), c => c);
 
-            // 按章节顺序处理返回的内容（服务端返回的 key 是章节序号）
+            _logger?.LogDebug(
+                "处理范围 {Range} 返回: 服务器返回 {ServerCount} 章节, orderToChapterMap 有 {MapCount} 项, Orders: [{Orders}], 服务器Keys: [{ServerKeys}], 范围起始: {RangeStart}",
+                chapterRange,
+                response.Data.Chapters.Count,
+                orderToChapterMap.Count,
+                string.Join(", ", orderToChapterMap.Keys.OrderBy(k => k).Take(10)),
+                string.Join(", ", response.Data.Chapters.Keys.OrderBy(k => k).Take(10)),
+                rangeStart);
+
+            // 按章节顺序处理返回的内容
+            // 服务端返回的 key 可能是相对序号（1, 2, 3）或绝对序号（250, 251, 252）
             foreach (var kvp in response.Data.Chapters)
             {
-                var orderKey = kvp.Key;  // 这是章节序号，如 "1", "2", "3"
+                var orderKey = kvp.Key;
                 var chapter = kvp.Value;
 
                 if (chapter is null)
@@ -699,8 +717,22 @@ internal sealed class FanQieDispatcher : IDisposable
                     continue;
                 }
 
-                // 通过序号查找对应的章节信息
-                orderToChapterMap.TryGetValue(orderKey, out var chapterInfo);
+                // 尝试两种方式查找章节信息：
+                // 1. 直接使用 orderKey 作为绝对序号
+                // 2. 如果找不到，尝试将 orderKey 作为相对序号（相对于范围起始）
+                ChapterItem? chapterInfo = null;
+                if (!orderToChapterMap.TryGetValue(orderKey, out chapterInfo) && int.TryParse(orderKey, out var relativeOrder))
+                {
+                    // 计算绝对序号：范围起始 + 相对序号 - 1（因为相对序号从1开始）
+                    var absoluteOrder = rangeStart + relativeOrder - 1;
+                    orderToChapterMap.TryGetValue(absoluteOrder.ToString(), out chapterInfo);
+
+                    if (chapterInfo != null)
+                    {
+                        _logger?.LogDebug("使用相对序号映射: {RelativeOrder} -> {AbsoluteOrder} -> {ItemId}", orderKey, absoluteOrder, chapterInfo.ItemId);
+                    }
+                }
+
                 var itemId = chapterInfo?.ItemId ?? orderKey;
 
                 // 优先使用纯文本内容，如果有 HTML 内容则解析

@@ -1,6 +1,8 @@
 // Copyright (c) Richasy. All rights reserved.
 
+using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Threading.Channels;
 using Richasy.RodelReader.Components.FanQie.Abstractions;
 using Richasy.RodelReader.Components.FanQie.Internal;
 
@@ -204,7 +206,18 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            // 5. 下载章节
+            // 5. 创建图片下载通道
+            var imageChannel = Channel.CreateUnbounded<ImageDownloadTask>();
+
+            // 6. 启动图片下载任务（后台运行，不阻塞章节下载）
+            var imageDownloadTask = DownloadImagesFromChannelAsync(
+                cacheManager,
+                imageChannel.Reader,
+                stats,
+                progress,
+                cancellationToken);
+
+            // 7. 下载章节（并行下载，最多3个并发，每次最多20章节）
             if (chaptersToDownload.Count > 0)
             {
                 await DownloadChaptersAsync(
@@ -213,24 +226,31 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
                     chaptersToDownload,
                     cacheManager,
                     stats,
+                    imageChannel,
                     progress,
                     options.ContinueOnError,
                     cancellationToken).ConfigureAwait(false);
             }
 
+            // 8. 下载封面图片
+            if (!string.IsNullOrEmpty(bookDetail.CoverUrl) && !cacheManager.ImageExists("cover"))
+            {
+                await imageChannel.Writer.WriteAsync(new ImageDownloadTask
+                {
+                    ImageId = "cover",
+                    Url = bookDetail.CoverUrl,
+                }, cancellationToken).ConfigureAwait(false);
+            }
+
+            // 9. 关闭图片通道，通知图片下载任务没有更多图片
+            imageChannel.Writer.Complete();
+
+            // 10. 等待所有图片下载完成
+            await imageDownloadTask.ConfigureAwait(false);
+
             cancellationToken.ThrowIfCancellationRequested();
 
-            // 6. 下载图片
-            await DownloadImagesAsync(
-                cacheManager,
-                bookDetail.CoverUrl,
-                stats,
-                progress,
-                cancellationToken).ConfigureAwait(false);
-
-            cancellationToken.ThrowIfCancellationRequested();
-
-            // 7. 生成 EPUB
+            // 11. 生成 EPUB
             var epubPath = await GenerateEpubAsync(
                 bookId,
                 bookDetail,
@@ -245,13 +265,13 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
                 progress,
                 cancellationToken).ConfigureAwait(false);
 
-            // 8. 清理缓存
+            // 12. 清理缓存
             progress?.Report(SyncProgress.CleaningUp());
             cacheManager.Cleanup();
             existingBook?.Dispose();
             existingBook = null;
 
-            // 9. 完成
+            // 13. 完成
             stopwatch.Stop();
             stats.Duration = stopwatch.Elapsed;
 
@@ -324,6 +344,7 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
         List<ChapterItem> chapters,
         CacheManager cacheManager,
         SyncStatisticsBuilder stats,
+        Channel<ImageDownloadTask> imageChannel,
         IProgress<SyncProgress>? progress,
         bool continueOnError,
         CancellationToken cancellationToken)
@@ -333,17 +354,13 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
             return;
         }
 
-        var completed = 0;
-        var failed = 0;
-        var skipped = 0;
-        var total = chapters.Count;
-
         // 构建章节信息映射
         var chapterInfoMap = chapters.ToDictionary(c => c.ItemId, c => c);
 
         // 计算需要下载的范围（跳过已缓存的章节）
         var orderedChapters = chapters.OrderBy(c => c.Order).ToList();
         var chaptersToDownload = new List<ChapterItem>();
+        var skippedCount = 0;
 
         foreach (var chapter in orderedChapters)
         {
@@ -351,129 +368,205 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
             var cached = await cacheManager.LoadChapterAsync(chapter.ItemId).ConfigureAwait(false);
             if (cached?.Status == ChapterStatus.Downloaded)
             {
-                skipped++;
-                ReportDownloadProgress(progress, completed, total, failed, skipped, chapter.Title);
+                skippedCount++;
                 continue;
             }
 
             chaptersToDownload.Add(chapter);
         }
 
+        var progressTracker = new DownloadProgressTracker { Total = chapters.Count };
+        progressTracker.AddSkipped(skippedCount);
+
         if (chaptersToDownload.Count == 0)
         {
             return;
         }
 
-        // 计算连续范围
-        var ranges = CalculateDownloadRanges(chaptersToDownload);
+        // 计算连续范围（每个范围最多20章节）
+        var ranges = CalculateDownloadRanges(chaptersToDownload, maxChaptersPerRange: 20);
         _logger?.LogInformation("需要下载 {Count} 个范围: {Ranges}", ranges.Count, string.Join(", ", ranges.Select(r => r.Range)));
 
-        // 按范围批量下载
+        // 使用信号量限制并行度（最多3个并发请求）
+        using var semaphore = new SemaphoreSlim(3);
+        var downloadTasks = new List<Task>();
+
         foreach (var rangeInfo in ranges)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            try
+            await semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
+
+            var task = DownloadRangeAsync(
+                bookId,
+                bookTitle,
+                rangeInfo,
+                chapterInfoMap,
+                cacheManager,
+                stats,
+                imageChannel,
+                progress,
+                continueOnError,
+                semaphore,
+                progressTracker,
+                cancellationToken);
+
+            downloadTasks.Add(task);
+        }
+
+        // 等待所有下载任务完成
+        await Task.WhenAll(downloadTasks).ConfigureAwait(false);
+    }
+
+    private async Task DownloadRangeAsync(
+        string bookId,
+        string bookTitle,
+        DownloadRangeInfo rangeInfo,
+        Dictionary<string, ChapterItem> chapterInfoMap,
+        CacheManager cacheManager,
+        SyncStatisticsBuilder stats,
+        Channel<ImageDownloadTask> imageChannel,
+        IProgress<SyncProgress>? progress,
+        bool continueOnError,
+        SemaphoreSlim semaphore,
+        DownloadProgressTracker progressTracker,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            _logger?.LogDebug("下载范围: {Range}, 包含 {Count} 章节", rangeInfo.Range, rangeInfo.Chapters.Count);
+
+            var contents = await _client.GetChapterContentsByRangeAsync(
+                bookId,
+                bookTitle,
+                rangeInfo.Range,
+                chapterInfoMap,
+                cancellationToken).ConfigureAwait(false);
+
+            _logger?.LogDebug("范围 {Range} 返回 {Count} 章节", rangeInfo.Range, contents.Count);
+
+            // 处理下载结果
+            foreach (var content in contents)
             {
-                _logger?.LogDebug("下载范围: {Range}", rangeInfo.Range);
-
-                var contents = await _client.GetChapterContentsByRangeAsync(
-                    bookId,
-                    bookTitle,
-                    rangeInfo.Range,
-                    chapterInfoMap,
-                    cancellationToken).ConfigureAwait(false);
-
-                // 处理下载结果
-                foreach (var content in contents)
+                if (!chapterInfoMap.TryGetValue(content.ItemId, out var chapterInfo))
                 {
-                    if (!chapterInfoMap.TryGetValue(content.ItemId, out var chapterInfo))
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    // 添加段落标记
-                    var markedHtml = ChapterContentMarker.AddMarkers(content.HtmlContent, content.ItemId);
+                // 添加段落标记
+                var markedHtml = ChapterContentMarker.AddMarkers(content.HtmlContent, content.ItemId);
 
-                    var cachedChapter = new CachedChapter
+                var cachedChapter = new CachedChapter
+                {
+                    ChapterId = content.ItemId,
+                    Title = content.Title,
+                    Order = content.Order,
+                    VolumeName = content.VolumeName,
+                    Status = ChapterStatus.Downloaded,
+                    HtmlContent = markedHtml,
+                    WordCount = content.WordCount,
+                    DownloadTime = DateTimeOffset.Now,
+                    Images = content.Images?.Select(img => new CachedImageRef
                     {
-                        ChapterId = content.ItemId,
-                        Title = content.Title,
-                        Order = content.Order,
-                        VolumeName = content.VolumeName,
-                        Status = ChapterStatus.Downloaded,
-                        HtmlContent = markedHtml,
-                        WordCount = content.WordCount,
-                        DownloadTime = DateTimeOffset.Now,
-                        Images = content.Images?.Select(img => new CachedImageRef
+                        ImageId = img.Id,
+                        Url = img.Url,
+                        MediaType = GuessImageMediaType(img.Url),
+                    }).ToList(),
+                };
+
+                await cacheManager.SaveChapterAsync(cachedChapter).ConfigureAwait(false);
+
+                // 将图片下载任务加入队列（不阻塞章节下载）
+                if (content.Images?.Count > 0)
+                {
+                    foreach (var img in content.Images)
+                    {
+                        var imageTask = new ImageDownloadTask
                         {
                             ImageId = img.Id,
                             Url = img.Url,
-                            MediaType = GuessImageMediaType(img.Url),
-                        }).ToList(),
-                    };
-
-                    await cacheManager.SaveChapterAsync(cachedChapter).ConfigureAwait(false);
-                    completed++;
-                    stats.NewlyDownloaded++;
-                    ReportDownloadProgress(progress, completed, total, failed, skipped, content.Title);
+                        };
+                        await imageChannel.Writer.WriteAsync(imageTask, cancellationToken).ConfigureAwait(false);
+                    }
                 }
 
-                // 检查是否有章节未返回（下载失败）
-                var downloadedIds = contents.Select(c => c.ItemId).ToHashSet();
-                foreach (var chapter in rangeInfo.Chapters)
+                progressTracker.IncrementCompleted();
+                stats.IncrementNewlyDownloaded();
+                ReportDownloadProgress(progress, progressTracker, content.Title);
+            }
+
+            // 检查是否有章节未返回（下载失败）
+            var downloadedIds = contents.Select(c => c.ItemId).ToHashSet();
+            var requestedIds = rangeInfo.Chapters.Select(c => c.ItemId).ToHashSet();
+
+            _logger?.LogDebug(
+                "范围 {Range}: 请求 {RequestCount} 章节, 返回 {ResponseCount} 章节, 匹配 {MatchCount} 章节",
+                rangeInfo.Range,
+                requestedIds.Count,
+                contents.Count,
+                downloadedIds.Intersect(requestedIds).Count());
+
+            foreach (var chapter in rangeInfo.Chapters)
+            {
+                if (!downloadedIds.Contains(chapter.ItemId))
                 {
-                    if (!downloadedIds.Contains(chapter.ItemId))
+                    _logger?.LogWarning(
+                        "章节未返回: {ChapterId} {Title} (Order: {Order}), 已返回的 ItemIds: [{ReturnedIds}]",
+                        chapter.ItemId,
+                        chapter.Title,
+                        chapter.Order,
+                        string.Join(", ", downloadedIds.Take(10)));
+
+                    if (continueOnError)
                     {
-                        _logger?.LogWarning("章节未返回: {ChapterId} {Title}", chapter.ItemId, chapter.Title);
-
-                        if (continueOnError)
+                        var failedChapter = new CachedChapter
                         {
-                            var failedChapter = new CachedChapter
-                            {
-                                ChapterId = chapter.ItemId,
-                                Title = chapter.Title,
-                                Order = chapter.Order,
-                                VolumeName = chapter.VolumeName,
-                                Status = ChapterStatus.Failed,
-                                FailureReason = "服务器未返回此章节",
-                                DownloadTime = DateTimeOffset.Now,
-                            };
+                            ChapterId = chapter.ItemId,
+                            Title = chapter.Title,
+                            Order = chapter.Order,
+                            VolumeName = chapter.VolumeName,
+                            Status = ChapterStatus.Failed,
+                            FailureReason = "服务器未返回此章节",
+                            DownloadTime = DateTimeOffset.Now,
+                        };
 
-                            await cacheManager.SaveChapterAsync(failedChapter).ConfigureAwait(false);
-                            failed++;
-                            stats.Failed++;
-                            stats.FailedChapterIds.Add(chapter.ItemId);
-                            ReportDownloadProgress(progress, completed, total, failed, skipped, chapter.Title);
-                        }
+                        await cacheManager.SaveChapterAsync(failedChapter).ConfigureAwait(false);
+                        progressTracker.IncrementFailed();
+                        stats.IncrementFailed();
+                        stats.FailedChapterIds.Add(chapter.ItemId);
+                        ReportDownloadProgress(progress, progressTracker, chapter.Title);
                     }
                 }
             }
-            catch (Exception ex) when (continueOnError)
+        }
+        catch (Exception ex) when (continueOnError)
+        {
+            _logger?.LogWarning(ex, "下载范围失败: {Range}", rangeInfo.Range);
+
+            // 将范围内所有章节标记为失败
+            foreach (var chapter in rangeInfo.Chapters)
             {
-                _logger?.LogWarning(ex, "下载范围失败: {Range}", rangeInfo.Range);
-
-                // 将范围内所有章节标记为失败
-                foreach (var chapter in rangeInfo.Chapters)
+                var failedChapter = new CachedChapter
                 {
-                    var failedChapter = new CachedChapter
-                    {
-                        ChapterId = chapter.ItemId,
-                        Title = chapter.Title,
-                        Order = chapter.Order,
-                        VolumeName = chapter.VolumeName,
-                        Status = ChapterStatus.Failed,
-                        FailureReason = ex.Message,
-                        DownloadTime = DateTimeOffset.Now,
-                    };
+                    ChapterId = chapter.ItemId,
+                    Title = chapter.Title,
+                    Order = chapter.Order,
+                    VolumeName = chapter.VolumeName,
+                    Status = ChapterStatus.Failed,
+                    FailureReason = ex.Message,
+                    DownloadTime = DateTimeOffset.Now,
+                };
 
-                    await cacheManager.SaveChapterAsync(failedChapter).ConfigureAwait(false);
-                    failed++;
-                    stats.Failed++;
-                    stats.FailedChapterIds.Add(chapter.ItemId);
-                    ReportDownloadProgress(progress, completed, total, failed, skipped, chapter.Title);
-                }
+                await cacheManager.SaveChapterAsync(failedChapter).ConfigureAwait(false);
+                progressTracker.IncrementFailed();
+                stats.IncrementFailed();
+                stats.FailedChapterIds.Add(chapter.ItemId);
+                ReportDownloadProgress(progress, progressTracker, chapter.Title);
             }
+        }
+        finally
+        {
+            semaphore.Release();
         }
     }
 
@@ -481,8 +574,9 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
     /// 计算需要下载的连续范围.
     /// </summary>
     /// <param name="chapters">需要下载的章节列表（已按 Order 排序）.</param>
+    /// <param name="maxChaptersPerRange">每个范围最大章节数（默认20）.</param>
     /// <returns>范围列表.</returns>
-    private static List<DownloadRangeInfo> CalculateDownloadRanges(List<ChapterItem> chapters)
+    private static List<DownloadRangeInfo> CalculateDownloadRanges(List<ChapterItem> chapters, int maxChaptersPerRange = 20)
     {
         if (chapters.Count == 0)
         {
@@ -496,15 +590,18 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
 
         for (var i = 1; i < chapters.Count; i++)
         {
-            if (chapters[i].Order == endOrder + 1)
+            var isConsecutive = chapters[i].Order == endOrder + 1;
+            var rangeNotFull = currentRangeChapters.Count < maxChaptersPerRange;
+
+            if (isConsecutive && rangeNotFull)
             {
-                // 连续
+                // 连续且未超过最大限制
                 endOrder = chapters[i].Order;
                 currentRangeChapters.Add(chapters[i]);
             }
             else
             {
-                // 断开，保存当前范围
+                // 断开或达到最大限制，保存当前范围
                 ranges.Add(new DownloadRangeInfo
                 {
                     Range = $"{startOrder}-{endOrder}",
@@ -537,61 +634,54 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
         public required List<ChapterItem> Chapters { get; init; }
     }
 
-    private async Task DownloadImagesAsync(
+    /// <summary>
+    /// 从通道消费图片下载任务并下载图片.
+    /// </summary>
+    private async Task DownloadImagesFromChannelAsync(
         CacheManager cacheManager,
-        string? coverUrl,
+        ChannelReader<ImageDownloadTask> imageReader,
         SyncStatisticsBuilder stats,
         IProgress<SyncProgress>? progress,
         CancellationToken cancellationToken)
     {
-        // 收集所有需要下载的图片
-        var imageUrls = new Dictionary<string, string>(); // imageId -> url
+        var downloadedCount = 0;
+        var pendingCount = 0;
 
-        // 封面
-        if (!string.IsNullOrEmpty(coverUrl) && !cacheManager.ImageExists("cover"))
+        try
         {
-            imageUrls["cover"] = coverUrl;
-        }
-
-        // 章节图片
-        var chapters = await cacheManager.LoadAllChaptersAsync().ConfigureAwait(false);
-        foreach (var chapter in chapters.Where(c => c.Images?.Count > 0))
-        {
-            foreach (var img in chapter.Images!)
+            await foreach (var imageTask in imageReader.ReadAllAsync(cancellationToken).ConfigureAwait(false))
             {
-                if (!cacheManager.ImageExists(img.ImageId))
+                pendingCount++;
+
+                // 跳过已存在的图片
+                if (cacheManager.ImageExists(imageTask.ImageId))
                 {
-                    imageUrls[img.ImageId] = img.Url;
+                    continue;
+                }
+
+                try
+                {
+                    var data = await _client.DownloadImageAsync(imageTask.Url, cancellationToken).ConfigureAwait(false);
+                    await cacheManager.SaveImageAsync(imageTask.ImageId, data).ConfigureAwait(false);
+                    stats.IncrementImagesDownloaded();
+                    downloadedCount++;
+
+                    progress?.Report(SyncProgress.DownloadingImages(0, $"已下载 {downloadedCount} 张图片"));
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogWarning(ex, "下载图片失败: {ImageId} {Url}", imageTask.ImageId, imageTask.Url);
                 }
             }
         }
-
-        if (imageUrls.Count == 0)
+        catch (OperationCanceledException)
         {
-            return;
+            // 取消时正常退出
         }
 
-        _logger?.LogInformation("需要下载 {Count} 张图片", imageUrls.Count);
-
-        var completed = 0;
-        foreach (var (imageId, url) in imageUrls)
+        if (downloadedCount > 0)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            try
-            {
-                var data = await _client.DownloadImageAsync(url, cancellationToken).ConfigureAwait(false);
-                await cacheManager.SaveImageAsync(imageId, data).ConfigureAwait(false);
-                stats.ImagesDownloaded++;
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogWarning(ex, "下载图片失败: {ImageId} {Url}", imageId, url);
-            }
-
-            completed++;
-            var percentage = completed * 100.0 / imageUrls.Count;
-            progress?.Report(SyncProgress.DownloadingImages(percentage, $"下载图片 {completed}/{imageUrls.Count}"));
+            _logger?.LogInformation("图片下载完成: {Downloaded} 张", downloadedCount);
         }
     }
 
@@ -765,7 +855,7 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
                 CustomMetadata.Create("fanqie:sync-time", DateTimeOffset.Now.ToString("O")),
                 CustomMetadata.Create("fanqie:toc-hash", tocHash),
                 CustomMetadata.Create("fanqie:chapter-count", allChapters.Count.ToString()),
-                .. (stats.FailedChapterIds.Count > 0
+                .. (!stats.FailedChapterIds.IsEmpty
                     ? [CustomMetadata.Create("fanqie:failed-chapters", string.Join(",", stats.FailedChapterIds))]
                     : Array.Empty<CustomMetadata>()),
             ],
@@ -796,18 +886,15 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
 
     private static void ReportDownloadProgress(
         IProgress<SyncProgress>? progress,
-        int completed,
-        int total,
-        int failed,
-        int skipped,
+        DownloadProgressTracker tracker,
         string currentChapter)
     {
         progress?.Report(SyncProgress.DownloadingChapters(new DownloadProgressDetail
         {
-            Completed = completed,
-            Total = total,
-            Failed = failed,
-            Skipped = skipped,
+            Completed = tracker.Completed,
+            Total = tracker.Total,
+            Failed = tracker.Failed,
+            Skipped = tracker.Skipped,
             CurrentChapter = currentChapter,
         }));
     }
@@ -838,15 +925,27 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
     /// </summary>
     private sealed class SyncStatisticsBuilder
     {
-        public int TotalChapters { get; set; }
-        public int NewlyDownloaded { get; set; }
-        public int Reused { get; set; }
-        public int Failed { get; set; }
-        public int RestoredFromCache { get; set; }
-        public int ImagesDownloaded { get; set; }
-        public int LockedChapters { get; set; }
+        private int _totalChapters;
+        private int _newlyDownloaded;
+        private int _reused;
+        private int _failed;
+        private int _restoredFromCache;
+        private int _imagesDownloaded;
+        private int _lockedChapters;
+
+        public int TotalChapters { get => _totalChapters; set => _totalChapters = value; }
+        public int NewlyDownloaded { get => _newlyDownloaded; set => _newlyDownloaded = value; }
+        public int Reused { get => _reused; set => _reused = value; }
+        public int Failed { get => _failed; set => _failed = value; }
+        public int RestoredFromCache { get => _restoredFromCache; set => _restoredFromCache = value; }
+        public int ImagesDownloaded { get => _imagesDownloaded; set => _imagesDownloaded = value; }
+        public int LockedChapters { get => _lockedChapters; set => _lockedChapters = value; }
         public TimeSpan Duration { get; set; }
-        public List<string> FailedChapterIds { get; } = [];
+        public ConcurrentBag<string> FailedChapterIds { get; } = [];
+
+        public void IncrementNewlyDownloaded() => Interlocked.Increment(ref _newlyDownloaded);
+        public void IncrementFailed() => Interlocked.Increment(ref _failed);
+        public void IncrementImagesDownloaded() => Interlocked.Increment(ref _imagesDownloaded);
 
         public SyncStatistics Build() => new()
         {
@@ -859,5 +958,34 @@ public sealed class FanQieDownloadService : IFanQieDownloadService
             LockedChapters = LockedChapters,
             Duration = Duration,
         };
+    }
+
+    /// <summary>
+    /// 图片下载任务.
+    /// </summary>
+    private sealed class ImageDownloadTask
+    {
+        public required string ImageId { get; init; }
+        public required string Url { get; init; }
+    }
+
+    /// <summary>
+    /// 下载进度跟踪器（线程安全）.
+    /// </summary>
+    private sealed class DownloadProgressTracker
+    {
+        private int _completed;
+        private int _failed;
+        private int _skipped;
+
+        public int Completed => _completed;
+        public int Failed => _failed;
+        public int Skipped => _skipped;
+        public int Total { get; init; }
+
+        public void IncrementCompleted() => Interlocked.Increment(ref _completed);
+        public void IncrementFailed() => Interlocked.Increment(ref _failed);
+        public void IncrementSkipped() => Interlocked.Increment(ref _skipped);
+        public void AddSkipped(int count) => Interlocked.Add(ref _skipped, count);
     }
 }
