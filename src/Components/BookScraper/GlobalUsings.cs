@@ -8,5 +8,9 @@ global using System.Web;
 global using AngleSharp;
 global using AngleSharp.Dom;
 global using Microsoft.Extensions.Logging;
-global using Richasy.RodelReader.Components.BookScraper.Abstractions;
-global using Richasy.RodelReader.Components.BookScraper.Models;
+global using Richasy.RodelReader.Plugin.Abstractions.Scrapers;
+
+
+
+
+

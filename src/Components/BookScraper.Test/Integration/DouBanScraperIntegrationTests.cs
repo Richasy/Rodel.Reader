@@ -21,9 +21,9 @@ public class DouBanScraperIntegrationTests : ScraperIntegrationTestBase
     }
 
     [TestMethod]
-    public void Type_ReturnsDouBan()
+    public void FeatureId_ReturnsDouBan()
     {
-        Assert.AreEqual(ScraperType.DouBan, _scraper.Type);
+        Assert.AreEqual(DouBanBookScraper.Id, _scraper.FeatureId);
     }
 
     [TestMethod]
@@ -49,7 +49,7 @@ public class DouBanScraperIntegrationTests : ScraperIntegrationTestBase
         {
             Id = "2567698",
             Title = "三体",
-            Source = ScraperType.DouBan,
+            ScraperId = DouBanBookScraper.Id,
         };
 
         // Act

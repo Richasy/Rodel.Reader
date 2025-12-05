@@ -21,9 +21,9 @@ public class GoogleScraperIntegrationTests : ScraperIntegrationTestBase
     }
 
     [TestMethod]
-    public void Type_ReturnsGoogle()
+    public void FeatureId_ReturnsGoogle()
     {
-        Assert.AreEqual(ScraperType.Google, _scraper.Type);
+        Assert.AreEqual(GoogleBookScraper.Id, _scraper.FeatureId);
     }
 
     [TestMethod]
@@ -48,7 +48,7 @@ public class GoogleScraperIntegrationTests : ScraperIntegrationTestBase
         {
             Id = "abYKXvCwEToC",
             Title = "Harry Potter",
-            Source = ScraperType.Google,
+            ScraperId = GoogleBookScraper.Id,
         };
 
         // Act

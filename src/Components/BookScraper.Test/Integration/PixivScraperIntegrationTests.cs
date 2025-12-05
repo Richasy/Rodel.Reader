@@ -21,13 +21,12 @@ public class PixivScraperIntegrationTests : ScraperIntegrationTestBase
     }
 
     [TestMethod]
-    public void Type_ReturnsPixiv()
+    public void FeatureId_ReturnsPixiv()
     {
-        Assert.AreEqual(ScraperType.Pixiv, _scraper.Type);
+        Assert.AreEqual(PixivBookScraper.Id, _scraper.FeatureId);
     }
 
     [TestMethod]
-    [Ignore("需要网络访问和 Pixiv 登录，仅手动运行")]
     public async Task SearchBooksAsync_WithValidKeyword_ReturnsResults()
     {
         // Arrange
@@ -49,7 +48,7 @@ public class PixivScraperIntegrationTests : ScraperIntegrationTestBase
         {
             Id = "26631466",
             Title = "慈愛の女神",
-            Source = ScraperType.Pixiv,
+            ScraperId = PixivBookScraper.Id,
         };
 
         // Act

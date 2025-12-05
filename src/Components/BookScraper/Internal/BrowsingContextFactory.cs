@@ -1,5 +1,7 @@
 // Copyright (c) Richasy. All rights reserved.
 
+using Richasy.RodelReader.Components.BookScraper.Abstractions;
+
 namespace Richasy.RodelReader.Components.BookScraper.Internal;
 
 /// <summary>

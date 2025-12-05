@@ -1,5 +1,6 @@
 // Copyright (c) Richasy. All rights reserved.
 
+using Richasy.RodelReader.Components.BookScraper.Abstractions;
 using Richasy.RodelReader.Components.BookScraper.Internal;
 
 namespace Richasy.RodelReader.Components.BookScraper.Services;
@@ -7,8 +8,13 @@ namespace Richasy.RodelReader.Components.BookScraper.Services;
 /// <summary>
 /// 晋江文学城书籍刮削器.
 /// </summary>
-public sealed class JinJiangBookScraper : IBookScraper
+public sealed class JinJiangBookScraper : IBookScraperFeature
 {
+    /// <summary>
+    /// 刮削器唯一标识.
+    /// </summary>
+    public const string Id = "jjwxc";
+
     private const string SearchUrl = "https://www.jjwxc.net/search.php";
     private const string BookUrl = "https://www.jjwxc.net/onebook.php";
 
@@ -29,7 +35,16 @@ public sealed class JinJiangBookScraper : IBookScraper
     }
 
     /// <inheritdoc/>
-    public ScraperType Type => ScraperType.JinJiang;
+    public string FeatureId => Id;
+
+    /// <inheritdoc/>
+    public string FeatureName => "晋江文学城";
+
+    /// <inheritdoc/>
+    public IReadOnlyList<string> SupportedCultures => ["zh-CN"];
+
+    /// <inheritdoc/>
+    public string? IconUri => "https://www.jjwxc.net/favicon.ico";
 
     /// <inheritdoc/>
     public async Task<IReadOnlyList<ScrapedBook>> SearchBooksAsync(
@@ -87,6 +102,7 @@ public sealed class JinJiangBookScraper : IBookScraper
             {
                 Id = book.Id,
                 Title = book.Title,
+                ScraperId = FeatureId,
                 Author = book.Author,
                 Description = book.Description,
                 PublishDate = book.PublishDate,
@@ -94,7 +110,6 @@ public sealed class JinJiangBookScraper : IBookScraper
                 Cover = UrlHelper.EnsureScheme(cover) ?? book.Cover,
                 Rating = 3, // 晋江没有评分系统，使用默认值
                 Publisher = "晋江文学城",
-                Source = ScraperType.JinJiang,
             };
 
             _logger?.LogInformation("获取晋江文学城书籍详情成功: {Title}", detailedBook.Title);
@@ -107,7 +122,7 @@ public sealed class JinJiangBookScraper : IBookScraper
         }
     }
 
-    private static ScrapedBook? ParseSearchResult(IElement element)
+    private ScrapedBook? ParseSearchResult(IElement element)
     {
         var titleElement = element.QuerySelector("h3.title");
         if (titleElement is null)
@@ -149,12 +164,12 @@ public sealed class JinJiangBookScraper : IBookScraper
         {
             Id = bookId,
             Title = title,
+            ScraperId = FeatureId,
             Author = author,
             Description = introduction,
             PublishDate = publishDate,
             WebLink = href,
             Publisher = "晋江文学城",
-            Source = ScraperType.JinJiang,
         };
     }
 }

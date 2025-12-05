@@ -4,7 +4,5 @@ global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
 global using Microsoft.VisualStudio.TestTools.UnitTesting;
 global using Moq;
-global using Richasy.RodelReader.Components.BookScraper;
-global using Richasy.RodelReader.Components.BookScraper.Abstractions;
-global using Richasy.RodelReader.Components.BookScraper.Services;
+global using Richasy.RodelReader.Plugin.Abstractions;
 global using Richasy.RodelReader.Plugin.Abstractions.Scrapers;

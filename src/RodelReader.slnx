@@ -11,6 +11,12 @@
     <Project Path="Components/LegadoDownloader.Test/LegadoDownloader.Test.csproj" Id="54a81a97-9c0f-4ff8-9e88-5a5b6ac4428e" />
     <Project Path="Components/LegadoDownloader/LegadoDownloader.csproj" Id="d757802d-713d-4b95-937a-b1e9533699f0" />
   </Folder>
+  <Folder Name="/Plugin/">
+    <Project Path="Plugin/Plugin.Abstractions.Test/Plugin.Abstractions.Test.csproj" />
+    <Project Path="Plugin/Plugin.Abstractions/Plugin.Abstractions.csproj" />
+    <Project Path="Plugin/Plugin.Loader.Test/Plugin.Loader.Test.csproj" />
+    <Project Path="Plugin/Plugin.Loader/Plugin.Loader.csproj" />
+  </Folder>
   <Folder Name="/Services/">
     <Project Path="Services/OpdsService.Test/OpdsService.Test.csproj" Id="c519ece5-0bd3-41db-924c-2e36facfb0a8" />
     <Project Path="Services/OpdsService/OpdsService.csproj" Id="71b058d6-88ac-4f44-93af-51ed7dfd679e" />

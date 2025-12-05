@@ -19,6 +19,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\Plugin\Plugin.Abstractions\Plugin.Abstractions.csproj" />
 		<ProjectReference Include="..\..\Sources\FanQieSource\FanQieSource.csproj" />
 	</ItemGroup>
 

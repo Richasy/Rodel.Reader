@@ -29,9 +29,9 @@ public class FanQieScraperIntegrationTests : ScraperIntegrationTestBase
     }
 
     [TestMethod]
-    public void Type_ReturnsFanQie()
+    public void FeatureId_ReturnsFanQie()
     {
-        Assert.AreEqual(ScraperType.FanQie, _scraper.Type);
+        Assert.AreEqual(FanQieBookScraper.Id, _scraper.FeatureId);
     }
 
     [TestMethod]
@@ -56,7 +56,7 @@ public class FanQieScraperIntegrationTests : ScraperIntegrationTestBase
         {
             Id = "7143038691944959011",
             Title = "十日终焉",
-            Source = ScraperType.FanQie,
+            ScraperId = FanQieBookScraper.Id,
         };
 
         // Act

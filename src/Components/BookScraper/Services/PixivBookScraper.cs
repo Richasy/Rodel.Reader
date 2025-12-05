@@ -9,8 +9,13 @@ namespace Richasy.RodelReader.Components.BookScraper.Services;
 /// <summary>
 /// Pixiv 小说刮削器.
 /// </summary>
-public sealed class PixivBookScraper : IBookScraper
+public sealed class PixivBookScraper : IBookScraperFeature
 {
+    /// <summary>
+    /// 刮削器唯一标识.
+    /// </summary>
+    public const string Id = "pixiv";
+
     private const string SearchUrl = "https://www.pixiv.net/ajax/search/novels/{0}?word={0}&order=date_d&mode=all&p=1&s_mode=s_tag&gs=1&lang=zh";
 
     private readonly IHttpClientFactory _httpClientFactory;
@@ -30,7 +35,16 @@ public sealed class PixivBookScraper : IBookScraper
     }
 
     /// <inheritdoc/>
-    public ScraperType Type => ScraperType.Pixiv;
+    public string FeatureId => Id;
+
+    /// <inheritdoc/>
+    public string FeatureName => "Pixiv 小说";
+
+    /// <inheritdoc/>
+    public IReadOnlyList<string> SupportedCultures => ["ja", "zh-CN", "zh-TW", "en"];
+
+    /// <inheritdoc/>
+    public string? IconUri => "https://www.pixiv.net/favicon.ico";
 
     /// <inheritdoc/>
     public async Task<IReadOnlyList<ScrapedBook>> SearchBooksAsync(
@@ -82,7 +96,7 @@ public sealed class PixivBookScraper : IBookScraper
         return Task.FromResult(book);
     }
 
-    private static ScrapedBook ParseNovelItem(PixivSearchNovelItem item)
+    private ScrapedBook ParseNovelItem(PixivSearchNovelItem item)
     {
         var rating = item.bookmarkCount switch
         {
@@ -100,6 +114,7 @@ public sealed class PixivBookScraper : IBookScraper
         {
             Id = item.id,
             Title = item.title,
+            ScraperId = FeatureId,
             Author = item.userName,
             Cover = item.cover?.urls?.original,
             Description = item.caption,
@@ -108,7 +123,6 @@ public sealed class PixivBookScraper : IBookScraper
             Publisher = "Pixiv",
             PublishDate = publishDate,
             WebLink = $"https://www.pixiv.net/novel/series/{item.id}",
-            Source = ScraperType.Pixiv,
         };
     }
 }

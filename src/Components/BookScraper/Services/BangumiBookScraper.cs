@@ -1,5 +1,6 @@
 // Copyright (c) Richasy. All rights reserved.
 
+using Richasy.RodelReader.Components.BookScraper.Abstractions;
 using Richasy.RodelReader.Components.BookScraper.Internal;
 
 namespace Richasy.RodelReader.Components.BookScraper.Services;
@@ -7,8 +8,13 @@ namespace Richasy.RodelReader.Components.BookScraper.Services;
 /// <summary>
 /// Bangumi 书籍刮削器.
 /// </summary>
-public sealed class BangumiBookScraper : IBookScraper
+public sealed class BangumiBookScraper : IBookScraperFeature
 {
+    /// <summary>
+    /// 刮削器唯一标识.
+    /// </summary>
+    public const string Id = "bangumi";
+
     private const string SearchUrl = "https://bangumi.tv/subject_search/{0}?cat=1";
     private const string BookUrl = "https://bangumi.tv/subject/{0}";
 
@@ -29,7 +35,16 @@ public sealed class BangumiBookScraper : IBookScraper
     }
 
     /// <inheritdoc/>
-    public ScraperType Type => ScraperType.Bangumi;
+    public string FeatureId => Id;
+
+    /// <inheritdoc/>
+    public string FeatureName => "Bangumi";
+
+    /// <inheritdoc/>
+    public IReadOnlyList<string> SupportedCultures => ["ja", "zh-CN", "zh-TW"];
+
+    /// <inheritdoc/>
+    public string? IconUri => "https://bgm.tv/img/favicon.ico";
 
     /// <inheritdoc/>
     public async Task<IReadOnlyList<ScrapedBook>> SearchBooksAsync(
@@ -101,6 +116,7 @@ public sealed class BangumiBookScraper : IBookScraper
             {
                 Id = book.Id,
                 Title = book.Title,
+                ScraperId = FeatureId,
                 Rating = rating,
                 Subtitle = book.Subtitle,
                 Description = summary ?? book.Description,
@@ -109,7 +125,6 @@ public sealed class BangumiBookScraper : IBookScraper
                 Author = book.Author,
                 Publisher = book.Publisher,
                 PublishDate = book.PublishDate,
-                Source = ScraperType.Bangumi,
             };
 
             _logger?.LogInformation("获取 Bangumi 书籍详情成功: {Title}", detailedBook.Title);
@@ -122,7 +137,7 @@ public sealed class BangumiBookScraper : IBookScraper
         }
     }
 
-    private static ScrapedBook? ParseSearchResult(IElement element)
+    private ScrapedBook? ParseSearchResult(IElement element)
     {
         var headerEle = element.QuerySelector("a");
         if (headerEle is null)
@@ -162,6 +177,7 @@ public sealed class BangumiBookScraper : IBookScraper
         {
             Id = id,
             Title = title,
+            ScraperId = FeatureId,
             Rating = rating,
             Subtitle = subtitle,
             Cover = UrlHelper.EnsureScheme(cover),
@@ -169,7 +185,6 @@ public sealed class BangumiBookScraper : IBookScraper
             Publisher = publisher,
             PublishDate = time,
             WebLink = $"https://bangumi.tv/subject/{id}",
-            Source = ScraperType.Bangumi,
         };
     }
 }

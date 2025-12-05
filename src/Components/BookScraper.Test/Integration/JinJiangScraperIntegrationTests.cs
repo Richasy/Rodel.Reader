@@ -21,9 +21,9 @@ public class JinJiangScraperIntegrationTests : ScraperIntegrationTestBase
     }
 
     [TestMethod]
-    public void Type_ReturnsJinJiang()
+    public void FeatureId_ReturnsJinJiang()
     {
-        Assert.AreEqual(ScraperType.JinJiang, _scraper.Type);
+        Assert.AreEqual(JinJiangBookScraper.Id, _scraper.FeatureId);
     }
 
     [TestMethod]
@@ -48,7 +48,7 @@ public class JinJiangScraperIntegrationTests : ScraperIntegrationTestBase
         {
             Id = "9235710",
             Title = "侯门",
-            Source = ScraperType.JinJiang,
+            ScraperId = JinJiangBookScraper.Id,
         };
 
         // Act

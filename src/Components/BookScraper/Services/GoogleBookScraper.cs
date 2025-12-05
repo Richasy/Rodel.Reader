@@ -9,8 +9,13 @@ namespace Richasy.RodelReader.Components.BookScraper.Services;
 /// <summary>
 /// Google Books 刮削器.
 /// </summary>
-public sealed class GoogleBookScraper : IBookScraper
+public sealed class GoogleBookScraper : IBookScraperFeature
 {
+    /// <summary>
+    /// 刮削器唯一标识.
+    /// </summary>
+    public const string Id = "google";
+
     private const string SearchUrl = "https://www.googleapis.com/books/v1/volumes?q={0}";
     private const string DetailUrl = "https://www.googleapis.com/books/v1/volumes/{0}";
 
@@ -31,7 +36,16 @@ public sealed class GoogleBookScraper : IBookScraper
     }
 
     /// <inheritdoc/>
-    public ScraperType Type => ScraperType.Google;
+    public string FeatureId => Id;
+
+    /// <inheritdoc/>
+    public string FeatureName => "Google Books";
+
+    /// <inheritdoc/>
+    public IReadOnlyList<string> SupportedCultures => []; // 支持所有语言
+
+    /// <inheritdoc/>
+    public string? IconUri => "https://www.google.com/favicon.ico";
 
     /// <inheritdoc/>
     public async Task<IReadOnlyList<ScrapedBook>> SearchBooksAsync(
@@ -101,7 +115,7 @@ public sealed class GoogleBookScraper : IBookScraper
         }
     }
 
-    private static ScrapedBook ParseBook(GoogleBookItem item)
+    private ScrapedBook ParseBook(GoogleBookItem item)
     {
         var volumeInfo = item.volumeInfo;
         var author = volumeInfo.authors is not null
@@ -116,6 +130,7 @@ public sealed class GoogleBookScraper : IBookScraper
         {
             Id = item.id,
             Title = volumeInfo.title,
+            ScraperId = FeatureId,
             Subtitle = volumeInfo.subtitle ?? author,
             Cover = UrlHelper.EnsureScheme(volumeInfo.imageLinks?.thumbnail),
             Author = author,
@@ -125,7 +140,6 @@ public sealed class GoogleBookScraper : IBookScraper
             PublishDate = volumeInfo.publishedDate,
             ISBN = isbn,
             Category = category,
-            Source = ScraperType.Google,
         };
     }
 }

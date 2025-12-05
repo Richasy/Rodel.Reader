@@ -21,9 +21,9 @@ public class BangumiScraperIntegrationTests : ScraperIntegrationTestBase
     }
 
     [TestMethod]
-    public void Type_ReturnsBangumi()
+    public void FeatureId_ReturnsBangumi()
     {
-        Assert.AreEqual(ScraperType.Bangumi, _scraper.Type);
+        Assert.AreEqual(BangumiBookScraper.Id, _scraper.FeatureId);
     }
 
     [TestMethod]
@@ -48,7 +48,7 @@ public class BangumiScraperIntegrationTests : ScraperIntegrationTestBase
         {
             Id = "3559",
             Title = "魔法禁书目录",
-            Source = ScraperType.Bangumi,
+            ScraperId = BangumiBookScraper.Id,
             WebLink = "https://bangumi.tv/subject/3559",
         };
 

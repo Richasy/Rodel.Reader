@@ -9,12 +9,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="temp\**" />
-	  <EmbeddedResource Remove="temp\**" />
-	  <None Remove="temp\**" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<InternalsVisibleTo Include="LegadoSource.Test" />
 	</ItemGroup>
 

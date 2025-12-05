@@ -9,8 +9,13 @@ namespace Richasy.RodelReader.Components.BookScraper.Services;
 /// <summary>
 /// 豆瓣书籍刮削器.
 /// </summary>
-public sealed class DouBanBookScraper : IBookScraper
+public sealed class DouBanBookScraper : IBookScraperFeature
 {
+    /// <summary>
+    /// 刮削器唯一标识.
+    /// </summary>
+    public const string Id = "douban";
+
     private const string SearchUrl = "https://api.douban.com/v2/book/search";
     private const string BookUrl = "https://api.douban.com/v2/book/{0}";
     private const string WebUrl = "https://book.douban.com/subject/{0}";
@@ -34,7 +39,16 @@ public sealed class DouBanBookScraper : IBookScraper
     }
 
     /// <inheritdoc/>
-    public ScraperType Type => ScraperType.DouBan;
+    public string FeatureId => Id;
+
+    /// <inheritdoc/>
+    public string FeatureName => "豆瓣读书";
+
+    /// <inheritdoc/>
+    public IReadOnlyList<string> SupportedCultures => ["zh-CN", "zh-TW"];
+
+    /// <inheritdoc/>
+    public string? IconUri => "https://img3.doubanio.com/favicon.ico";
 
     /// <inheritdoc/>
     public async Task<IReadOnlyList<ScrapedBook>> SearchBooksAsync(
@@ -104,7 +118,7 @@ public sealed class DouBanBookScraper : IBookScraper
         }
     }
 
-    private static ScrapedBook ConvertToScrapedBook(DouBanBook book)
+    private ScrapedBook ConvertToScrapedBook(DouBanBook book)
     {
         var rating = RatingHelper.ParseAndNormalize(book.Rating?.Average, book.Rating?.Max ?? 10);
         var cover = book.Images?.Large ?? book.Images?.Medium ?? book.Image;
@@ -114,6 +128,7 @@ public sealed class DouBanBookScraper : IBookScraper
         {
             Id = book.Id!,
             Title = book.Title!,
+            ScraperId = FeatureId,
             Subtitle = book.Subtitle,
             Rating = rating,
             Description = book.Summary,
@@ -125,7 +140,6 @@ public sealed class DouBanBookScraper : IBookScraper
             PublishDate = book.PubDate,
             ISBN = book.Isbn13 ?? book.Isbn10,
             PageCount = int.TryParse(book.Pages, out var pages) ? pages : null,
-            Source = ScraperType.DouBan,
         };
     }
 }

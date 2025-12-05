@@ -7,8 +7,13 @@ namespace Richasy.RodelReader.Components.BookScraper.Services;
 /// <summary>
 /// 番茄小说刮削器.
 /// </summary>
-public sealed class FanQieBookScraper : IBookScraper
+public sealed class FanQieBookScraper : IBookScraperFeature
 {
+    /// <summary>
+    /// 刮削器唯一标识.
+    /// </summary>
+    public const string Id = "fanqie";
+
     private readonly IFanQieClient _fanQieClient;
     private readonly ILogger<FanQieBookScraper>? _logger;
 
@@ -26,7 +31,16 @@ public sealed class FanQieBookScraper : IBookScraper
     }
 
     /// <inheritdoc/>
-    public ScraperType Type => ScraperType.FanQie;
+    public string FeatureId => Id;
+
+    /// <inheritdoc/>
+    public string FeatureName => "番茄小说";
+
+    /// <inheritdoc/>
+    public IReadOnlyList<string> SupportedCultures => ["zh-CN"];
+
+    /// <inheritdoc/>
+    public string? IconUri => "https://fanqienovel.com/favicon.ico";
 
     /// <inheritdoc/>
     public async Task<IReadOnlyList<ScrapedBook>> SearchBooksAsync(
@@ -84,7 +98,7 @@ public sealed class FanQieBookScraper : IBookScraper
         }
     }
 
-    private static ScrapedBook ParseBookItem(Sources.FanQie.Models.BookItem item)
+    private ScrapedBook ParseBookItem(Sources.FanQie.Models.BookItem item)
     {
         var rating = 0;
         if (!string.IsNullOrEmpty(item.Score) &&
@@ -104,6 +118,7 @@ public sealed class FanQieBookScraper : IBookScraper
         {
             Id = item.BookId,
             Title = item.Title,
+            ScraperId = FeatureId,
             Author = item.Author,
             Cover = item.CoverUrl,
             Description = item.Abstract,
@@ -112,11 +127,10 @@ public sealed class FanQieBookScraper : IBookScraper
             Rating = rating,
             Publisher = "番茄小说",
             WebLink = $"https://fanqienovel.com/page/{item.BookId}",
-            Source = ScraperType.FanQie,
         };
     }
 
-    private static ScrapedBook ParseBookDetail(Sources.FanQie.Models.BookDetail detail)
+    private ScrapedBook ParseBookDetail(Sources.FanQie.Models.BookDetail detail)
     {
         var status = detail.CreationStatus switch
         {
@@ -131,6 +145,7 @@ public sealed class FanQieBookScraper : IBookScraper
         {
             Id = detail.BookId,
             Title = detail.Title,
+            ScraperId = FeatureId,
             Author = detail.Author,
             Cover = detail.CoverUrl,
             Description = detail.Abstract,
@@ -140,7 +155,6 @@ public sealed class FanQieBookScraper : IBookScraper
             Publisher = "番茄小说",
             PublishDate = publishDate,
             WebLink = $"https://fanqienovel.com/page/{detail.BookId}",
-            Source = ScraperType.FanQie,
         };
     }
 }
