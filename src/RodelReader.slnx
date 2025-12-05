@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Apps/">
     <Project Path="Apps/FanQieDownloadConsoleApp/FanQieDownloadConsoleApp.csproj" Id="4fc216ae-710e-4259-9297-de0e4dcb3fd7" />
+    <Project Path="Apps/LegadoDownloadConsoleApp/LegadoDownloadConsoleApp.csproj" />
   </Folder>
   <Folder Name="/Components/">
     <Project Path="Components/FanQieDownloader.Test/FanQieDownloader.Test.csproj" />
