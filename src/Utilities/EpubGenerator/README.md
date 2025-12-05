@@ -16,7 +16,7 @@
 ### 基本用法
 
 ```csharp
-using Richasy.RodelPlayer.Utilities.EpubGenerator;
+using Richasy.RodelReader.Utilities.EpubGenerator;
 
 // 1. 创建构建器和分割器
 var builder = new EpubBuilder();

@@ -2,7 +2,7 @@
 
 using System.Runtime.CompilerServices;
 
-namespace Richasy.RodelPlayer.Utilities.EpubGenerator;
+namespace Richasy.RodelReader.Utilities.EpubGenerator;
 
 /// <summary>
 /// 章节信息.

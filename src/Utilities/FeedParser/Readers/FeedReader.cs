@@ -1,10 +1,10 @@
 // Copyright (c) Reader Copilot. All rights reserved.
 
 using System.Xml;
-using Richasy.RodelPlayer.Utilities.FeedParser.Internal;
-using Richasy.RodelPlayer.Utilities.FeedParser.Parsers;
+using Richasy.RodelReader.Utilities.FeedParser.Internal;
+using Richasy.RodelReader.Utilities.FeedParser.Parsers;
 
-namespace Richasy.RodelPlayer.Utilities.FeedParser.Readers;
+namespace Richasy.RodelReader.Utilities.FeedParser.Readers;
 
 /// <summary>
 /// Feed 读取器门面类.

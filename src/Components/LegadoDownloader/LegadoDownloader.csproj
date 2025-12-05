@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AssemblyName>Richasy.RodelReader.Components.Legado</AssemblyName>
+		<RootNamespace>$(AssemblyName)</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="LegadoDownloader.Test" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Sources\LegadoSource\LegadoSource.csproj" />
+		<ProjectReference Include="..\..\Utilities\EpubGenerator\EpubGenerator.csproj" />
+		<ProjectReference Include="..\..\Utilities\EpubParser\EpubParser.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -2,7 +2,7 @@
 
 using System.IO.Compression;
 
-namespace Richasy.RodelPlayer.Utilities.EpubGenerator;
+namespace Richasy.RodelReader.Utilities.EpubGenerator;
 
 /// <summary>
 /// EPUB 验证器实现.

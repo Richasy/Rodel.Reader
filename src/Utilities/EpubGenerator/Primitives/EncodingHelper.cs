@@ -3,7 +3,7 @@
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace Richasy.RodelPlayer.Utilities.EpubGenerator;
+namespace Richasy.RodelReader.Utilities.EpubGenerator;
 
 /// <summary>
 /// 编码检测辅助类.

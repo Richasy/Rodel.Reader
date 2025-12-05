@@ -16,7 +16,7 @@
 ### 基本用法
 
 ```csharp
-using Richasy.RodelPlayer.Utilities.FeedParser.Readers;
+using Richasy.RodelReader.Utilities.FeedParser.Readers;
 
 // 从 URL 读取 Feed
 using var httpClient = new HttpClient();

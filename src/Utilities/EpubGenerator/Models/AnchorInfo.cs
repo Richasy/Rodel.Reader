@@ -1,6 +1,6 @@
 // Copyright (c) Reader Copilot. All rights reserved.
 
-namespace Richasy.RodelPlayer.Utilities.EpubGenerator;
+namespace Richasy.RodelReader.Utilities.EpubGenerator;
 
 /// <summary>
 /// 锚点信息（章节内的子节/书签）.

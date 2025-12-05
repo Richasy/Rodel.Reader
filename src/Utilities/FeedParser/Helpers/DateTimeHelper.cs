@@ -3,7 +3,7 @@
 using System.Globalization;
 using System.Text;
 
-namespace Richasy.RodelPlayer.Utilities.FeedParser.Helpers;
+namespace Richasy.RodelReader.Utilities.FeedParser.Helpers;
 
 /// <summary>
 /// 日期时间解析帮助类.

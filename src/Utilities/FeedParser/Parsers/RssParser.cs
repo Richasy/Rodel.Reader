@@ -1,10 +1,10 @@
 // Copyright (c) Reader Copilot. All rights reserved.
 
 using System.Xml;
-using Richasy.RodelPlayer.Utilities.FeedParser.Helpers;
-using Richasy.RodelPlayer.Utilities.FeedParser.Internal;
+using Richasy.RodelReader.Utilities.FeedParser.Helpers;
+using Richasy.RodelReader.Utilities.FeedParser.Internal;
 
-namespace Richasy.RodelPlayer.Utilities.FeedParser.Parsers;
+namespace Richasy.RodelReader.Utilities.FeedParser.Parsers;
 
 /// <summary>
 /// RSS 解析器实现.

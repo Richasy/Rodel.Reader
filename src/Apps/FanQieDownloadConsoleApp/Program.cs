@@ -2,7 +2,7 @@
 
 using System.Diagnostics;
 using FanQieDownloadConsoleApp;
-using Richasy.RodelPlayer.Utilities.EpubGenerator;
+using Richasy.RodelReader.Utilities.EpubGenerator;
 using Richasy.RodelReader.Components.FanQie.Models;
 using Richasy.RodelReader.Components.FanQie.Services;
 using Richasy.RodelReader.Sources.FanQie;

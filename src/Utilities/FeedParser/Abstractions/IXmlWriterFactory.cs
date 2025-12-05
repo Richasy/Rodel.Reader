@@ -2,7 +2,7 @@
 
 using System.Xml;
 
-namespace Richasy.RodelPlayer.Utilities.FeedParser;
+namespace Richasy.RodelReader.Utilities.FeedParser;
 
 /// <summary>
 /// XML 写入器工厂接口.

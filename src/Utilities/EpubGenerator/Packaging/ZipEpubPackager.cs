@@ -3,7 +3,7 @@
 using System.IO.Compression;
 using System.Text;
 
-namespace Richasy.RodelPlayer.Utilities.EpubGenerator;
+namespace Richasy.RodelReader.Utilities.EpubGenerator;
 
 /// <summary>
 /// 基于ZIP的EPUB打包器实现.

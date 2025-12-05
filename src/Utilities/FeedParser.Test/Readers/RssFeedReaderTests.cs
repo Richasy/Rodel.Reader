@@ -1,6 +1,6 @@
 // Copyright (c) Reader Copilot. All rights reserved.
 
-using Richasy.RodelPlayer.Utilities.FeedParser.Readers;
+using Richasy.RodelReader.Utilities.FeedParser.Readers;
 
 namespace FeedParser.Test.Readers;
 

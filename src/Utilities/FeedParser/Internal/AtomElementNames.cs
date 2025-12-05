@@ -1,6 +1,6 @@
 // Copyright (c) Reader Copilot. All rights reserved.
 
-namespace Richasy.RodelPlayer.Utilities.FeedParser.Internal;
+namespace Richasy.RodelReader.Utilities.FeedParser.Internal;
 
 /// <summary>
 /// Atom 元素名称定义.

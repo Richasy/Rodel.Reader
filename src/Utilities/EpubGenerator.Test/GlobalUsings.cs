@@ -2,4 +2,4 @@
 
 global using Microsoft.VisualStudio.TestTools.UnitTesting;
 global using Moq;
-global using Richasy.RodelPlayer.Utilities.EpubGenerator;
+global using Richasy.RodelReader.Utilities.EpubGenerator;

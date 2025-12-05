@@ -1,8 +1,8 @@
 // Copyright (c) Reader Copilot. All rights reserved.
 
-using Richasy.RodelPlayer.Utilities.FeedParser.Internal;
+using Richasy.RodelReader.Utilities.FeedParser.Internal;
 
-namespace Richasy.RodelPlayer.Utilities.FeedParser.Parsers;
+namespace Richasy.RodelReader.Utilities.FeedParser.Parsers;
 
 /// <summary>
 /// Atom 元素类型映射器.

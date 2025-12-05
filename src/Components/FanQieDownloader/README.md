@@ -17,7 +17,7 @@
 using Richasy.RodelReader.Components.FanQie;
 using Richasy.RodelReader.Components.FanQie.Services;
 using Richasy.RodelReader.Sources.FanQie;
-using Richasy.RodelPlayer.Utilities.EpubGenerator;
+using Richasy.RodelReader.Utilities.EpubGenerator;
 
 // 创建依赖
 using var fanQieClient = new FanQieClient();

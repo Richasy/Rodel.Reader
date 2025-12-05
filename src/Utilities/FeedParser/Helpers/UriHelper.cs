@@ -1,6 +1,6 @@
 // Copyright (c) Reader Copilot. All rights reserved.
 
-namespace Richasy.RodelPlayer.Utilities.FeedParser.Helpers;
+namespace Richasy.RodelReader.Utilities.FeedParser.Helpers;
 
 /// <summary>
 /// URI 解析帮助类.

@@ -2,7 +2,7 @@
 
 using System.Runtime.CompilerServices;
 
-namespace Richasy.RodelPlayer.Utilities.EpubGenerator;
+namespace Richasy.RodelReader.Utilities.EpubGenerator;
 
 /// <summary>
 /// 高性能字符串扩展方法.

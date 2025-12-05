@@ -3,7 +3,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Richasy.RodelPlayer.Utilities.EpubGenerator;
+namespace Richasy.RodelReader.Utilities.EpubGenerator;
 
 /// <summary>
 /// 基于正则表达式的文本分割器实现.

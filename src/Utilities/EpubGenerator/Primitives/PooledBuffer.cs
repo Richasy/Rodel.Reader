@@ -3,7 +3,7 @@
 using System.Buffers;
 using System.Runtime.CompilerServices;
 
-namespace Richasy.RodelPlayer.Utilities.EpubGenerator;
+namespace Richasy.RodelReader.Utilities.EpubGenerator;
 
 /// <summary>
 /// 基于 ArrayPool 的临时缓冲区，用于减少内存分配.

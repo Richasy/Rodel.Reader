@@ -1,6 +1,6 @@
 // Copyright (c) Reader Copilot. All rights reserved.
 
-namespace Richasy.RodelPlayer.Utilities.FeedParser.Internal;
+namespace Richasy.RodelReader.Utilities.FeedParser.Internal;
 
 /// <summary>
 /// 跳过前导空白字符的流包装器.
