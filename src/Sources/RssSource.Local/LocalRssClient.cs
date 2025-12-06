@@ -96,10 +96,10 @@ public sealed class LocalRssClient : IRssClient
                     Id = feed.Id,
                     Name = string.IsNullOrEmpty(channel.Title) ? feed.Name : channel.Title,
                     Url = feed.Url,
-                    Website = channel.Link ?? feed.Website,
+                    Website = channel.GetPrimaryLink()?.ToString() ?? feed.Website,
                     Description = channel.Description ?? feed.Description,
                     GroupIds = feed.GroupIds,
-                    Logo = channel.Image?.Url ?? feed.Logo,
+                    IconUrl = channel.GetPrimaryImage()?.ToString() ?? feed.IconUrl,
                 },
                 Articles = articles,
             };
@@ -261,7 +261,7 @@ public sealed class LocalRssClient : IRssClient
         var idList = articleIds.ToList();
         _logger.LogDebug("标记 {Count} 篇文章为已读", idList.Count);
 
-        await _storage.MarkArticlesAsReadAsync(idList, cancellationToken).ConfigureAwait(false);
+        await _storage.MarkAsReadAsync(idList, cancellationToken).ConfigureAwait(false);
 
         _logger.LogInformation("成功标记 {Count} 篇文章为已读", idList.Count);
         return true;
@@ -291,7 +291,14 @@ public sealed class LocalRssClient : IRssClient
 
         _logger.LogDebug("将分组 {GroupName} 下的所有文章标记为已读", group.Name);
 
-        await _storage.MarkGroupAsReadAsync(group.Id, cancellationToken).ConfigureAwait(false);
+        // 获取分组下的所有订阅源
+        var allFeeds = await _storage.GetAllFeedsAsync(cancellationToken).ConfigureAwait(false);
+        var groupFeeds = allFeeds.Where(f => f.GroupIds?.Contains(group.Id, StringComparison.Ordinal) == true).ToList();
+
+        foreach (var feed in groupFeeds)
+        {
+            await _storage.MarkFeedAsReadAsync(feed.Id, cancellationToken).ConfigureAwait(false);
+        }
 
         _logger.LogInformation("分组 {GroupName} 的所有文章已标记为已读", group.Name);
         return true;
@@ -392,11 +399,11 @@ public sealed class LocalRssClient : IRssClient
         string feedUrl,
         CancellationToken cancellationToken)
     {
-        using var response = await _httpClient.GetAsync(feedUrl, cancellationToken).ConfigureAwait(false);
+        using var response = await _httpClient.GetAsync(new Uri(feedUrl), cancellationToken).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
 
         using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-        using var reader = await Readers.FeedReader.CreateAsync(stream, cancellationToken).ConfigureAwait(false);
+        using var reader = await Richasy.RodelReader.Utilities.FeedParser.Readers.FeedReader.CreateAsync(stream, cancellationToken).ConfigureAwait(false);
 
         var channel = await reader.ReadChannelAsync(cancellationToken).ConfigureAwait(false);
         var items = await reader.ReadAllItemsAsync(cancellationToken).ConfigureAwait(false);
@@ -406,17 +413,18 @@ public sealed class LocalRssClient : IRssClient
 
     private static RssArticle ConvertToArticle(FeedItem item, string feedId)
     {
+        var primaryLink = item.GetPrimaryLink();
         return new RssArticle
         {
-            Id = item.Id ?? item.Link ?? Guid.NewGuid().ToString("N"),
+            Id = item.Id ?? primaryLink?.ToString() ?? Guid.NewGuid().ToString("N"),
             FeedId = feedId,
             Title = item.Title ?? string.Empty,
-            Link = item.Link,
-            Summary = item.Summary,
+            Url = primaryLink?.ToString(),
+            Summary = item.Description,
             Content = item.Content,
-            Author = item.Authors?.FirstOrDefault()?.Name,
-            PublishTime = item.PublishDate,
-            UpdateTime = item.UpdateDate,
+            CoverUrl = item.ImageUrl,
+            Author = item.Contributors.Count > 0 ? item.Contributors[0].Name : null,
+            PublishTime = item.PublishedAt?.ToString("O"),
         };
     }
 }
