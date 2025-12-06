@@ -18,8 +18,8 @@
     <Project Path="Services/WebDavService/WebDavService.csproj" Id="3bc7427b-f860-44b1-a418-0973f3223bda" />
   </Folder>
   <Folder Name="/Sources/">
-    <Project Path="Sources/ApplePodcastSource.Test/ApplePodcastSource.Test.csproj" Id="6213bc7a-0e47-48ed-9a43-91d55409970d" />
-    <Project Path="Sources/ApplePodcastSource/ApplePodcastSource.csproj" Id="d51c0790-ded0-487f-91ed-e33dbbcbb878" />
+    <Project Path="Sources/PodcastSource.Apple.Test/PodcastSource.Apple.Test.csproj" Id="6213bc7a-0e47-48ed-9a43-91d55409970d" />
+    <Project Path="Sources/PodcastSource.Apple/PodcastSource.Apple.csproj" Id="d51c0790-ded0-487f-91ed-e33dbbcbb878" />
     <Project Path="Sources/FanQieSource.Test/FanQieSource.Test.csproj" Id="aa7dbde0-d81e-0e05-21d9-97ea9f75a059" />
     <Project Path="Sources/FanQieSource/FanQieSource.csproj" Id="581945f9-d4b3-4e5a-9633-99e32db2d5f0" />
     <Project Path="Sources/LegadoSource.Test/LegadoSource.Test.csproj" Id="e2bb72cc-f831-dd61-922b-ade4a24a3913" />
