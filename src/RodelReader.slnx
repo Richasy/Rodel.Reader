@@ -26,6 +26,10 @@
     <Project Path="Sources/LegadoSource/LegadoSource.csproj" Id="2eee6023-a306-4626-b16e-0262196f71ed" />
     <Project Path="Sources/RssSource.Abstractions.Test/RssSource.Abstractions.Test.csproj" Id="e43e7dfa-eff3-ed4f-a003-501616a9f712" />
     <Project Path="Sources/RssSource.Abstractions/RssSource.Abstractions.csproj" Id="3b98b0ca-57a7-86d5-d88e-1dbbd680f39f" />
+    <Project Path="Sources/RssSource.Inoreader.Test/RssSource.Inoreader.Test.csproj" Id="a1b2c3d4-e5f6-7890-1234-567890abcdef" />
+    <Project Path="Sources/RssSource.Inoreader/RssSource.Inoreader.csproj" Id="fedcba09-8765-4321-0fed-cba987654321" />
+    <Project Path="Sources/RssSource.Local.Test/RssSource.Local.Test.csproj" Id="12345678-90ab-cdef-1234-567890abcdef" />
+    <Project Path="Sources/RssSource.Local/RssSource.Local.csproj" Id="abcdef12-3456-7890-abcd-ef1234567890" />
     <Project Path="Sources/ZLibrarySource.Test/ZLibrarySource.Test.csproj" Id="d4cd8bf4-5a61-4fb2-bd7a-41ca5506a493" />
     <Project Path="Sources/ZLibrarySource/ZLibrarySource.csproj" Id="51cf4ec8-75be-409f-a928-9b0bbab97554" />
   </Folder>

@@ -1,0 +1,20 @@
+<Project Sdk="MSTest.Sdk/4.0.1">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UseVSTest>true</UseVSTest>
+    <NoWarn>$(NoWarn);CS1591;CA1307;CA1707;CA1861;MSTEST0004;MSTEST0023;MSTEST0032;MSTEST0036;MSTEST0037;IDE0005;Moq1400</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Moq" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RssSource.Inoreader\RssSource.Inoreader.csproj" />
+  </ItemGroup>
+
+</Project>
