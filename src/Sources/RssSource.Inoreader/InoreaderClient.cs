@@ -581,8 +581,12 @@ public sealed class InoreaderClient : IRssClient
 
     private HttpRequestMessage CreateRequest(string path, HttpMethod method)
     {
-        var url = new Uri(_options.GetApiBaseUrl(), path);
-        var request = new HttpRequestMessage(method, url);
+        // 确保 path 不以 / 开头，以便正确追加到基础 URL
+        var relativePath = path.TrimStart('/');
+        var baseUrl = _options.GetApiBaseUrl().ToString().TrimEnd('/');
+        var fullUrl = $"{baseUrl}/{relativePath}";
+
+        var request = new HttpRequestMessage(method, fullUrl);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _options.AccessToken);
         return request;
     }
