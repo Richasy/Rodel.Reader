@@ -130,7 +130,7 @@ public static class MobiReader
         }
 
         // 如果没有通过 EXTH 找到封面，尝试使用第一张图片
-        cover ??= await TryFindCoverAsync(stream, records, mobiHeader, images).ConfigureAwait(false);
+        cover ??= TryFindCover(stream, records, mobiHeader, images);
 
         // 解析目录
         var navigation = await ParseNavigationAsync(stream, records, mobiHeader).ConfigureAwait(false);
@@ -219,16 +219,13 @@ public static class MobiReader
     /// <summary>
     /// 尝试查找封面。
     /// </summary>
-    private static async Task<MobiCover?> TryFindCoverAsync(Stream stream, List<PalmDbRecord> records, MobiHeader mobiHeader, List<MobiImage> images)
+    private static MobiCover? TryFindCover(Stream stream, List<PalmDbRecord> records, MobiHeader mobiHeader, List<MobiImage> images)
     {
         // 尝试使用第一张图片作为封面
         if (images.Count > 0)
         {
             var firstImage = images[0];
-            return new MobiCover(firstImage.MediaType, async () =>
-            {
-                return await ReadRecordAsync(stream, records, firstImage.Index).ConfigureAwait(false);
-            });
+            return new MobiCover(firstImage.MediaType, async () => await ReadRecordAsync(stream, records, firstImage.Index).ConfigureAwait(false));
         }
 
         return null;

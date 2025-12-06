@@ -2,24 +2,24 @@
 
 using Richasy.SqliteGenerator;
 
-namespace Richasy.RodelReader.Storage.Rss.Database;
+namespace Richasy.RodelReader.Storage.Book.Database;
 
 /// <summary>
 /// 数据库连接管理器.
 /// </summary>
-internal sealed class RssDatabase : ISqliteDatabase, IAsyncDisposable, IDisposable
+internal sealed class BookDatabase : ISqliteDatabase, IAsyncDisposable, IDisposable
 {
     private readonly string _connectionString;
-    private readonly ILogger<RssDatabase>? _logger;
+    private readonly ILogger<BookDatabase>? _logger;
     private SqliteConnection? _connection;
     private bool _disposed;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RssDatabase"/> class.
+    /// Initializes a new instance of the <see cref="BookDatabase"/> class.
     /// </summary>
     /// <param name="databasePath">数据库文件路径.</param>
     /// <param name="logger">日志记录器.</param>
-    public RssDatabase(string databasePath, ILogger<RssDatabase>? logger = null)
+    public BookDatabase(string databasePath, ILogger<BookDatabase>? logger = null)
     {
         // 禁用连接池以确保关闭连接后可以删除文件
         _connectionString = $"Data Source={databasePath};Pooling=False";
@@ -56,7 +56,7 @@ internal sealed class RssDatabase : ISqliteDatabase, IAsyncDisposable, IDisposab
     /// <returns>初始化任务.</returns>
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
-        _logger?.LogInformation("Initializing RSS database...");
+        _logger?.LogInformation("Initializing Book database...");
 
         var connection = GetConnection();
 
@@ -65,7 +65,7 @@ internal sealed class RssDatabase : ISqliteDatabase, IAsyncDisposable, IDisposab
 
         await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
 
-        _logger?.LogInformation("RSS database initialized successfully.");
+        _logger?.LogInformation("Book database initialized successfully.");
     }
 
     /// <summary>
@@ -105,7 +105,6 @@ internal sealed class RssDatabase : ISqliteDatabase, IAsyncDisposable, IDisposab
         _connection?.Dispose();
         _connection = null;
         _disposed = true;
-
         _logger?.LogDebug("Database connection disposed.");
     }
 
@@ -125,7 +124,6 @@ internal sealed class RssDatabase : ISqliteDatabase, IAsyncDisposable, IDisposab
         }
 
         _disposed = true;
-
         _logger?.LogDebug("Database connection disposed asynchronously.");
     }
 }

@@ -9,7 +9,7 @@ internal sealed class FeedRepository
 {
     private readonly RssDatabase _database;
     private readonly ILogger? _logger;
-    private readonly RssFeedEntityRepository _repository = new();
+    private readonly RssFeedEntityRepository<RssDatabase> _repository = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FeedRepository"/> class.

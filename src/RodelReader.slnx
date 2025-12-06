@@ -34,6 +34,8 @@
     <Project Path="Sources/ZLibrarySource/ZLibrarySource.csproj" Id="51cf4ec8-75be-409f-a928-9b0bbab97554" />
   </Folder>
   <Folder Name="/Storage/">
+    <Project Path="Storage/BookStorage.Test/BookStorage.Test.csproj" Id="b2345678-90ab-cdef-0123-456789abcdef" />
+    <Project Path="Storage/BookStorage/BookStorage.csproj" Id="a1234567-89ab-cdef-0123-456789abcdef" />
     <Project Path="Storage/RssStorage.Test/RssStorage.Test.csproj" Id="c05311f0-7e4d-bb09-ec26-57bbd5156c86" />
     <Project Path="Storage/RssStorage/RssStorage.csproj" Id="c5e8ac81-58f3-67a8-957d-e21165cd4aa8" />
   </Folder>

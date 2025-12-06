@@ -161,13 +161,15 @@ public class SqliteRepositoryGenerator : IIncrementalGenerator
         sb.AppendLine("using System.Threading;");
         sb.AppendLine("using System.Threading.Tasks;");
         sb.AppendLine("using Microsoft.Data.Sqlite;");
+        sb.AppendLine("using Richasy.SqliteGenerator;");
         sb.AppendLine();
         sb.AppendLine($"namespace {entity.Namespace};");
         sb.AppendLine();
         sb.AppendLine("/// <summary>");
         sb.AppendLine($"/// {entity.ClassName} 数据仓库（自动生成）.");
         sb.AppendLine("/// </summary>");
-        sb.AppendLine($"internal sealed partial class {entity.ClassName}Repository");
+        sb.AppendLine($"internal sealed partial class {entity.ClassName}Repository<TDatabase>");
+        sb.AppendLine("    where TDatabase : ISqliteDatabase");
         sb.AppendLine("{");
 
         // 生成字段列表常量
@@ -208,7 +210,7 @@ public class SqliteRepositoryGenerator : IIncrementalGenerator
         sb.AppendLine("    /// <summary>");
         sb.AppendLine("    /// 获取所有实体.");
         sb.AppendLine("    /// </summary>");
-        sb.AppendLine($"    public async Task<IReadOnlyList<{entity.ClassName}>> GetAllAsync(RssDatabase database, CancellationToken cancellationToken = default)");
+        sb.AppendLine($"    public async Task<IReadOnlyList<{entity.ClassName}>> GetAllAsync(TDatabase database, CancellationToken cancellationToken = default)");
         sb.AppendLine("    {");
         sb.AppendLine($"        var sql = string.Format(SelectAllSql, {(hasListFields ? "ListFields" : "AllFields")});");
         sb.AppendLine("        await using var cmd = database.CreateCommand(sql);");
@@ -228,7 +230,7 @@ public class SqliteRepositoryGenerator : IIncrementalGenerator
         sb.AppendLine("    /// <summary>");
         sb.AppendLine("    /// 根据 ID 获取实体.");
         sb.AppendLine("    /// </summary>");
-        sb.AppendLine($"    public async Task<{entity.ClassName}?> GetByIdAsync(RssDatabase database, string id, CancellationToken cancellationToken = default)");
+        sb.AppendLine($"    public async Task<{entity.ClassName}?> GetByIdAsync(TDatabase database, string id, CancellationToken cancellationToken = default)");
         sb.AppendLine("    {");
         sb.AppendLine("        var sql = string.Format(SelectByIdSql, AllFields);");
         sb.AppendLine("        await using var cmd = database.CreateCommand(sql);");
@@ -248,7 +250,7 @@ public class SqliteRepositoryGenerator : IIncrementalGenerator
         sb.AppendLine("    /// <summary>");
         sb.AppendLine("    /// 添加或更新实体.");
         sb.AppendLine("    /// </summary>");
-        sb.AppendLine($"    public async Task UpsertAsync(RssDatabase database, {entity.ClassName} entity, CancellationToken cancellationToken = default)");
+        sb.AppendLine($"    public async Task UpsertAsync(TDatabase database, {entity.ClassName} entity, CancellationToken cancellationToken = default)");
         sb.AppendLine("    {");
         sb.AppendLine("        await using var cmd = database.CreateCommand(UpsertSql);");
         sb.AppendLine("        AddParameters(cmd, entity);");
@@ -260,7 +262,7 @@ public class SqliteRepositoryGenerator : IIncrementalGenerator
         sb.AppendLine("    /// <summary>");
         sb.AppendLine("    /// 批量添加或更新实体.");
         sb.AppendLine("    /// </summary>");
-        sb.AppendLine($"    public async Task UpsertManyAsync(RssDatabase database, IEnumerable<{entity.ClassName}> entities, CancellationToken cancellationToken = default)");
+        sb.AppendLine($"    public async Task UpsertManyAsync(TDatabase database, IEnumerable<{entity.ClassName}> entities, CancellationToken cancellationToken = default)");
         sb.AppendLine("    {");
         sb.AppendLine("        await using var transaction = await database.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);");
         sb.AppendLine("        try");
@@ -287,7 +289,7 @@ public class SqliteRepositoryGenerator : IIncrementalGenerator
         sb.AppendLine("    /// <summary>");
         sb.AppendLine("    /// 删除实体.");
         sb.AppendLine("    /// </summary>");
-        sb.AppendLine("    public async Task<bool> DeleteAsync(RssDatabase database, string id, CancellationToken cancellationToken = default)");
+        sb.AppendLine("    public async Task<bool> DeleteAsync(TDatabase database, string id, CancellationToken cancellationToken = default)");
         sb.AppendLine("    {");
         sb.AppendLine("        await using var cmd = database.CreateCommand(DeleteSql);");
         sb.AppendLine("        cmd.Parameters.AddWithValue(\"@id\", id);");
@@ -300,7 +302,7 @@ public class SqliteRepositoryGenerator : IIncrementalGenerator
         sb.AppendLine("    /// <summary>");
         sb.AppendLine("    /// 删除实体（使用事务）.");
         sb.AppendLine("    /// </summary>");
-        sb.AppendLine("    public async Task<bool> DeleteAsync(RssDatabase database, string id, SqliteTransaction transaction, CancellationToken cancellationToken = default)");
+        sb.AppendLine("    public async Task<bool> DeleteAsync(TDatabase database, string id, SqliteTransaction transaction, CancellationToken cancellationToken = default)");
         sb.AppendLine("    {");
         sb.AppendLine("        await using var cmd = database.CreateCommand(DeleteSql);");
         sb.AppendLine("        cmd.Transaction = transaction;");
@@ -361,9 +363,10 @@ public class SqliteRepositoryGenerator : IIncrementalGenerator
         foreach (var prop in entity.Properties)
         {
             var ordinal = $"reader.GetOrdinal(\"{prop.ColumnName}\")";
+            var readerMethod = GetReaderMethod(prop.TypeName);
             if (prop.IsNullable)
             {
-                sb.AppendLine($"            {prop.Name} = reader.IsDBNull({ordinal}) ? null : reader.GetString({ordinal}),");
+                sb.AppendLine($"            {prop.Name} = reader.IsDBNull({ordinal}) ? null : {readerMethod}({ordinal}),");
             }
             else if (prop.TypeName == "bool")
             {
@@ -371,7 +374,7 @@ public class SqliteRepositoryGenerator : IIncrementalGenerator
             }
             else
             {
-                sb.AppendLine($"            {prop.Name} = reader.GetString({ordinal}),");
+                sb.AppendLine($"            {prop.Name} = {readerMethod}({ordinal}),");
             }
         }
 
@@ -394,9 +397,10 @@ public class SqliteRepositoryGenerator : IIncrementalGenerator
             foreach (var prop in listProps)
             {
                 var ordinal = $"reader.GetOrdinal(\"{prop.ColumnName}\")";
+                var readerMethod = GetReaderMethod(prop.TypeName);
                 if (prop.IsNullable)
                 {
-                    sb.AppendLine($"            {prop.Name} = reader.IsDBNull({ordinal}) ? null : reader.GetString({ordinal}),");
+                    sb.AppendLine($"            {prop.Name} = reader.IsDBNull({ordinal}) ? null : {readerMethod}({ordinal}),");
                 }
                 else if (prop.TypeName == "bool")
                 {
@@ -404,13 +408,31 @@ public class SqliteRepositoryGenerator : IIncrementalGenerator
                 }
                 else
                 {
-                    sb.AppendLine($"            {prop.Name} = reader.GetString({ordinal}),");
+                    sb.AppendLine($"            {prop.Name} = {readerMethod}({ordinal}),");
                 }
             }
 
             sb.AppendLine("        };");
             sb.AppendLine("    }");
         }
+    }
+
+    private static string GetReaderMethod(string typeName)
+    {
+        // 移除可空标记来获取基础类型
+        var baseType = typeName.TrimEnd('?');
+
+        return baseType switch
+        {
+            "int" => "reader.GetInt32",
+            "long" => "reader.GetInt64",
+            "double" => "reader.GetDouble",
+            "float" => "reader.GetFloat",
+            "decimal" => "reader.GetDecimal",
+            "short" => "reader.GetInt16",
+            "byte" => "reader.GetByte",
+            _ => "reader.GetString"
+        };
     }
 
     private static void GenerateParameterMethod(StringBuilder sb, EntityInfo entity)
@@ -449,9 +471,19 @@ public class SqliteRepositoryGenerator : IIncrementalGenerator
     private const string AttributesSource = @"// <auto-generated/>
 #nullable enable
 using System;
+using Microsoft.Data.Sqlite;
 
 namespace Richasy.SqliteGenerator
 {
+    /// <summary>
+    /// SQLite 数据库接口.
+    /// </summary>
+    internal interface ISqliteDatabase
+    {
+        SqliteCommand CreateCommand(string sql);
+        System.Threading.Tasks.Task<SqliteTransaction> BeginTransactionAsync(System.Threading.CancellationToken cancellationToken = default);
+    }
+
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     internal sealed class SqliteTableAttribute : Attribute
     {

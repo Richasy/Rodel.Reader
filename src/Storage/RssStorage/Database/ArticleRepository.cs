@@ -9,7 +9,7 @@ internal sealed class ArticleRepository
 {
     private readonly RssDatabase _database;
     private readonly ILogger? _logger;
-    private readonly RssArticleEntityRepository _repository = new();
+    private readonly RssArticleEntityRepository<RssDatabase> _repository = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ArticleRepository"/> class.
@@ -30,7 +30,7 @@ internal sealed class ArticleRepository
         CancellationToken cancellationToken = default)
     {
         var sql = $"""
-            SELECT {RssArticleEntityRepository.ListFields}
+            SELECT {RssArticleEntityRepository<RssDatabase>.ListFields}
             FROM Articles
             WHERE FeedId = @feedId
             ORDER BY PublishTime DESC
@@ -55,7 +55,7 @@ internal sealed class ArticleRepository
         var articles = new List<RssArticle>();
         while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
         {
-            articles.Add(RssArticleEntityRepository.MapToEntityList(reader).ToModel());
+            articles.Add(RssArticleEntityRepository<RssDatabase>.MapToEntityList(reader).ToModel());
         }
 
         _logger?.LogDebug("Retrieved {Count} articles for feed {FeedId}.", articles.Count, feedId);
@@ -72,7 +72,7 @@ internal sealed class ArticleRepository
         CancellationToken cancellationToken = default)
     {
         var sql = $"""
-            SELECT {RssArticleEntityRepository.ListFields}
+            SELECT {RssArticleEntityRepository<RssDatabase>.ListFields}
             FROM Articles a
             WHERE NOT EXISTS (SELECT 1 FROM ReadStatus r WHERE r.ArticleId = a.Id)
             """;
@@ -98,7 +98,7 @@ internal sealed class ArticleRepository
         var articles = new List<RssArticle>();
         while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
         {
-            articles.Add(RssArticleEntityRepository.MapToEntityList(reader).ToModel());
+            articles.Add(RssArticleEntityRepository<RssDatabase>.MapToEntityList(reader).ToModel());
         }
 
         _logger?.LogDebug("Retrieved {Count} unread articles.", articles.Count);
@@ -114,7 +114,7 @@ internal sealed class ArticleRepository
         CancellationToken cancellationToken = default)
     {
         var sql = $"""
-            SELECT {RssArticleEntityRepository.ListFields}
+            SELECT {RssArticleEntityRepository<RssDatabase>.ListFields}
             FROM Articles a
             WHERE EXISTS (SELECT 1 FROM Favorites f WHERE f.ArticleId = a.Id)
             ORDER BY a.PublishTime DESC
@@ -130,7 +130,7 @@ internal sealed class ArticleRepository
         var articles = new List<RssArticle>();
         while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
         {
-            articles.Add(RssArticleEntityRepository.MapToEntityList(reader).ToModel());
+            articles.Add(RssArticleEntityRepository<RssDatabase>.MapToEntityList(reader).ToModel());
         }
 
         _logger?.LogDebug("Retrieved {Count} favorite articles.", articles.Count);

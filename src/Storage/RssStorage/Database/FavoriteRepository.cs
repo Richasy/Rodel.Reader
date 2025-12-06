@@ -9,7 +9,7 @@ internal sealed class FavoriteRepository
 {
     private readonly RssDatabase _database;
     private readonly ILogger? _logger;
-    private readonly FavoriteEntityRepository _repository = new();
+    private readonly FavoriteEntityRepository<RssDatabase> _repository = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FavoriteRepository"/> class.

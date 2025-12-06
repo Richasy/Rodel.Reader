@@ -9,7 +9,7 @@ internal sealed class ReadStatusRepository
 {
     private readonly RssDatabase _database;
     private readonly ILogger? _logger;
-    private readonly ReadStatusEntityRepository _repository = new();
+    private readonly ReadStatusEntityRepository<RssDatabase> _repository = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ReadStatusRepository"/> class.

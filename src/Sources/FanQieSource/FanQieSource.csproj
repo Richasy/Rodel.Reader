@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="FanQieSource.Test" />
+    <InternalsVisibleTo Include="FanQieDownloader.Test" />
   </ItemGroup>
 
   <ItemGroup>
