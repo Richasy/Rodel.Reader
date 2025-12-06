@@ -1,0 +1,510 @@
+// Copyright (c) Richasy. All rights reserved.
+
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
+
+namespace Richasy.SqliteGenerator;
+
+/// <summary>
+/// SQLite Repository 生成器.
+/// </summary>
+[Generator]
+public class SqliteRepositoryGenerator : IIncrementalGenerator
+{
+    /// <inheritdoc/>
+    public void Initialize(IncrementalGeneratorInitializationContext context)
+    {
+        // 注册 Attributes 作为附加源
+        context.RegisterPostInitializationOutput(ctx =>
+        {
+            ctx.AddSource("SqliteAttributes.g.cs", SourceText.From(AttributesSource, Encoding.UTF8));
+        });
+
+        // 查找所有带有 SqliteTable 特性的类
+        var entityProvider = context.SyntaxProvider
+            .CreateSyntaxProvider(
+                predicate: static (s, _) => IsCandidateSyntaxNode(s),
+                transform: static (ctx, _) => GetSemanticTarget(ctx))
+            .Where(static m => m is not null);
+
+        // 生成代码
+        context.RegisterSourceOutput(entityProvider, static (spc, source) => Execute(source, spc));
+    }
+
+    private static bool IsCandidateSyntaxNode(SyntaxNode node)
+    {
+        return node is ClassDeclarationSyntax classDecl &&
+               classDecl.AttributeLists.Count > 0;
+    }
+
+    private static EntityInfo? GetSemanticTarget(GeneratorSyntaxContext context)
+    {
+        var classDecl = (ClassDeclarationSyntax)context.Node;
+        var symbol = context.SemanticModel.GetDeclaredSymbol(classDecl);
+
+        if (symbol is not INamedTypeSymbol classSymbol)
+        {
+            return null;
+        }
+
+        // 查找 SqliteTable 特性
+        var tableAttr = classSymbol.GetAttributes()
+            .FirstOrDefault(a => a.AttributeClass?.Name == "SqliteTableAttribute");
+
+        if (tableAttr is null)
+        {
+            return null;
+        }
+
+        // 获取表名
+        var tableName = tableAttr.ConstructorArguments.Length > 0
+            ? tableAttr.ConstructorArguments[0].Value?.ToString()
+            : classSymbol.Name;
+
+        if (string.IsNullOrEmpty(tableName))
+        {
+            return null;
+        }
+
+        // 获取所有属性
+        var properties = new List<PropertyInfo>();
+        foreach (var member in classSymbol.GetMembers().OfType<IPropertySymbol>())
+        {
+            // 跳过带有 SqliteIgnore 特性的属性
+            if (member.GetAttributes().Any(a => a.AttributeClass?.Name == "SqliteIgnoreAttribute"))
+            {
+                continue;
+            }
+
+            var columnAttr = member.GetAttributes()
+                .FirstOrDefault(a => a.AttributeClass?.Name == "SqliteColumnAttribute");
+
+            if (columnAttr is null)
+            {
+                continue;
+            }
+
+            var columnName = columnAttr.ConstructorArguments.Length > 0
+                ? columnAttr.ConstructorArguments[0].Value?.ToString()
+                : null;
+
+            var isPrimaryKey = false;
+            var excludeFromList = false;
+            var isAutoTimestamp = false;
+
+            foreach (var namedArg in columnAttr.NamedArguments)
+            {
+                switch (namedArg.Key)
+                {
+                    case "IsPrimaryKey":
+                        isPrimaryKey = namedArg.Value.Value is true;
+                        break;
+                    case "ExcludeFromList":
+                        excludeFromList = namedArg.Value.Value is true;
+                        break;
+                    case "IsAutoTimestamp":
+                        isAutoTimestamp = namedArg.Value.Value is true;
+                        break;
+                }
+            }
+
+            properties.Add(new PropertyInfo
+            {
+                Name = member.Name,
+                ColumnName = columnName ?? member.Name,
+                TypeName = member.Type.ToDisplayString(),
+                IsNullable = member.Type.NullableAnnotation == NullableAnnotation.Annotated,
+                IsPrimaryKey = isPrimaryKey,
+                ExcludeFromList = excludeFromList,
+                IsAutoTimestamp = isAutoTimestamp,
+            });
+        }
+
+        if (properties.Count == 0)
+        {
+            return null;
+        }
+
+        return new EntityInfo
+        {
+            Namespace = classSymbol.ContainingNamespace.ToDisplayString(),
+            ClassName = classSymbol.Name,
+            TableName = tableName ?? classSymbol.Name,
+            Properties = properties,
+        };
+    }
+
+    private static void Execute(EntityInfo? entityInfo, SourceProductionContext context)
+    {
+        if (entityInfo is null)
+        {
+            return;
+        }
+
+        var source = GenerateRepositoryCode(entityInfo);
+        context.AddSource($"{entityInfo.ClassName}Repository.g.cs", SourceText.From(source, Encoding.UTF8));
+    }
+
+    private static string GenerateRepositoryCode(EntityInfo entity)
+    {
+        var sb = new StringBuilder();
+
+        sb.AppendLine("// <auto-generated/>");
+        sb.AppendLine("#nullable enable");
+        sb.AppendLine();
+        sb.AppendLine("using System;");
+        sb.AppendLine("using System.Collections.Generic;");
+        sb.AppendLine("using System.Threading;");
+        sb.AppendLine("using System.Threading.Tasks;");
+        sb.AppendLine("using Microsoft.Data.Sqlite;");
+        sb.AppendLine();
+        sb.AppendLine($"namespace {entity.Namespace};");
+        sb.AppendLine();
+        sb.AppendLine("/// <summary>");
+        sb.AppendLine($"/// {entity.ClassName} 数据仓库（自动生成）.");
+        sb.AppendLine("/// </summary>");
+        sb.AppendLine($"internal sealed partial class {entity.ClassName}Repository");
+        sb.AppendLine("{");
+
+        // 生成字段列表常量
+        GenerateFieldConstants(sb, entity);
+        sb.AppendLine();
+
+        // 生成 SQL 常量
+        GenerateSqlConstants(sb, entity!);
+        sb.AppendLine();
+
+        // 生成映射方法
+        GenerateMappingMethods(sb, entity);
+        sb.AppendLine();
+
+        // 生成参数添加方法
+        GenerateParameterMethod(sb, entity);
+        sb.AppendLine();
+
+        // 生成 CRUD 方法
+        GenerateCrudMethods(sb, entity);
+
+        sb.AppendLine("}");
+
+        return sb.ToString();
+    }
+
+    private static void GenerateCrudMethods(StringBuilder sb, EntityInfo entity)
+    {
+        var primaryKey = entity.Properties.FirstOrDefault(p => p.IsPrimaryKey);
+        if (primaryKey is null)
+        {
+            return;
+        }
+
+        var hasListFields = entity.Properties.Any(p => p.ExcludeFromList);
+
+        // GetAllAsync
+        sb.AppendLine("    /// <summary>");
+        sb.AppendLine("    /// 获取所有实体.");
+        sb.AppendLine("    /// </summary>");
+        sb.AppendLine($"    public async Task<IReadOnlyList<{entity.ClassName}>> GetAllAsync(RssDatabase database, CancellationToken cancellationToken = default)");
+        sb.AppendLine("    {");
+        sb.AppendLine($"        var sql = string.Format(SelectAllSql, {(hasListFields ? "ListFields" : "AllFields")});");
+        sb.AppendLine("        await using var cmd = database.CreateCommand(sql);");
+        sb.AppendLine("        await using var reader = await cmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);");
+        sb.AppendLine();
+        sb.AppendLine($"        var results = new List<{entity.ClassName}>();");
+        sb.AppendLine("        while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))");
+        sb.AppendLine("        {");
+        sb.AppendLine($"            results.Add({(hasListFields ? "MapToEntityList" : "MapToEntity")}(reader));");
+        sb.AppendLine("        }");
+        sb.AppendLine();
+        sb.AppendLine("        return results;");
+        sb.AppendLine("    }");
+        sb.AppendLine();
+
+        // GetByIdAsync
+        sb.AppendLine("    /// <summary>");
+        sb.AppendLine("    /// 根据 ID 获取实体.");
+        sb.AppendLine("    /// </summary>");
+        sb.AppendLine($"    public async Task<{entity.ClassName}?> GetByIdAsync(RssDatabase database, string id, CancellationToken cancellationToken = default)");
+        sb.AppendLine("    {");
+        sb.AppendLine("        var sql = string.Format(SelectByIdSql, AllFields);");
+        sb.AppendLine("        await using var cmd = database.CreateCommand(sql);");
+        sb.AppendLine("        cmd.Parameters.AddWithValue(\"@id\", id);");
+        sb.AppendLine("        await using var reader = await cmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);");
+        sb.AppendLine();
+        sb.AppendLine("        if (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))");
+        sb.AppendLine("        {");
+        sb.AppendLine("            return MapToEntity(reader);");
+        sb.AppendLine("        }");
+        sb.AppendLine();
+        sb.AppendLine("        return null;");
+        sb.AppendLine("    }");
+        sb.AppendLine();
+
+        // UpsertAsync
+        sb.AppendLine("    /// <summary>");
+        sb.AppendLine("    /// 添加或更新实体.");
+        sb.AppendLine("    /// </summary>");
+        sb.AppendLine($"    public async Task UpsertAsync(RssDatabase database, {entity.ClassName} entity, CancellationToken cancellationToken = default)");
+        sb.AppendLine("    {");
+        sb.AppendLine("        await using var cmd = database.CreateCommand(UpsertSql);");
+        sb.AppendLine("        AddParameters(cmd, entity);");
+        sb.AppendLine("        await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);");
+        sb.AppendLine("    }");
+        sb.AppendLine();
+
+        // UpsertManyAsync
+        sb.AppendLine("    /// <summary>");
+        sb.AppendLine("    /// 批量添加或更新实体.");
+        sb.AppendLine("    /// </summary>");
+        sb.AppendLine($"    public async Task UpsertManyAsync(RssDatabase database, IEnumerable<{entity.ClassName}> entities, CancellationToken cancellationToken = default)");
+        sb.AppendLine("    {");
+        sb.AppendLine("        await using var transaction = await database.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);");
+        sb.AppendLine("        try");
+        sb.AppendLine("        {");
+        sb.AppendLine("            foreach (var entity in entities)");
+        sb.AppendLine("            {");
+        sb.AppendLine("                await using var cmd = database.CreateCommand(UpsertSql);");
+        sb.AppendLine("                cmd.Transaction = transaction;");
+        sb.AppendLine("                AddParameters(cmd, entity);");
+        sb.AppendLine("                await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);");
+        sb.AppendLine("            }");
+        sb.AppendLine();
+        sb.AppendLine("            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);");
+        sb.AppendLine("        }");
+        sb.AppendLine("        catch");
+        sb.AppendLine("        {");
+        sb.AppendLine("            await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);");
+        sb.AppendLine("            throw;");
+        sb.AppendLine("        }");
+        sb.AppendLine("    }");
+        sb.AppendLine();
+
+        // DeleteAsync
+        sb.AppendLine("    /// <summary>");
+        sb.AppendLine("    /// 删除实体.");
+        sb.AppendLine("    /// </summary>");
+        sb.AppendLine("    public async Task<bool> DeleteAsync(RssDatabase database, string id, CancellationToken cancellationToken = default)");
+        sb.AppendLine("    {");
+        sb.AppendLine("        await using var cmd = database.CreateCommand(DeleteSql);");
+        sb.AppendLine("        cmd.Parameters.AddWithValue(\"@id\", id);");
+        sb.AppendLine("        var affected = await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);");
+        sb.AppendLine("        return affected > 0;");
+        sb.AppendLine("    }");
+        sb.AppendLine();
+
+        // DeleteAsync with transaction
+        sb.AppendLine("    /// <summary>");
+        sb.AppendLine("    /// 删除实体（使用事务）.");
+        sb.AppendLine("    /// </summary>");
+        sb.AppendLine("    public async Task<bool> DeleteAsync(RssDatabase database, string id, SqliteTransaction transaction, CancellationToken cancellationToken = default)");
+        sb.AppendLine("    {");
+        sb.AppendLine("        await using var cmd = database.CreateCommand(DeleteSql);");
+        sb.AppendLine("        cmd.Transaction = transaction;");
+        sb.AppendLine("        cmd.Parameters.AddWithValue(\"@id\", id);");
+        sb.AppendLine("        var affected = await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);");
+        sb.AppendLine("        return affected > 0;");
+        sb.AppendLine("    }");
+    }
+
+    private static void GenerateFieldConstants(StringBuilder sb, EntityInfo entity)
+    {
+        var allFields = string.Join(", ", entity.Properties.Select(p => p.ColumnName));
+        var listFields = string.Join(", ", entity.Properties.Where(p => !p.ExcludeFromList).Select(p => p.ColumnName));
+
+        sb.AppendLine("    // 字段列表");
+        sb.AppendLine($"    public const string AllFields = \"{allFields}\";");
+        sb.AppendLine($"    public const string ListFields = \"{listFields}\";");
+    }
+
+    private static void GenerateSqlConstants(StringBuilder sb, EntityInfo entity)
+    {
+        var primaryKey = entity.Properties.FirstOrDefault(p => p.IsPrimaryKey);
+        if (primaryKey is null)
+        {
+            return;
+        }
+
+        sb.AppendLine("    // SQL 语句");
+        sb.AppendLine($"    public const string SelectAllSql = \"SELECT {{0}} FROM {entity.TableName}\";");
+        sb.AppendLine($"    public const string SelectByIdSql = \"SELECT {{0}} FROM {entity.TableName} WHERE {primaryKey.ColumnName} = @id\";");
+
+        // 生成 INSERT/UPDATE SQL
+        var columns = string.Join(", ", entity.Properties.Select(p => p.ColumnName));
+        var values = string.Join(", ", entity.Properties.Select(p => $"@{p.Name.ToLowerFirstChar()}"));
+        var updates = string.Join(",\n                ", entity.Properties
+            .Where(p => !p.IsPrimaryKey)
+            .Select(p => $"{p.ColumnName} = excluded.{p.ColumnName}"));
+
+        sb.AppendLine($"    public const string UpsertSql = @\"");
+        sb.AppendLine($"        INSERT INTO {entity.TableName} ({columns})");
+        sb.AppendLine($"        VALUES ({values})");
+        sb.AppendLine($"        ON CONFLICT({primaryKey.ColumnName}) DO UPDATE SET");
+        sb.AppendLine($"            {updates}\";");
+
+        sb.AppendLine($"    public const string DeleteSql = \"DELETE FROM {entity.TableName} WHERE {primaryKey.ColumnName} = @id\";");
+    }
+
+    private static void GenerateMappingMethods(StringBuilder sb, EntityInfo entity)
+    {
+        sb.AppendLine("    /// <summary>");
+        sb.AppendLine("    /// 将 DataReader 映射到实体（包含所有字段）.");
+        sb.AppendLine("    /// </summary>");
+        sb.AppendLine($"    public static {entity.Namespace}.{entity.ClassName} MapToEntity(SqliteDataReader reader)");
+        sb.AppendLine("    {");
+        sb.AppendLine($"        return new {entity.Namespace}.{entity.ClassName}");
+        sb.AppendLine("        {");
+
+        foreach (var prop in entity.Properties)
+        {
+            var ordinal = $"reader.GetOrdinal(\"{prop.ColumnName}\")";
+            if (prop.IsNullable)
+            {
+                sb.AppendLine($"            {prop.Name} = reader.IsDBNull({ordinal}) ? null : reader.GetString({ordinal}),");
+            }
+            else if (prop.TypeName == "bool")
+            {
+                sb.AppendLine($"            {prop.Name} = reader.GetInt32({ordinal}) == 1,");
+            }
+            else
+            {
+                sb.AppendLine($"            {prop.Name} = reader.GetString({ordinal}),");
+            }
+        }
+
+        sb.AppendLine("        };");
+        sb.AppendLine("    }");
+        sb.AppendLine();
+
+        // 生成列表映射方法（排除大字段）
+        var listProps = entity.Properties.Where(p => !p.ExcludeFromList).ToList();
+        if (listProps.Count < entity.Properties.Count)
+        {
+            sb.AppendLine("    /// <summary>");
+            sb.AppendLine("    /// 将 DataReader 映射到实体（仅列表字段）.");
+            sb.AppendLine("    /// </summary>");
+            sb.AppendLine($"    public static {entity.Namespace}.{entity.ClassName} MapToEntityList(SqliteDataReader reader)");
+            sb.AppendLine("    {");
+            sb.AppendLine($"        return new {entity.Namespace}.{entity.ClassName}");
+            sb.AppendLine("        {");
+
+            foreach (var prop in listProps)
+            {
+                var ordinal = $"reader.GetOrdinal(\"{prop.ColumnName}\")";
+                if (prop.IsNullable)
+                {
+                    sb.AppendLine($"            {prop.Name} = reader.IsDBNull({ordinal}) ? null : reader.GetString({ordinal}),");
+                }
+                else if (prop.TypeName == "bool")
+                {
+                    sb.AppendLine($"            {prop.Name} = reader.GetInt32({ordinal}) == 1,");
+                }
+                else
+                {
+                    sb.AppendLine($"            {prop.Name} = reader.GetString({ordinal}),");
+                }
+            }
+
+            sb.AppendLine("        };");
+            sb.AppendLine("    }");
+        }
+    }
+
+    private static void GenerateParameterMethod(StringBuilder sb, EntityInfo entity)
+    {
+        sb.AppendLine("    /// <summary>");
+        sb.AppendLine("    /// 添加实体参数到命令.");
+        sb.AppendLine("    /// </summary>");
+        sb.AppendLine($"    public static void AddParameters(SqliteCommand cmd, {entity.Namespace}.{entity.ClassName} entity)");
+        sb.AppendLine("    {");
+
+        foreach (var prop in entity.Properties)
+        {
+            var paramName = $"@{prop.Name.ToLowerFirstChar()}";
+
+            if (prop.IsAutoTimestamp)
+            {
+                sb.AppendLine($"        cmd.Parameters.AddWithValue(\"{paramName}\", DateTimeOffset.UtcNow.ToString(\"O\"));");
+            }
+            else if (prop.IsNullable)
+            {
+                sb.AppendLine($"        cmd.Parameters.AddWithValue(\"{paramName}\", (object?)entity.{prop.Name} ?? DBNull.Value);");
+            }
+            else if (prop.TypeName == "bool")
+            {
+                sb.AppendLine($"        cmd.Parameters.AddWithValue(\"{paramName}\", entity.{prop.Name} ? 1 : 0);");
+            }
+            else
+            {
+                sb.AppendLine($"        cmd.Parameters.AddWithValue(\"{paramName}\", entity.{prop.Name});");
+            }
+        }
+
+        sb.AppendLine("    }");
+    }
+
+    private const string AttributesSource = @"// <auto-generated/>
+#nullable enable
+using System;
+
+namespace Richasy.SqliteGenerator
+{
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    internal sealed class SqliteTableAttribute : Attribute
+    {
+        public SqliteTableAttribute(string tableName) => TableName = tableName;
+        public string TableName { get; }
+    }
+
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+    internal sealed class SqliteColumnAttribute : Attribute
+    {
+        public SqliteColumnAttribute() { }
+        public SqliteColumnAttribute(string columnName) => ColumnName = columnName;
+        public string? ColumnName { get; }
+        public bool IsPrimaryKey { get; set; }
+        public bool ExcludeFromList { get; set; }
+        public bool IsAutoTimestamp { get; set; }
+    }
+
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+    internal sealed class SqliteIgnoreAttribute : Attribute
+    {
+    }
+}";
+}
+
+internal sealed class EntityInfo
+{
+    public string Namespace { get; set; } = string.Empty;
+    public string ClassName { get; set; } = string.Empty;
+    public string TableName { get; set; } = string.Empty;
+    public List<PropertyInfo> Properties { get; set; } = new();
+}
+
+internal sealed class PropertyInfo
+{
+    public string Name { get; set; } = string.Empty;
+    public string ColumnName { get; set; } = string.Empty;
+    public string TypeName { get; set; } = string.Empty;
+    public bool IsNullable { get; set; }
+    public bool IsPrimaryKey { get; set; }
+    public bool ExcludeFromList { get; set; }
+    public bool IsAutoTimestamp { get; set; }
+}
+
+internal static class StringExtensions
+{
+    public static string ToLowerFirstChar(this string str)
+    {
+        if (string.IsNullOrEmpty(str) || char.IsLower(str[0]))
+        {
+            return str;
+        }
+
+        return char.ToLowerInvariant(str[0]) + str.Substring(1);
+    }
+}
