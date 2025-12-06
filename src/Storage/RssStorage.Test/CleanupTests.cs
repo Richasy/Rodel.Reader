@@ -15,7 +15,7 @@ public class CleanupTests
     public async Task Setup()
     {
         _testDbPath = Path.Combine(Path.GetTempPath(), $"rss_test_{Guid.NewGuid()}.db");
-        var options = new RssStorageOptions { DatabasePath = _testDbPath, DefaultArticleRetentionDays = 7 };
+        var options = new RssStorageOptions { DatabasePath = _testDbPath };
         _storage = new RssStorage(options);
         await _storage.InitializeAsync();
 

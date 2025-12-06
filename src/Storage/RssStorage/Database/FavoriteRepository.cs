@@ -9,6 +9,7 @@ internal sealed class FavoriteRepository
 {
     private readonly RssDatabase _database;
     private readonly ILogger? _logger;
+    private readonly FavoriteEntityRepository _repository = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FavoriteRepository"/> class.
@@ -24,17 +25,8 @@ internal sealed class FavoriteRepository
     /// </summary>
     public async Task AddAsync(string articleId, CancellationToken cancellationToken = default)
     {
-        const string sql = """
-            INSERT INTO Favorites (ArticleId, FavoritedAt)
-            VALUES (@articleId, @favoritedAt)
-            ON CONFLICT(ArticleId) DO NOTHING
-            """;
-
-        await using var cmd = _database.CreateCommand(sql);
-        cmd.Parameters.AddWithValue("@articleId", articleId);
-        cmd.Parameters.AddWithValue("@favoritedAt", DateTimeOffset.UtcNow.ToString("O"));
-
-        await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+        var entity = new FavoriteEntity { ArticleId = articleId };
+        await _repository.UpsertAsync(_database, entity, cancellationToken).ConfigureAwait(false);
         _logger?.LogDebug("Added article {ArticleId} to favorites.", articleId);
     }
 
@@ -43,12 +35,7 @@ internal sealed class FavoriteRepository
     /// </summary>
     public async Task RemoveAsync(string articleId, CancellationToken cancellationToken = default)
     {
-        const string sql = "DELETE FROM Favorites WHERE ArticleId = @articleId";
-
-        await using var cmd = _database.CreateCommand(sql);
-        cmd.Parameters.AddWithValue("@articleId", articleId);
-
-        await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+        await _repository.DeleteAsync(_database, articleId, cancellationToken).ConfigureAwait(false);
         _logger?.LogDebug("Removed article {ArticleId} from favorites.", articleId);
     }
 
@@ -57,12 +44,7 @@ internal sealed class FavoriteRepository
     /// </summary>
     public async Task<bool> IsFavoriteAsync(string articleId, CancellationToken cancellationToken = default)
     {
-        const string sql = "SELECT 1 FROM Favorites WHERE ArticleId = @articleId";
-
-        await using var cmd = _database.CreateCommand(sql);
-        cmd.Parameters.AddWithValue("@articleId", articleId);
-
-        var result = await cmd.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
-        return result is not null;
+        var entity = await _repository.GetByIdAsync(_database, articleId, cancellationToken).ConfigureAwait(false);
+        return entity is not null;
     }
 }

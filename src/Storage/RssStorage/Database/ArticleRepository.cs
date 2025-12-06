@@ -9,16 +9,7 @@ internal sealed class ArticleRepository
 {
     private readonly RssDatabase _database;
     private readonly ILogger? _logger;
-
-    // 不包含 Content 的字段列表（用于列表查询）
-    private const string ArticleFieldsWithoutContent = """
-        Id, FeedId, Title, Summary, CoverUrl, Url, Author, PublishTime, Tags, ExtraData, CachedAt
-        """;
-
-    // 包含 Content 的字段列表（用于详情查询）
-    private const string ArticleFieldsWithContent = """
-        Id, FeedId, Title, Summary, Content, CoverUrl, Url, Author, PublishTime, Tags, ExtraData, CachedAt
-        """;
+    private readonly RssArticleEntityRepository _repository = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ArticleRepository"/> class.
@@ -39,7 +30,7 @@ internal sealed class ArticleRepository
         CancellationToken cancellationToken = default)
     {
         var sql = $"""
-            SELECT {ArticleFieldsWithoutContent}
+            SELECT {RssArticleEntityRepository.ListFields}
             FROM Articles
             WHERE FeedId = @feedId
             ORDER BY PublishTime DESC
@@ -64,7 +55,7 @@ internal sealed class ArticleRepository
         var articles = new List<RssArticle>();
         while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
         {
-            articles.Add(MapToArticleWithoutContent(reader));
+            articles.Add(RssArticleEntityRepository.MapToEntityList(reader).ToModel());
         }
 
         _logger?.LogDebug("Retrieved {Count} articles for feed {FeedId}.", articles.Count, feedId);
@@ -81,7 +72,7 @@ internal sealed class ArticleRepository
         CancellationToken cancellationToken = default)
     {
         var sql = $"""
-            SELECT {ArticleFieldsWithoutContent}
+            SELECT {RssArticleEntityRepository.ListFields}
             FROM Articles a
             WHERE NOT EXISTS (SELECT 1 FROM ReadStatus r WHERE r.ArticleId = a.Id)
             """;
@@ -107,7 +98,7 @@ internal sealed class ArticleRepository
         var articles = new List<RssArticle>();
         while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
         {
-            articles.Add(MapToArticleWithoutContent(reader));
+            articles.Add(RssArticleEntityRepository.MapToEntityList(reader).ToModel());
         }
 
         _logger?.LogDebug("Retrieved {Count} unread articles.", articles.Count);
@@ -123,7 +114,7 @@ internal sealed class ArticleRepository
         CancellationToken cancellationToken = default)
     {
         var sql = $"""
-            SELECT {ArticleFieldsWithoutContent}
+            SELECT {RssArticleEntityRepository.ListFields}
             FROM Articles a
             WHERE EXISTS (SELECT 1 FROM Favorites f WHERE f.ArticleId = a.Id)
             ORDER BY a.PublishTime DESC
@@ -139,7 +130,7 @@ internal sealed class ArticleRepository
         var articles = new List<RssArticle>();
         while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
         {
-            articles.Add(MapToArticleWithoutContent(reader));
+            articles.Add(RssArticleEntityRepository.MapToEntityList(reader).ToModel());
         }
 
         _logger?.LogDebug("Retrieved {Count} favorite articles.", articles.Count);
@@ -151,23 +142,8 @@ internal sealed class ArticleRepository
     /// </summary>
     public async Task<RssArticle?> GetByIdAsync(string articleId, CancellationToken cancellationToken = default)
     {
-        var sql = $"""
-            SELECT {ArticleFieldsWithContent}
-            FROM Articles
-            WHERE Id = @id
-            """;
-
-        await using var cmd = _database.CreateCommand(sql);
-        cmd.Parameters.AddWithValue("@id", articleId);
-
-        await using var reader = await cmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
-
-        if (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
-        {
-            return MapToArticleWithContent(reader);
-        }
-
-        return null;
+        var entity = await _repository.GetByIdAsync(_database, articleId, cancellationToken).ConfigureAwait(false);
+        return entity?.ToModel();
     }
 
     /// <summary>
@@ -189,27 +165,8 @@ internal sealed class ArticleRepository
     /// </summary>
     public async Task UpsertAsync(RssArticle article, CancellationToken cancellationToken = default)
     {
-        const string sql = """
-            INSERT INTO Articles (Id, FeedId, Title, Summary, Content, CoverUrl, Url, Author, PublishTime, Tags, ExtraData, CachedAt)
-            VALUES (@id, @feedId, @title, @summary, @content, @coverUrl, @url, @author, @publishTime, @tags, @extraData, @cachedAt)
-            ON CONFLICT(Id) DO UPDATE SET
-                FeedId = excluded.FeedId,
-                Title = excluded.Title,
-                Summary = excluded.Summary,
-                Content = excluded.Content,
-                CoverUrl = excluded.CoverUrl,
-                Url = excluded.Url,
-                Author = excluded.Author,
-                PublishTime = excluded.PublishTime,
-                Tags = excluded.Tags,
-                ExtraData = excluded.ExtraData,
-                CachedAt = excluded.CachedAt
-            """;
-
-        await using var cmd = _database.CreateCommand(sql);
-        AddArticleParameters(cmd, article);
-
-        await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+        var entity = RssArticleEntity.FromModel(article);
+        await _repository.UpsertAsync(_database, entity, cancellationToken).ConfigureAwait(false);
         _logger?.LogDebug("Upserted article: {ArticleId}", article.Id);
     }
 
@@ -218,44 +175,9 @@ internal sealed class ArticleRepository
     /// </summary>
     public async Task UpsertManyAsync(IEnumerable<RssArticle> articles, CancellationToken cancellationToken = default)
     {
-        await using var transaction = await _database.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
-
-        try
-        {
-            foreach (var article in articles)
-            {
-                const string sql = """
-                    INSERT INTO Articles (Id, FeedId, Title, Summary, Content, CoverUrl, Url, Author, PublishTime, Tags, ExtraData, CachedAt)
-                    VALUES (@id, @feedId, @title, @summary, @content, @coverUrl, @url, @author, @publishTime, @tags, @extraData, @cachedAt)
-                    ON CONFLICT(Id) DO UPDATE SET
-                        FeedId = excluded.FeedId,
-                        Title = excluded.Title,
-                        Summary = excluded.Summary,
-                        Content = excluded.Content,
-                        CoverUrl = excluded.CoverUrl,
-                        Url = excluded.Url,
-                        Author = excluded.Author,
-                        PublishTime = excluded.PublishTime,
-                        Tags = excluded.Tags,
-                        ExtraData = excluded.ExtraData,
-                        CachedAt = excluded.CachedAt
-                    """;
-
-                await using var cmd = _database.CreateCommand(sql);
-                cmd.Transaction = transaction;
-                AddArticleParameters(cmd, article);
-
-                await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
-            }
-
-            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-            _logger?.LogDebug("Upserted multiple articles in batch.");
-        }
-        catch
-        {
-            await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-            throw;
-        }
+        var entities = articles.Select(RssArticleEntity.FromModel);
+        await _repository.UpsertManyAsync(_database, entities, cancellationToken).ConfigureAwait(false);
+        _logger?.LogDebug("Upserted multiple articles in batch.");
     }
 
     /// <summary>
@@ -263,15 +185,9 @@ internal sealed class ArticleRepository
     /// </summary>
     public async Task<bool> DeleteAsync(string articleId, CancellationToken cancellationToken = default)
     {
-        const string sql = "DELETE FROM Articles WHERE Id = @id";
-
-        await using var cmd = _database.CreateCommand(sql);
-        cmd.Parameters.AddWithValue("@id", articleId);
-
-        var affected = await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+        var affected = await _repository.DeleteAsync(_database, articleId, cancellationToken).ConfigureAwait(false);
         _logger?.LogDebug("Deleted article: {ArticleId}, affected: {Affected}", articleId, affected);
-
-        return affected > 0;
+        return affected;
     }
 
     /// <summary>
@@ -312,56 +228,5 @@ internal sealed class ArticleRepository
         _logger?.LogInformation("Cleaned up {Count} old articles.", affected);
 
         return affected;
-    }
-
-    private static RssArticle MapToArticleWithoutContent(SqliteDataReader reader)
-    {
-        return new RssArticle
-        {
-            Id = reader.GetString(0),
-            FeedId = reader.GetString(1),
-            Title = reader.GetString(2),
-            Summary = reader.IsDBNull(3) ? null : reader.GetString(3),
-            CoverUrl = reader.IsDBNull(4) ? null : reader.GetString(4),
-            Url = reader.IsDBNull(5) ? null : reader.GetString(5),
-            Author = reader.IsDBNull(6) ? null : reader.GetString(6),
-            PublishTime = reader.IsDBNull(7) ? null : reader.GetString(7),
-            Tags = reader.IsDBNull(8) ? null : reader.GetString(8),
-            ExtraData = reader.IsDBNull(9) ? null : reader.GetString(9),
-        };
-    }
-
-    private static RssArticle MapToArticleWithContent(SqliteDataReader reader)
-    {
-        return new RssArticle
-        {
-            Id = reader.GetString(0),
-            FeedId = reader.GetString(1),
-            Title = reader.GetString(2),
-            Summary = reader.IsDBNull(3) ? null : reader.GetString(3),
-            Content = reader.IsDBNull(4) ? null : reader.GetString(4),
-            CoverUrl = reader.IsDBNull(5) ? null : reader.GetString(5),
-            Url = reader.IsDBNull(6) ? null : reader.GetString(6),
-            Author = reader.IsDBNull(7) ? null : reader.GetString(7),
-            PublishTime = reader.IsDBNull(8) ? null : reader.GetString(8),
-            Tags = reader.IsDBNull(9) ? null : reader.GetString(9),
-            ExtraData = reader.IsDBNull(10) ? null : reader.GetString(10),
-        };
-    }
-
-    private static void AddArticleParameters(SqliteCommand cmd, RssArticle article)
-    {
-        cmd.Parameters.AddWithValue("@id", article.Id);
-        cmd.Parameters.AddWithValue("@feedId", article.FeedId);
-        cmd.Parameters.AddWithValue("@title", article.Title);
-        cmd.Parameters.AddWithValue("@summary", (object?)article.Summary ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@content", (object?)article.Content ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@coverUrl", (object?)article.CoverUrl ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@url", (object?)article.Url ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@author", (object?)article.Author ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@publishTime", (object?)article.PublishTime ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@tags", (object?)article.Tags ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@extraData", (object?)article.ExtraData ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@cachedAt", DateTimeOffset.UtcNow.ToString("O"));
     }
 }

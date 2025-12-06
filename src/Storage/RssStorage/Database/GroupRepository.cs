@@ -9,6 +9,7 @@ internal sealed class GroupRepository
 {
     private readonly RssDatabase _database;
     private readonly ILogger? _logger;
+    private readonly RssFeedGroupEntityRepository _repository = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GroupRepository"/> class.
@@ -24,17 +25,8 @@ internal sealed class GroupRepository
     /// </summary>
     public async Task<IReadOnlyList<RssFeedGroup>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        const string sql = "SELECT Id, Name FROM Groups ORDER BY Name";
-
-        await using var cmd = _database.CreateCommand(sql);
-        await using var reader = await cmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
-
-        var groups = new List<RssFeedGroup>();
-        while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
-        {
-            groups.Add(MapToGroup(reader));
-        }
-
+        var entities = await _repository.GetAllAsync(_database, cancellationToken).ConfigureAwait(false);
+        var groups = entities.Select(e => e.ToModel()).ToList();
         _logger?.LogDebug("Retrieved {Count} groups.", groups.Count);
         return groups;
     }
@@ -44,19 +36,8 @@ internal sealed class GroupRepository
     /// </summary>
     public async Task<RssFeedGroup?> GetByIdAsync(string groupId, CancellationToken cancellationToken = default)
     {
-        const string sql = "SELECT Id, Name FROM Groups WHERE Id = @id";
-
-        await using var cmd = _database.CreateCommand(sql);
-        cmd.Parameters.AddWithValue("@id", groupId);
-
-        await using var reader = await cmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
-
-        if (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
-        {
-            return MapToGroup(reader);
-        }
-
-        return null;
+        var entity = await _repository.GetByIdAsync(_database, groupId, cancellationToken).ConfigureAwait(false);
+        return entity?.ToModel();
     }
 
     /// <summary>
@@ -64,17 +45,8 @@ internal sealed class GroupRepository
     /// </summary>
     public async Task UpsertAsync(RssFeedGroup group, CancellationToken cancellationToken = default)
     {
-        const string sql = """
-            INSERT INTO Groups (Id, Name)
-            VALUES (@id, @name)
-            ON CONFLICT(Id) DO UPDATE SET Name = excluded.Name
-            """;
-
-        await using var cmd = _database.CreateCommand(sql);
-        cmd.Parameters.AddWithValue("@id", group.Id);
-        cmd.Parameters.AddWithValue("@name", group.Name);
-
-        await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+        var entity = RssFeedGroupEntity.FromModel(group);
+        await _repository.UpsertAsync(_database, entity, cancellationToken).ConfigureAwait(false);
         _logger?.LogDebug("Upserted group: {GroupId}", group.Id);
     }
 
@@ -83,34 +55,9 @@ internal sealed class GroupRepository
     /// </summary>
     public async Task UpsertManyAsync(IEnumerable<RssFeedGroup> groups, CancellationToken cancellationToken = default)
     {
-        await using var transaction = await _database.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
-
-        try
-        {
-            foreach (var group in groups)
-            {
-                const string sql = """
-                    INSERT INTO Groups (Id, Name)
-                    VALUES (@id, @name)
-                    ON CONFLICT(Id) DO UPDATE SET Name = excluded.Name
-                    """;
-
-                await using var cmd = _database.CreateCommand(sql);
-                cmd.Transaction = transaction;
-                cmd.Parameters.AddWithValue("@id", group.Id);
-                cmd.Parameters.AddWithValue("@name", group.Name);
-
-                await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
-            }
-
-            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-            _logger?.LogDebug("Upserted multiple groups in batch.");
-        }
-        catch
-        {
-            await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-            throw;
-        }
+        var entities = groups.Select(RssFeedGroupEntity.FromModel);
+        await _repository.UpsertManyAsync(_database, entities, cancellationToken).ConfigureAwait(false);
+        _logger?.LogDebug("Upserted multiple groups in batch.");
     }
 
     /// <summary>
@@ -118,23 +65,8 @@ internal sealed class GroupRepository
     /// </summary>
     public async Task<bool> DeleteAsync(string groupId, CancellationToken cancellationToken = default)
     {
-        const string sql = "DELETE FROM Groups WHERE Id = @id";
-
-        await using var cmd = _database.CreateCommand(sql);
-        cmd.Parameters.AddWithValue("@id", groupId);
-
-        var affected = await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+        var affected = await _repository.DeleteAsync(_database, groupId, cancellationToken).ConfigureAwait(false);
         _logger?.LogDebug("Deleted group: {GroupId}, affected: {Affected}", groupId, affected);
-
-        return affected > 0;
-    }
-
-    private static RssFeedGroup MapToGroup(SqliteDataReader reader)
-    {
-        return new RssFeedGroup
-        {
-            Id = reader.GetString(0),
-            Name = reader.GetString(1),
-        };
+        return affected;
     }
 }

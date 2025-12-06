@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Sources\RssSource.Abstractions\RssSource.Abstractions.csproj" />
+    <ProjectReference Include="..\..\Utilities\SqliteGenerator\SqliteGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

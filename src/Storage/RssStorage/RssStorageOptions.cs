@@ -16,9 +16,4 @@ public sealed class RssStorageOptions
     /// 是否在初始化时创建表.
     /// </summary>
     public bool CreateTablesOnInit { get; set; } = true;
-
-    /// <summary>
-    /// 默认的文章保留天数（0 表示不自动清理）.
-    /// </summary>
-    public int DefaultArticleRetentionDays { get; set; } = 30;
 }

@@ -17,7 +17,6 @@ public class RssStorageOptionsTests
         // Assert
         Assert.AreEqual(string.Empty, options.DatabasePath);
         Assert.IsTrue(options.CreateTablesOnInit);
-        Assert.AreEqual(30, options.DefaultArticleRetentionDays);
     }
 
     [TestMethod]
@@ -28,12 +27,10 @@ public class RssStorageOptionsTests
         {
             DatabasePath = "test.db",
             CreateTablesOnInit = false,
-            DefaultArticleRetentionDays = 60,
         };
 
         // Assert
         Assert.AreEqual("test.db", options.DatabasePath);
         Assert.IsFalse(options.CreateTablesOnInit);
-        Assert.AreEqual(60, options.DefaultArticleRetentionDays);
     }
 }

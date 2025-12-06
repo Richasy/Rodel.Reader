@@ -1,12 +1,12 @@
 <Solution>
   <Folder Name="/Apps/">
     <Project Path="Apps/FanQieDownloadConsoleApp/FanQieDownloadConsoleApp.csproj" Id="4fc216ae-710e-4259-9297-de0e4dcb3fd7" />
-    <Project Path="Apps/LegadoDownloadConsoleApp/LegadoDownloadConsoleApp.csproj" />
+    <Project Path="Apps/LegadoDownloadConsoleApp/LegadoDownloadConsoleApp.csproj" Id="03ec146e-4352-4a6d-43a7-73683173c1d9" />
   </Folder>
   <Folder Name="/Components/">
-    <Project Path="Components/BookScraper.Test/BookScraper.Test.csproj" />
-    <Project Path="Components/BookScraper/BookScraper.csproj" />
-    <Project Path="Components/FanQieDownloader.Test/FanQieDownloader.Test.csproj" />
+    <Project Path="Components/BookScraper.Test/BookScraper.Test.csproj" Id="cf4f9af6-6de7-ddb5-ed9c-bbbd20dcffef" />
+    <Project Path="Components/BookScraper/BookScraper.csproj" Id="3dd76ccd-fb35-41bf-0f34-eb153698bc9f" />
+    <Project Path="Components/FanQieDownloader.Test/FanQieDownloader.Test.csproj" Id="8afe6ceb-e625-8212-e4ca-3821919a8e7b" />
     <Project Path="Components/FanQieDownloader/FanQieDownloader.csproj" Id="a88b6db5-74ac-422c-a1a7-8c164f0c9170" />
     <Project Path="Components/LegadoDownloader.Test/LegadoDownloader.Test.csproj" Id="54a81a97-9c0f-4ff8-9e88-5a5b6ac4428e" />
     <Project Path="Components/LegadoDownloader/LegadoDownloader.csproj" Id="d757802d-713d-4b95-937a-b1e9533699f0" />
@@ -20,25 +20,32 @@
   <Folder Name="/Sources/">
     <Project Path="Sources/ApplePodcastSource.Test/ApplePodcastSource.Test.csproj" Id="6213bc7a-0e47-48ed-9a43-91d55409970d" />
     <Project Path="Sources/ApplePodcastSource/ApplePodcastSource.csproj" Id="d51c0790-ded0-487f-91ed-e33dbbcbb878" />
-    <Project Path="Sources/FanQieSource.Test/FanQieSource.Test.csproj" />
+    <Project Path="Sources/FanQieSource.Test/FanQieSource.Test.csproj" Id="aa7dbde0-d81e-0e05-21d9-97ea9f75a059" />
     <Project Path="Sources/FanQieSource/FanQieSource.csproj" Id="581945f9-d4b3-4e5a-9633-99e32db2d5f0" />
-    <Project Path="Sources/LegadoSource.Test/LegadoSource.Test.csproj" />
+    <Project Path="Sources/LegadoSource.Test/LegadoSource.Test.csproj" Id="e2bb72cc-f831-dd61-922b-ade4a24a3913" />
     <Project Path="Sources/LegadoSource/LegadoSource.csproj" Id="2eee6023-a306-4626-b16e-0262196f71ed" />
+    <Project Path="Sources/RssSource.Abstractions.Test/RssSource.Abstractions.Test.csproj" Id="e43e7dfa-eff3-ed4f-a003-501616a9f712" />
+    <Project Path="Sources/RssSource.Abstractions/RssSource.Abstractions.csproj" Id="3b98b0ca-57a7-86d5-d88e-1dbbd680f39f" />
     <Project Path="Sources/ZLibrarySource.Test/ZLibrarySource.Test.csproj" Id="d4cd8bf4-5a61-4fb2-bd7a-41ca5506a493" />
     <Project Path="Sources/ZLibrarySource/ZLibrarySource.csproj" Id="51cf4ec8-75be-409f-a928-9b0bbab97554" />
   </Folder>
+  <Folder Name="/Storage/">
+    <Project Path="Storage/RssStorage.Test/RssStorage.Test.csproj" Id="c05311f0-7e4d-bb09-ec26-57bbd5156c86" />
+    <Project Path="Storage/RssStorage/RssStorage.csproj" Id="c5e8ac81-58f3-67a8-957d-e21165cd4aa8" />
+  </Folder>
   <Folder Name="/Utilities/">
-    <Project Path="Utilities/DownloadKit.Test/DownloadKit.Test.csproj" />
-    <Project Path="Utilities/DownloadKit/DownloadKit.csproj" />
+    <Project Path="Utilities/DownloadKit.Test/DownloadKit.Test.csproj" Id="d0c60164-32af-76ef-4e06-72223f95f845" />
+    <Project Path="Utilities/DownloadKit/DownloadKit.csproj" Id="8d0dba0d-d572-84a5-48f2-e19f3efcaf9f" />
     <Project Path="Utilities/EpubGenerator.Test/EpubGenerator.Test.csproj" Id="8901cd61-8a67-4757-8a6a-48fb9af6d8d2" />
     <Project Path="Utilities/EpubGenerator/EpubGenerator.csproj" Id="fc724acf-dc31-4037-9c88-01eb14ce8a7f" />
     <Project Path="Utilities/EpubParser.Test/EpubParser.Test.csproj" Id="ef642972-69a8-43f4-bb4a-b275ff6f662d" />
     <Project Path="Utilities/EpubParser/EpubParser.csproj" Id="21d0369c-7870-4e63-8dba-bee9bd73c5d9" />
-    <Project Path="Utilities/Fb2Parser.Test/Fb2Parser.Test.csproj" />
-    <Project Path="Utilities/Fb2Parser/Fb2Parser.csproj" />
+    <Project Path="Utilities/Fb2Parser.Test/Fb2Parser.Test.csproj" Id="5a01ae1e-a125-e35c-2821-92384a1e5918" />
+    <Project Path="Utilities/Fb2Parser/Fb2Parser.csproj" Id="ae9a9b0e-509c-4fa4-9fa6-ee032edc564a" />
     <Project Path="Utilities/FeedParser.Test/FeedParser.Test.csproj" Id="921acf3b-0a23-4f81-8767-b04b6c96c18e" />
     <Project Path="Utilities/FeedParser/FeedParser.csproj" Id="40214b69-4feb-4cad-a6ea-0be5c972f9e4" />
     <Project Path="Utilities/MobiParser.Test/MobiParser.Test.csproj" Id="b2c3d4e5-f6a7-8901-bcde-f12345678901" />
     <Project Path="Utilities/MobiParser/MobiParser.csproj" Id="a1b2c3d4-e5f6-7890-abcd-ef1234567890" />
+    <Project Path="Utilities/SqliteGenerator/SqliteGenerator.csproj" Id="9ca90168-5019-2715-bb72-ceb826459562" />
   </Folder>
 </Solution>

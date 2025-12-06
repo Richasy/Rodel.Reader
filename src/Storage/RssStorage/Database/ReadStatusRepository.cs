@@ -9,6 +9,7 @@ internal sealed class ReadStatusRepository
 {
     private readonly RssDatabase _database;
     private readonly ILogger? _logger;
+    private readonly ReadStatusEntityRepository _repository = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ReadStatusRepository"/> class.
@@ -24,34 +25,9 @@ internal sealed class ReadStatusRepository
     /// </summary>
     public async Task MarkAsReadAsync(IEnumerable<string> articleIds, CancellationToken cancellationToken = default)
     {
-        await using var transaction = await _database.BeginTransactionAsync(cancellationToken).ConfigureAwait(false);
-
-        try
-        {
-            foreach (var articleId in articleIds)
-            {
-                const string sql = """
-                    INSERT INTO ReadStatus (ArticleId, ReadAt)
-                    VALUES (@articleId, @readAt)
-                    ON CONFLICT(ArticleId) DO NOTHING
-                    """;
-
-                await using var cmd = _database.CreateCommand(sql);
-                cmd.Transaction = transaction;
-                cmd.Parameters.AddWithValue("@articleId", articleId);
-                cmd.Parameters.AddWithValue("@readAt", DateTimeOffset.UtcNow.ToString("O"));
-
-                await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
-            }
-
-            await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
-            _logger?.LogDebug("Marked articles as read.");
-        }
-        catch
-        {
-            await transaction.RollbackAsync(cancellationToken).ConfigureAwait(false);
-            throw;
-        }
+        var entities = articleIds.Select(id => new ReadStatusEntity { ArticleId = id });
+        await _repository.UpsertManyAsync(_database, entities, cancellationToken).ConfigureAwait(false);
+        _logger?.LogDebug("Marked articles as read.");
     }
 
     /// <summary>
@@ -65,13 +41,7 @@ internal sealed class ReadStatusRepository
         {
             foreach (var articleId in articleIds)
             {
-                const string sql = "DELETE FROM ReadStatus WHERE ArticleId = @articleId";
-
-                await using var cmd = _database.CreateCommand(sql);
-                cmd.Transaction = transaction;
-                cmd.Parameters.AddWithValue("@articleId", articleId);
-
-                await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+                await _repository.DeleteAsync(_database, articleId, transaction, cancellationToken).ConfigureAwait(false);
             }
 
             await transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
@@ -124,12 +94,7 @@ internal sealed class ReadStatusRepository
     /// </summary>
     public async Task<bool> IsReadAsync(string articleId, CancellationToken cancellationToken = default)
     {
-        const string sql = "SELECT 1 FROM ReadStatus WHERE ArticleId = @articleId";
-
-        await using var cmd = _database.CreateCommand(sql);
-        cmd.Parameters.AddWithValue("@articleId", articleId);
-
-        var result = await cmd.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
-        return result is not null;
+        var entity = await _repository.GetByIdAsync(_database, articleId, cancellationToken).ConfigureAwait(false);
+        return entity is not null;
     }
 }

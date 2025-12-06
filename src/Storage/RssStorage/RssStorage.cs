@@ -7,10 +7,14 @@ namespace Richasy.RodelReader.Storage.Rss;
 /// <summary>
 /// RSS 存储服务实现.
 /// </summary>
-public sealed class RssStorage : IRssStorage
+/// <remarks>
+/// Initializes a new instance of the <see cref="RssStorage"/> class.
+/// </remarks>
+/// <param name="options">存储选项.</param>
+/// <param name="logger">日志记录器.</param>
+public sealed class RssStorage(RssStorageOptions options, ILogger<RssStorage>? logger = null) : IRssStorage
 {
-    private readonly RssStorageOptions _options;
-    private readonly ILogger<RssStorage>? _logger;
+    private readonly RssStorageOptions _options = options ?? throw new ArgumentNullException(nameof(options));
     private RssDatabase? _database;
     private FeedRepository? _feedRepository;
     private GroupRepository? _groupRepository;
@@ -20,17 +24,6 @@ public sealed class RssStorage : IRssStorage
     private bool _initialized;
     private bool _disposed;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RssStorage"/> class.
-    /// </summary>
-    /// <param name="options">存储选项.</param>
-    /// <param name="logger">日志记录器.</param>
-    public RssStorage(RssStorageOptions options, ILogger<RssStorage>? logger = null)
-    {
-        _options = options ?? throw new ArgumentNullException(nameof(options));
-        _logger = logger;
-    }
-
     /// <inheritdoc/>
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
@@ -38,11 +31,11 @@ public sealed class RssStorage : IRssStorage
 
         if (_initialized)
         {
-            _logger?.LogDebug("Storage already initialized.");
+            logger?.LogDebug("Storage already initialized.");
             return;
         }
 
-        _logger?.LogInformation("Initializing RSS storage at {DatabasePath}...", _options.DatabasePath);
+        logger?.LogInformation("Initializing RSS storage at {DatabasePath}...", _options.DatabasePath);
 
         // 确保目录存在
         var directory = Path.GetDirectoryName(_options.DatabasePath);
@@ -51,7 +44,7 @@ public sealed class RssStorage : IRssStorage
             Directory.CreateDirectory(directory);
         }
 
-        _database = new RssDatabase(_options.DatabasePath, _logger as ILogger<RssDatabase>);
+        _database = new RssDatabase(_options.DatabasePath, logger as ILogger<RssDatabase>);
 
         if (_options.CreateTablesOnInit)
         {
@@ -59,14 +52,14 @@ public sealed class RssStorage : IRssStorage
         }
 
         // 初始化仓库
-        _feedRepository = new FeedRepository(_database, _logger);
-        _groupRepository = new GroupRepository(_database, _logger);
-        _articleRepository = new ArticleRepository(_database, _logger);
-        _readStatusRepository = new ReadStatusRepository(_database, _logger);
-        _favoriteRepository = new FavoriteRepository(_database, _logger);
+        _feedRepository = new FeedRepository(_database, logger);
+        _groupRepository = new GroupRepository(_database, logger);
+        _articleRepository = new ArticleRepository(_database, logger);
+        _readStatusRepository = new ReadStatusRepository(_database, logger);
+        _favoriteRepository = new FavoriteRepository(_database, logger);
 
         _initialized = true;
-        _logger?.LogInformation("RSS storage initialized successfully.");
+        logger?.LogInformation("RSS storage initialized successfully.");
     }
 
     #region Feeds
@@ -305,7 +298,7 @@ public sealed class RssStorage : IRssStorage
     public async Task ClearAllAsync(CancellationToken cancellationToken = default)
     {
         EnsureInitialized();
-        _logger?.LogWarning("Clearing all RSS data...");
+        logger?.LogWarning("Clearing all RSS data...");
 
         await using var cmd = _database!.CreateCommand(Database.Schema.DropTablesSql);
         await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
@@ -313,7 +306,7 @@ public sealed class RssStorage : IRssStorage
         await using var createCmd = _database.CreateCommand(Database.Schema.CreateTablesSql);
         await createCmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
 
-        _logger?.LogWarning("All RSS data cleared.");
+        logger?.LogWarning("All RSS data cleared.");
     }
 
     #endregion
@@ -331,7 +324,7 @@ public sealed class RssStorage : IRssStorage
         _database?.Dispose();
         _disposed = true;
 
-        _logger?.LogDebug("RSS storage disposed.");
+        logger?.LogDebug("RSS storage disposed.");
     }
 
     /// <inheritdoc/>
@@ -349,7 +342,7 @@ public sealed class RssStorage : IRssStorage
 
         _disposed = true;
 
-        _logger?.LogDebug("RSS storage disposed asynchronously.");
+        logger?.LogDebug("RSS storage disposed asynchronously.");
     }
 
     #endregion
