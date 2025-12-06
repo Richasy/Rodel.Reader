@@ -44,7 +44,7 @@ public class CleanupTests
             Title = "Test Book",
             Format = BookFormat.Epub,
             SourceType = BookSourceType.Local,
-            AddedAt = DateTimeOffset.UtcNow.ToString("O"),
+            AddedAt = DateTimeOffset.UtcNow,
         };
         await _storage.UpsertBookAsync(book);
 
@@ -62,7 +62,7 @@ public class CleanupTests
         {
             BookId = book.Id,
             Progress = 0.5,
-            UpdatedAt = DateTimeOffset.UtcNow.ToString("O"),
+            UpdatedAt = DateTimeOffset.UtcNow,
         };
         await _storage.UpsertReadProgressAsync(progress);
 
@@ -70,8 +70,8 @@ public class CleanupTests
         {
             Id = Guid.NewGuid().ToString("N"),
             BookId = book.Id,
-            StartedAt = DateTimeOffset.UtcNow.AddMinutes(-10).ToString("O"),
-            EndedAt = DateTimeOffset.UtcNow.ToString("O"),
+            StartedAt = DateTimeOffset.UtcNow.AddMinutes(-10),
+            EndedAt = DateTimeOffset.UtcNow,
             DurationSeconds = 600,
         };
         await _storage.AddReadingSessionAsync(session);
@@ -81,7 +81,7 @@ public class CleanupTests
             Id = Guid.NewGuid().ToString("N"),
             BookId = book.Id,
             Position = "chapter-1",
-            CreatedAt = DateTimeOffset.UtcNow.ToString("O"),
+            CreatedAt = DateTimeOffset.UtcNow,
         };
         await _storage.UpsertBookmarkAsync(bookmark);
 
@@ -92,7 +92,7 @@ public class CleanupTests
             Type = AnnotationType.Highlight,
             Position = "chapter-1",
             SelectedText = "Test",
-            CreatedAt = DateTimeOffset.UtcNow.ToString("O"),
+            CreatedAt = DateTimeOffset.UtcNow,
         };
         await _storage.UpsertAnnotationAsync(annotation);
 
@@ -129,7 +129,7 @@ public class CleanupTests
             Title = "Test Book",
             Format = BookFormat.Epub,
             SourceType = BookSourceType.Local,
-            AddedAt = DateTimeOffset.UtcNow.ToString("O"),
+            AddedAt = DateTimeOffset.UtcNow,
         };
         await _storage.UpsertBookAsync(book);
 
@@ -160,7 +160,7 @@ public class CleanupTests
             Title = "Test Book",
             Format = BookFormat.Epub,
             SourceType = BookSourceType.Local,
-            AddedAt = DateTimeOffset.UtcNow.ToString("O"),
+            AddedAt = DateTimeOffset.UtcNow,
         };
         await _storage.UpsertBookAsync(book);
 

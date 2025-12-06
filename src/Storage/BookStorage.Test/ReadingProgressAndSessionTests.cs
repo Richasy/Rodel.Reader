@@ -31,7 +31,7 @@ public class ReadingProgressAndSessionTests
             Title = "Test Book",
             Format = BookFormat.Epub,
             SourceType = BookSourceType.Local,
-            AddedAt = DateTimeOffset.UtcNow.ToString("O"),
+            AddedAt = DateTimeOffset.UtcNow,
         };
         await _storage.UpsertBookAsync(_testBook);
     }
@@ -57,7 +57,7 @@ public class ReadingProgressAndSessionTests
             BookId = _testBook.Id,
             Progress = 0.5,
             Position = "chapter-1",
-            UpdatedAt = DateTimeOffset.UtcNow.ToString("O"),
+            UpdatedAt = DateTimeOffset.UtcNow,
         };
 
         // Act
@@ -79,7 +79,7 @@ public class ReadingProgressAndSessionTests
             BookId = _testBook.Id,
             Progress = 0.3,
             Position = "chapter-1",
-            UpdatedAt = DateTimeOffset.UtcNow.ToString("O"),
+            UpdatedAt = DateTimeOffset.UtcNow,
         };
         await _storage.UpsertReadProgressAsync(progress);
 
@@ -130,13 +130,13 @@ public class ReadingProgressAndSessionTests
     {
         // Arrange
         var session1 = CreateTestSession("session1");
-        session1.StartedAt = DateTimeOffset.UtcNow.AddHours(-2).ToString("O");
+        session1.StartedAt = DateTimeOffset.UtcNow.AddHours(-2);
 
         var session2 = CreateTestSession("session2");
-        session2.StartedAt = DateTimeOffset.UtcNow.AddHours(-1).ToString("O");
+        session2.StartedAt = DateTimeOffset.UtcNow.AddHours(-1);
 
         var session3 = CreateTestSession("session3");
-        session3.StartedAt = DateTimeOffset.UtcNow.ToString("O");
+        session3.StartedAt = DateTimeOffset.UtcNow;
 
         await _storage.AddReadingSessionAsync(session1);
         await _storage.AddReadingSessionAsync(session2);
@@ -159,17 +159,17 @@ public class ReadingProgressAndSessionTests
         var session1 = CreateTestSession("session1");
         session1.DurationSeconds = 3600; // 1 hour
         session1.PagesRead = 30;
-        session1.StartedAt = DateTimeOffset.UtcNow.AddDays(-2).ToString("O");
+        session1.StartedAt = DateTimeOffset.UtcNow.AddDays(-2);
 
         var session2 = CreateTestSession("session2");
         session2.DurationSeconds = 1800; // 30 minutes
         session2.PagesRead = 15;
-        session2.StartedAt = DateTimeOffset.UtcNow.AddDays(-1).ToString("O");
+        session2.StartedAt = DateTimeOffset.UtcNow.AddDays(-1);
 
         var session3 = CreateTestSession("session3");
         session3.DurationSeconds = 2700; // 45 minutes
         session3.PagesRead = 20;
-        session3.StartedAt = DateTimeOffset.UtcNow.ToString("O");
+        session3.StartedAt = DateTimeOffset.UtcNow;
 
         await _storage.AddReadingSessionAsync(session1);
         await _storage.AddReadingSessionAsync(session2);
@@ -205,8 +205,8 @@ public class ReadingProgressAndSessionTests
         {
             Id = id ?? Guid.NewGuid().ToString("N"),
             BookId = _testBook.Id,
-            StartedAt = DateTimeOffset.UtcNow.AddMinutes(-5).ToString("O"),
-            EndedAt = DateTimeOffset.UtcNow.ToString("O"),
+            StartedAt = DateTimeOffset.UtcNow.AddMinutes(-5),
+            EndedAt = DateTimeOffset.UtcNow,
             DurationSeconds = 300,
         };
     }

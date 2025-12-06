@@ -44,7 +44,7 @@ internal sealed partial class RssArticleEntity
     public string? ExtraData { get; set; }
 
     [SqliteColumn(IsAutoTimestamp = true)]
-    public string CachedAt { get; set; } = string.Empty;
+    public long CachedAt { get; set; }
 
     /// <summary>
     /// 从 RssArticle 转换.
@@ -208,7 +208,7 @@ internal sealed partial class ReadStatusEntity
     public string ArticleId { get; set; } = string.Empty;
 
     [SqliteColumn(IsAutoTimestamp = true)]
-    public string ReadAt { get; set; } = string.Empty;
+    public long ReadAt { get; set; }
 }
 
 /// <summary>
@@ -221,5 +221,5 @@ internal sealed partial class FavoriteEntity
     public string ArticleId { get; set; } = string.Empty;
 
     [SqliteColumn(IsAutoTimestamp = true)]
-    public string FavoritedAt { get; set; } = string.Empty;
+    public long FavoritedAt { get; set; }
 }

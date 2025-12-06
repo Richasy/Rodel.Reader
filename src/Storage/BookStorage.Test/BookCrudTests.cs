@@ -252,7 +252,7 @@ public class BookCrudTests
             Format = BookFormat.Epub,
             SourceType = BookSourceType.Local,
             TrackStatus = BookTrackStatus.None,
-            AddedAt = DateTimeOffset.UtcNow.ToString("O"),
+            AddedAt = DateTimeOffset.UtcNow,
         };
     }
 }

@@ -80,12 +80,12 @@ public sealed class Annotation
     /// <summary>
     /// 创建时间.
     /// </summary>
-    public string CreatedAt { get; set; } = string.Empty;
+    public DateTimeOffset CreatedAt { get; set; }
 
     /// <summary>
     /// 更新时间.
     /// </summary>
-    public string UpdatedAt { get; set; } = string.Empty;
+    public DateTimeOffset UpdatedAt { get; set; }
 
     /// <inheritdoc/>
     public override bool Equals(object? obj) => obj is Annotation annotation && Id == annotation.Id;

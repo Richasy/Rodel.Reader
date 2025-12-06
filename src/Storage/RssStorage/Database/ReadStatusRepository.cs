@@ -66,7 +66,7 @@ internal sealed class ReadStatusRepository
 
         await using var cmd = _database.CreateCommand(sql);
         cmd.Parameters.AddWithValue("@feedId", feedId);
-        cmd.Parameters.AddWithValue("@readAt", DateTimeOffset.UtcNow.ToString("O"));
+        cmd.Parameters.AddWithValue("@readAt", DateTimeOffset.UtcNow.ToUnixTimeSeconds());
 
         await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
         _logger?.LogDebug("Marked all articles in feed {FeedId} as read.", feedId);
@@ -83,7 +83,7 @@ internal sealed class ReadStatusRepository
             """;
 
         await using var cmd = _database.CreateCommand(sql);
-        cmd.Parameters.AddWithValue("@readAt", DateTimeOffset.UtcNow.ToString("O"));
+        cmd.Parameters.AddWithValue("@readAt", DateTimeOffset.UtcNow.ToUnixTimeSeconds());
 
         await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
         _logger?.LogInformation("Marked all articles as read.");

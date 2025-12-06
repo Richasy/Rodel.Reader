@@ -276,7 +276,7 @@ public sealed class BookStorage : IBookStorage
             ShelfId = shelfId,
             GroupId = groupId,
             SortIndex = 0,
-            AddedAt = DateTimeOffset.UtcNow.ToString("O"),
+            AddedAt = DateTimeOffset.UtcNow,
         };
         await _linkRepository!.UpsertAsync(link, cancellationToken).ConfigureAwait(false);
     }

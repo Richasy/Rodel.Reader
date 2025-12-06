@@ -1,11 +1,11 @@
 // Copyright (c) Richasy. All rights reserved.
 
-namespace Richasy.RodelReader.Storage.Book;
+namespace Richasy.RodelReader.Storage.Podcast;
 
 /// <summary>
-/// 阅读时段记录.
+/// 收听时段记录.
 /// </summary>
-public sealed class ReadingSession
+public sealed class ListeningSession
 {
     /// <summary>
     /// 标识符.
@@ -13,9 +13,14 @@ public sealed class ReadingSession
     public string Id { get; set; } = string.Empty;
 
     /// <summary>
-    /// 书籍 ID.
+    /// 单集 ID.
     /// </summary>
-    public string BookId { get; set; } = string.Empty;
+    public string EpisodeId { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 播客 ID.
+    /// </summary>
+    public string PodcastId { get; set; } = string.Empty;
 
     /// <summary>
     /// 开始时间.
@@ -28,27 +33,22 @@ public sealed class ReadingSession
     public DateTimeOffset EndedAt { get; set; }
 
     /// <summary>
-    /// 阅读时长（秒）.
+    /// 收听时长（秒）.
     /// </summary>
     public int DurationSeconds { get; set; }
 
     /// <summary>
-    /// 开始时的进度.
+    /// 开始位置（秒）.
     /// </summary>
-    public double? StartProgress { get; set; }
+    public int? StartPosition { get; set; }
 
     /// <summary>
-    /// 结束时的进度.
+    /// 结束位置（秒）.
     /// </summary>
-    public double? EndProgress { get; set; }
+    public int? EndPosition { get; set; }
 
     /// <summary>
-    /// 阅读页数.
-    /// </summary>
-    public int? PagesRead { get; set; }
-
-    /// <summary>
-    /// 设备标识.
+    /// 设备 ID.
     /// </summary>
     public string? DeviceId { get; set; }
 
@@ -58,7 +58,7 @@ public sealed class ReadingSession
     public string? DeviceName { get; set; }
 
     /// <inheritdoc/>
-    public override bool Equals(object? obj) => obj is ReadingSession session && Id == session.Id;
+    public override bool Equals(object? obj) => obj is ListeningSession session && Id == session.Id;
 
     /// <inheritdoc/>
     public override int GetHashCode() => HashCode.Combine(Id);

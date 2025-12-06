@@ -151,7 +151,7 @@ public class ShelfCrudTests
             Title = "Test Book",
             Format = BookFormat.Epub,
             SourceType = BookSourceType.Local,
-            AddedAt = DateTimeOffset.UtcNow.ToString("O"),
+            AddedAt = DateTimeOffset.UtcNow,
         };
         await _storage.UpsertBookAsync(book);
         await _storage.AddBookToShelfAsync(book.Id, shelf.Id);

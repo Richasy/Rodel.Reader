@@ -45,7 +45,7 @@ public sealed class ReadProgress
     /// <summary>
     /// 更新时间.
     /// </summary>
-    public string UpdatedAt { get; set; } = string.Empty;
+    public DateTimeOffset UpdatedAt { get; set; }
 
     /// <inheritdoc/>
     public override bool Equals(object? obj) => obj is ReadProgress progress && BookId == progress.BookId;

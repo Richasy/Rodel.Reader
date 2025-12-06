@@ -449,7 +449,7 @@ public class SqliteRepositoryGenerator : IIncrementalGenerator
 
             if (prop.IsAutoTimestamp)
             {
-                sb.AppendLine($"        cmd.Parameters.AddWithValue(\"{paramName}\", DateTimeOffset.UtcNow.ToString(\"O\"));");
+                sb.AppendLine($"        cmd.Parameters.AddWithValue(\"{paramName}\", DateTimeOffset.UtcNow.ToUnixTimeSeconds());");
             }
             else if (prop.IsNullable)
             {

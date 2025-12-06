@@ -44,10 +44,10 @@ internal static class Schema
             UserReview TEXT,
             UserTags TEXT,
             UseComicReader INTEGER DEFAULT 0,
-            AddedAt TEXT NOT NULL,
-            LastOpenedAt TEXT,
-            FinishedAt TEXT,
-            UpdatedAt TEXT NOT NULL,
+            AddedAt INTEGER NOT NULL,
+            LastOpenedAt INTEGER,
+            FinishedAt INTEGER,
+            UpdatedAt INTEGER NOT NULL,
             ExtraData TEXT
         );
 
@@ -58,8 +58,8 @@ internal static class Schema
             IconEmoji TEXT,
             SortIndex INTEGER DEFAULT 0,
             IsDefault INTEGER DEFAULT 0,
-            CreatedAt TEXT NOT NULL,
-            UpdatedAt TEXT NOT NULL
+            CreatedAt INTEGER NOT NULL,
+            UpdatedAt INTEGER NOT NULL
         );
 
         -- 书籍分组表
@@ -69,7 +69,7 @@ internal static class Schema
             Name TEXT NOT NULL,
             SortIndex INTEGER DEFAULT 0,
             IsCollapsed INTEGER DEFAULT 0,
-            CreatedAt TEXT NOT NULL,
+            CreatedAt INTEGER NOT NULL,
             FOREIGN KEY (ShelfId) REFERENCES Shelves(Id) ON DELETE CASCADE
         );
 
@@ -80,7 +80,7 @@ internal static class Schema
             ShelfId TEXT NOT NULL,
             GroupId TEXT,
             SortIndex INTEGER DEFAULT 0,
-            AddedAt TEXT NOT NULL,
+            AddedAt INTEGER NOT NULL,
             FOREIGN KEY (BookId) REFERENCES Books(Id) ON DELETE CASCADE,
             FOREIGN KEY (ShelfId) REFERENCES Shelves(Id) ON DELETE CASCADE,
             FOREIGN KEY (GroupId) REFERENCES BookGroups(Id) ON DELETE SET NULL
@@ -95,7 +95,7 @@ internal static class Schema
             ChapterTitle TEXT,
             CurrentPage INTEGER,
             Locations TEXT,
-            UpdatedAt TEXT NOT NULL,
+            UpdatedAt INTEGER NOT NULL,
             FOREIGN KEY (BookId) REFERENCES Books(Id) ON DELETE CASCADE
         );
 
@@ -103,8 +103,8 @@ internal static class Schema
         CREATE TABLE IF NOT EXISTS ReadingSessions (
             Id TEXT PRIMARY KEY NOT NULL,
             BookId TEXT NOT NULL,
-            StartedAt TEXT NOT NULL,
-            EndedAt TEXT NOT NULL,
+            StartedAt INTEGER NOT NULL,
+            EndedAt INTEGER NOT NULL,
             DurationSeconds INTEGER NOT NULL,
             StartProgress REAL,
             EndProgress REAL,
@@ -125,7 +125,7 @@ internal static class Schema
             ChapterTitle TEXT,
             PageNumber INTEGER,
             Color TEXT,
-            CreatedAt TEXT NOT NULL,
+            CreatedAt INTEGER NOT NULL,
             FOREIGN KEY (BookId) REFERENCES Books(Id) ON DELETE CASCADE
         );
 
@@ -145,8 +145,8 @@ internal static class Schema
             Style TEXT,
             RectJson TEXT,
             SvgPath TEXT,
-            CreatedAt TEXT NOT NULL,
-            UpdatedAt TEXT NOT NULL,
+            CreatedAt INTEGER NOT NULL,
+            UpdatedAt INTEGER NOT NULL,
             FOREIGN KEY (BookId) REFERENCES Books(Id) ON DELETE CASCADE
         );
 

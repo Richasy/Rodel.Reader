@@ -104,16 +104,16 @@ internal sealed partial class BookEntity
     public bool UseComicReader { get; set; }
 
     [SqliteColumn]
-    public string AddedAt { get; set; } = string.Empty;
+    public long AddedAt { get; set; }
 
     [SqliteColumn]
-    public string? LastOpenedAt { get; set; }
+    public long? LastOpenedAt { get; set; }
 
     [SqliteColumn]
-    public string? FinishedAt { get; set; }
+    public long? FinishedAt { get; set; }
 
     [SqliteColumn]
-    public string UpdatedAt { get; set; } = string.Empty;
+    public long UpdatedAt { get; set; }
 
     [SqliteColumn(ExcludeFromList = true)]
     public string? ExtraData { get; set; }
@@ -153,10 +153,10 @@ internal sealed partial class BookEntity
             UserReview = book.UserReview,
             UserTags = book.UserTags,
             UseComicReader = book.UseComicReader,
-            AddedAt = book.AddedAt,
-            LastOpenedAt = book.LastOpenedAt,
-            FinishedAt = book.FinishedAt,
-            UpdatedAt = book.UpdatedAt,
+            AddedAt = book.AddedAt.ToUnixTimeSeconds(),
+            LastOpenedAt = book.LastOpenedAt?.ToUnixTimeSeconds(),
+            FinishedAt = book.FinishedAt?.ToUnixTimeSeconds(),
+            UpdatedAt = book.UpdatedAt.ToUnixTimeSeconds(),
             ExtraData = book.ExtraData,
         };
     }
@@ -196,10 +196,10 @@ internal sealed partial class BookEntity
             UserReview = UserReview,
             UserTags = UserTags,
             UseComicReader = UseComicReader,
-            AddedAt = AddedAt,
-            LastOpenedAt = LastOpenedAt,
-            FinishedAt = FinishedAt,
-            UpdatedAt = UpdatedAt,
+            AddedAt = DateTimeOffset.FromUnixTimeSeconds(AddedAt),
+            LastOpenedAt = LastOpenedAt.HasValue ? DateTimeOffset.FromUnixTimeSeconds(LastOpenedAt.Value) : null,
+            FinishedAt = FinishedAt.HasValue ? DateTimeOffset.FromUnixTimeSeconds(FinishedAt.Value) : null,
+            UpdatedAt = DateTimeOffset.FromUnixTimeSeconds(UpdatedAt),
             ExtraData = ExtraData,
         };
     }
@@ -227,10 +227,10 @@ internal sealed partial class ShelfEntity
     public bool IsDefault { get; set; }
 
     [SqliteColumn]
-    public string CreatedAt { get; set; } = string.Empty;
+    public long CreatedAt { get; set; }
 
     [SqliteColumn]
-    public string UpdatedAt { get; set; } = string.Empty;
+    public long UpdatedAt { get; set; }
 
     public static ShelfEntity FromModel(Shelf shelf)
     {
@@ -241,8 +241,8 @@ internal sealed partial class ShelfEntity
             IconEmoji = shelf.IconEmoji,
             SortIndex = shelf.SortIndex,
             IsDefault = shelf.IsDefault,
-            CreatedAt = shelf.CreatedAt,
-            UpdatedAt = shelf.UpdatedAt,
+            CreatedAt = shelf.CreatedAt.ToUnixTimeSeconds(),
+            UpdatedAt = shelf.UpdatedAt.ToUnixTimeSeconds(),
         };
     }
 
@@ -255,8 +255,8 @@ internal sealed partial class ShelfEntity
             IconEmoji = IconEmoji,
             SortIndex = SortIndex,
             IsDefault = IsDefault,
-            CreatedAt = CreatedAt,
-            UpdatedAt = UpdatedAt,
+            CreatedAt = DateTimeOffset.FromUnixTimeSeconds(CreatedAt),
+            UpdatedAt = DateTimeOffset.FromUnixTimeSeconds(UpdatedAt),
         };
     }
 }
@@ -283,7 +283,7 @@ internal sealed partial class BookGroupEntity
     public bool IsCollapsed { get; set; }
 
     [SqliteColumn]
-    public string CreatedAt { get; set; } = string.Empty;
+    public long CreatedAt { get; set; }
 
     public static BookGroupEntity FromModel(BookGroup group)
     {
@@ -294,7 +294,7 @@ internal sealed partial class BookGroupEntity
             Name = group.Name,
             SortIndex = group.SortIndex,
             IsCollapsed = group.IsCollapsed,
-            CreatedAt = group.CreatedAt,
+            CreatedAt = group.CreatedAt.ToUnixTimeSeconds(),
         };
     }
 
@@ -307,7 +307,7 @@ internal sealed partial class BookGroupEntity
             Name = Name,
             SortIndex = SortIndex,
             IsCollapsed = IsCollapsed,
-            CreatedAt = CreatedAt,
+            CreatedAt = DateTimeOffset.FromUnixTimeSeconds(CreatedAt),
         };
     }
 }
@@ -334,7 +334,7 @@ internal sealed partial class ShelfBookLinkEntity
     public int SortIndex { get; set; }
 
     [SqliteColumn]
-    public string AddedAt { get; set; } = string.Empty;
+    public long AddedAt { get; set; }
 
     public static ShelfBookLinkEntity FromModel(ShelfBookLink link)
     {
@@ -345,7 +345,7 @@ internal sealed partial class ShelfBookLinkEntity
             ShelfId = link.ShelfId,
             GroupId = link.GroupId,
             SortIndex = link.SortIndex,
-            AddedAt = link.AddedAt,
+            AddedAt = link.AddedAt.ToUnixTimeSeconds(),
         };
     }
 
@@ -358,7 +358,7 @@ internal sealed partial class ShelfBookLinkEntity
             ShelfId = ShelfId,
             GroupId = GroupId,
             SortIndex = SortIndex,
-            AddedAt = AddedAt,
+            AddedAt = DateTimeOffset.FromUnixTimeSeconds(AddedAt),
         };
     }
 }
@@ -391,7 +391,7 @@ internal sealed partial class ReadProgressEntity
     public string? Locations { get; set; }
 
     [SqliteColumn]
-    public string UpdatedAt { get; set; } = string.Empty;
+    public long UpdatedAt { get; set; }
 
     public static ReadProgressEntity FromModel(ReadProgress progress)
     {
@@ -404,7 +404,7 @@ internal sealed partial class ReadProgressEntity
             ChapterTitle = progress.ChapterTitle,
             CurrentPage = progress.CurrentPage,
             Locations = progress.Locations,
-            UpdatedAt = progress.UpdatedAt,
+            UpdatedAt = progress.UpdatedAt.ToUnixTimeSeconds(),
         };
     }
 
@@ -419,7 +419,7 @@ internal sealed partial class ReadProgressEntity
             ChapterTitle = ChapterTitle,
             CurrentPage = CurrentPage,
             Locations = Locations,
-            UpdatedAt = UpdatedAt,
+            UpdatedAt = DateTimeOffset.FromUnixTimeSeconds(UpdatedAt),
         };
     }
 }
@@ -437,10 +437,10 @@ internal sealed partial class ReadingSessionEntity
     public string BookId { get; set; } = string.Empty;
 
     [SqliteColumn]
-    public string StartedAt { get; set; } = string.Empty;
+    public long StartedAt { get; set; }
 
     [SqliteColumn]
-    public string EndedAt { get; set; } = string.Empty;
+    public long EndedAt { get; set; }
 
     [SqliteColumn]
     public int DurationSeconds { get; set; }
@@ -466,8 +466,8 @@ internal sealed partial class ReadingSessionEntity
         {
             Id = session.Id,
             BookId = session.BookId,
-            StartedAt = session.StartedAt,
-            EndedAt = session.EndedAt,
+            StartedAt = session.StartedAt.ToUnixTimeSeconds(),
+            EndedAt = session.EndedAt.ToUnixTimeSeconds(),
             DurationSeconds = session.DurationSeconds,
             StartProgress = session.StartProgress,
             EndProgress = session.EndProgress,
@@ -483,8 +483,8 @@ internal sealed partial class ReadingSessionEntity
         {
             Id = Id,
             BookId = BookId,
-            StartedAt = StartedAt,
-            EndedAt = EndedAt,
+            StartedAt = DateTimeOffset.FromUnixTimeSeconds(StartedAt),
+            EndedAt = DateTimeOffset.FromUnixTimeSeconds(EndedAt),
             DurationSeconds = DurationSeconds,
             StartProgress = StartProgress,
             EndProgress = EndProgress,
@@ -529,7 +529,7 @@ internal sealed partial class BookmarkEntity
     public string? Color { get; set; }
 
     [SqliteColumn]
-    public string CreatedAt { get; set; } = string.Empty;
+    public long CreatedAt { get; set; }
 
     public static BookmarkEntity FromModel(Bookmark bookmark)
     {
@@ -544,7 +544,7 @@ internal sealed partial class BookmarkEntity
             ChapterTitle = bookmark.ChapterTitle,
             PageNumber = bookmark.PageNumber,
             Color = bookmark.Color,
-            CreatedAt = bookmark.CreatedAt,
+            CreatedAt = bookmark.CreatedAt.ToUnixTimeSeconds(),
         };
     }
 
@@ -561,7 +561,7 @@ internal sealed partial class BookmarkEntity
             ChapterTitle = ChapterTitle,
             PageNumber = PageNumber,
             Color = Color,
-            CreatedAt = CreatedAt,
+            CreatedAt = DateTimeOffset.FromUnixTimeSeconds(CreatedAt),
         };
     }
 }
@@ -615,10 +615,10 @@ internal sealed partial class AnnotationEntity
     public string? SvgPath { get; set; }
 
     [SqliteColumn]
-    public string CreatedAt { get; set; } = string.Empty;
+    public long CreatedAt { get; set; }
 
     [SqliteColumn]
-    public string UpdatedAt { get; set; } = string.Empty;
+    public long UpdatedAt { get; set; }
 
     public static AnnotationEntity FromModel(Annotation annotation)
     {
@@ -638,8 +638,8 @@ internal sealed partial class AnnotationEntity
             Style = annotation.Style,
             RectJson = annotation.RectJson,
             SvgPath = annotation.SvgPath,
-            CreatedAt = annotation.CreatedAt,
-            UpdatedAt = annotation.UpdatedAt,
+            CreatedAt = annotation.CreatedAt.ToUnixTimeSeconds(),
+            UpdatedAt = annotation.UpdatedAt.ToUnixTimeSeconds(),
         };
     }
 
@@ -661,8 +661,8 @@ internal sealed partial class AnnotationEntity
             Style = Style,
             RectJson = RectJson,
             SvgPath = SvgPath,
-            CreatedAt = CreatedAt,
-            UpdatedAt = UpdatedAt,
+            CreatedAt = DateTimeOffset.FromUnixTimeSeconds(CreatedAt),
+            UpdatedAt = DateTimeOffset.FromUnixTimeSeconds(UpdatedAt),
         };
     }
 }

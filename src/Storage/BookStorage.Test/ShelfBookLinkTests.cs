@@ -41,7 +41,7 @@ public class ShelfBookLinkTests
             Title = "Test Book",
             Format = BookFormat.Epub,
             SourceType = BookSourceType.Local,
-            AddedAt = DateTimeOffset.UtcNow.ToString("O"),
+            AddedAt = DateTimeOffset.UtcNow,
         };
         await _storage.UpsertBookAsync(_testBook);
     }
@@ -111,7 +111,7 @@ public class ShelfBookLinkTests
             Title = "Book 2",
             Format = BookFormat.Pdf,
             SourceType = BookSourceType.Local,
-            AddedAt = DateTimeOffset.UtcNow.ToString("O"),
+            AddedAt = DateTimeOffset.UtcNow,
         };
         await _storage.UpsertBookAsync(book2);
 

@@ -222,7 +222,7 @@ internal sealed class ArticleRepository
         }
 
         await using var cmd = _database.CreateCommand(sql);
-        cmd.Parameters.AddWithValue("@olderThan", olderThan.ToString("O"));
+        cmd.Parameters.AddWithValue("@olderThan", olderThan.ToUnixTimeSeconds());
 
         var affected = await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
         _logger?.LogInformation("Cleaned up {Count} old articles.", affected);

@@ -31,7 +31,7 @@ public class BookmarkAndAnnotationTests
             Title = "Test Book",
             Format = BookFormat.Epub,
             SourceType = BookSourceType.Local,
-            AddedAt = DateTimeOffset.UtcNow.ToString("O"),
+            AddedAt = DateTimeOffset.UtcNow,
         };
         await _storage.UpsertBookAsync(_testBook);
     }
@@ -91,7 +91,7 @@ public class BookmarkAndAnnotationTests
             Title = "Book 2",
             Format = BookFormat.Pdf,
             SourceType = BookSourceType.Local,
-            AddedAt = DateTimeOffset.UtcNow.ToString("O"),
+            AddedAt = DateTimeOffset.UtcNow,
         };
         await _storage.UpsertBookAsync(book2);
 
@@ -102,7 +102,7 @@ public class BookmarkAndAnnotationTests
             Id = "bm3",
             BookId = book2.Id,
             Position = "page-1",
-            CreatedAt = DateTimeOffset.UtcNow.ToString("O"),
+            CreatedAt = DateTimeOffset.UtcNow,
         };
 
         await _storage.UpsertBookmarkAsync(bookmark1);
@@ -212,7 +212,7 @@ public class BookmarkAndAnnotationTests
             BookId = _testBook.Id,
             Position = "chapter-1",
             Title = "Test Bookmark",
-            CreatedAt = DateTimeOffset.UtcNow.ToString("O"),
+            CreatedAt = DateTimeOffset.UtcNow,
         };
     }
 
@@ -225,7 +225,7 @@ public class BookmarkAndAnnotationTests
             Type = AnnotationType.Highlight,
             Position = "chapter-1",
             SelectedText = "This is a highlighted text.",
-            CreatedAt = DateTimeOffset.UtcNow.ToString("O"),
+            CreatedAt = DateTimeOffset.UtcNow,
         };
     }
 }

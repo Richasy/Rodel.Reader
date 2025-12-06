@@ -55,7 +55,7 @@ public sealed class Bookmark
     /// <summary>
     /// 创建时间.
     /// </summary>
-    public string CreatedAt { get; set; } = string.Empty;
+    public DateTimeOffset CreatedAt { get; set; }
 
     /// <inheritdoc/>
     public override bool Equals(object? obj) => obj is Bookmark bookmark && Id == bookmark.Id;

@@ -163,24 +163,24 @@ public sealed class Book
     public bool UseComicReader { get; set; }
 
     /// <summary>
-    /// 添加时间 (ISO 8601).
+    /// 添加时间.
     /// </summary>
-    public string AddedAt { get; set; } = string.Empty;
+    public DateTimeOffset AddedAt { get; set; }
 
     /// <summary>
     /// 最后打开时间.
     /// </summary>
-    public string? LastOpenedAt { get; set; }
+    public DateTimeOffset? LastOpenedAt { get; set; }
 
     /// <summary>
     /// 读完时间.
     /// </summary>
-    public string? FinishedAt { get; set; }
+    public DateTimeOffset? FinishedAt { get; set; }
 
     /// <summary>
     /// 更新时间.
     /// </summary>
-    public string UpdatedAt { get; set; } = string.Empty;
+    public DateTimeOffset UpdatedAt { get; set; }
 
     /// <summary>
     /// 扩展数据 (JSON).

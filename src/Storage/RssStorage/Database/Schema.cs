@@ -43,21 +43,21 @@ internal static class Schema
             PublishTime TEXT,
             Tags TEXT,
             ExtraData TEXT,
-            CachedAt TEXT NOT NULL,
+            CachedAt INTEGER NOT NULL,
             FOREIGN KEY (FeedId) REFERENCES Feeds(Id) ON DELETE CASCADE
         );
 
         -- 阅读状态表
         CREATE TABLE IF NOT EXISTS ReadStatus (
             ArticleId TEXT PRIMARY KEY NOT NULL,
-            ReadAt TEXT NOT NULL,
+            ReadAt INTEGER NOT NULL,
             FOREIGN KEY (ArticleId) REFERENCES Articles(Id) ON DELETE CASCADE
         );
 
         -- 收藏表
         CREATE TABLE IF NOT EXISTS Favorites (
             ArticleId TEXT PRIMARY KEY NOT NULL,
-            FavoritedAt TEXT NOT NULL,
+            FavoritedAt INTEGER NOT NULL,
             FOREIGN KEY (ArticleId) REFERENCES Articles(Id) ON DELETE CASCADE
         );
 

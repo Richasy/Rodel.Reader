@@ -35,7 +35,7 @@ public sealed class ShelfBookLink
     /// <summary>
     /// 添加到书架的时间.
     /// </summary>
-    public string AddedAt { get; set; } = string.Empty;
+    public DateTimeOffset AddedAt { get; set; }
 
     /// <inheritdoc/>
     public override bool Equals(object? obj) => obj is ShelfBookLink link && Id == link.Id;
