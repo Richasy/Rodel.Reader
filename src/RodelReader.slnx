@@ -40,6 +40,8 @@
     <Project Path="Storage/RssStorage/RssStorage.csproj" Id="c5e8ac81-58f3-67a8-957d-e21165cd4aa8" />
     <Project Path="Storage/PodcastStorage.Test/PodcastStorage.Test.csproj" Id="8ad35eec-638e-d0a1-baf1-9aa2da6fe874" />
     <Project Path="Storage/PodcastStorage/PodcastStorage.csproj" Id="9f808081-64ba-6445-6dae-28fb10c40b78" />
+    <Project Path="Storage/ServiceRegistry.Test/ServiceRegistry.Test.csproj" Id="e1234567-89ab-cdef-0123-456789abcdef" />
+    <Project Path="Storage/ServiceRegistry/ServiceRegistry.csproj" Id="f1234567-89ab-cdef-0123-456789abcdef" />
   </Folder>
   <Folder Name="/Utilities/">
     <Project Path="Utilities/DownloadKit.Test/DownloadKit.Test.csproj" Id="d0c60164-32af-76ef-4e06-72223f95f845" />
